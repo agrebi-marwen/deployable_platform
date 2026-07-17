@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Time Portal</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23f97316'/></svg>">
+  <link rel="stylesheet" href="global.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous"></script>
+  <script src="server.js" defer></script>
+</head>
+<body>
+
+  <div class="grid-background"></div>
+
+  <header class="navbar">
+    <div class="logo">
+      <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
+        <polyline class="clock-hands" points="12 6 12 12 16 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="1.5" fill="#f97316"/>
+      </svg>
+      The Time Portal <span class="badge">IEEE CS INSAT SBC</span>
+    </div>
+    <nav class="nav-links">
+      <a href="Dashboard/dashboard.html">Challenges</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="Account/sign_up.html" class="cta-btn" id="auth-btn">Sign Up</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <div class="tagline">✦ IEEE CS INSAT SBC // Launch Operations</div>
+    <h1>The Time Portal</h1>
+    <p class="subtitle">
+      Solve Monthly Coding Challenges, debug code blocks across past, present, and future epochs, 
+      and rank up on the registry of Elite Time Travelers.
+    </p>
+    
+    <div class="hero-buttons">
+      <a href="Account/login.html" class="btn btn-primary" id="time-rift-btn">Enter Time Rift</a>
+      <a href="#about" class="btn btn-secondary">Temporal Logs</a>
+    </div>
+  </main>
+
+  <section class="features" id="challenges">
+    <div class="card">
+      <div class="card-number">01</div>
+      <div class="card-header">
+        <span class="card-icon">🕒</span>
+        <h3>Past Epochs</h3>
+      </div>
+      <p>Step back to repair historical compiler crashes, clockwork data corruption, and legacy ledger collapses.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-number">02</div>
+      <div class="card-header">
+        <span class="card-icon">⚡</span>
+        <h3>Active Paradoxes</h3>
+      </div>
+      <p>Stabilize the active monthly timeline anomaly before recursive concurrency calls loop out of control.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-number">03</div>
+      <div class="card-header">
+        <span class="card-icon">🛡️</span>
+        <h3>Future Singularities</h3>
+      </div>
+      <p>Deploy secure, sandboxed execution rings to isolate autonomous agents and prevent runtime escapes.</p>
+    </div>
+  </section>
+
+  <section class="public-leaderboard-section" id="leaderboard">
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <span class="section-badge">Timeline Standings</span>
+        <h2>Registry of Elite Time Travelers</h2>
+        <p class="section-subtitle">Real-time standings of travelers stabilizing the timeline. No authorization required to view.</p>
+      </div>
+
+      <div class="leaderboard-card">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th class="col-rank">Rank</th>
+              <th class="col-name">Traveler Name</th>
+              <th class="col-points">Energy Points (EP)</th>
+            </tr>
+          </thead>
+          <tbody id="public-leaderboard-tbody">
+            <tr>
+              <td colspan="3" class="table-loading">Scanning historical registers...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="challenges-section">
+      <h2>Active Timeline Anomalies</h2>
+      <div id="latest-challenges-container">
+        <p class="loading-text">Scanning the timeline stream...</p>
+      </div>
+    </div>
+  </section>
+  
+  <footer class="temporal-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+            <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
+            <polyline class="clock-hands" points="12 6 12 12 16 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="1.5" fill="#f97316"/>
+          </svg>
+          The Time Portal
+        </div>
+        <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
+      </div>
+      
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="/index.html">Home Portal</a></li>
+          <li><a href="/Dashboard/dashboard.html">Anomalies</a></li>
+          <li><a href="/index.html#leaderboard">Registry Standings</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Connect</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.facebook.com/ComputerSocietyINSAT/" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Platform</a></li>
+          <li><a href="https://insat.rnu.tn" target="_blank" rel="noopener noreferrer">INSAT Space</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 IEEE Computer Society INSAT Student Branch Chapter. All rights reserved.</p>
+      <p class="system-status"><span class="status-indicator"></span> Temporal Core: Operational</p>
+    </div>
+  </footer>
+</body>
+</html>

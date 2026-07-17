@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous"></script>
+  <script src="signup.js" defer></script>
+</head>
+<body>
+  <form class="signup-form" id="signup-form">
+    <h2>Create Account</h2>
+    <label>Username:</label>
+    <input type="text" id="username" name="name" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" title="Usernames can only contain letters, numbers, and underscores (3-50 chars).">
+
+    <label>Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label>Password:</label>
+    <input type="password" id="password" name="password" required>
+    
+    <label>Confirm Password:</label>
+    <input type="password" id="confirm-password" name="confirm-password" required>
+    
+    <div id="message" style="margin: 10px 0; text-align: center; font-weight: bold; font-size: 14px;"></div>
+
+    <a href="login.html" id="a_style">Already got an account? Log in here</a>
+    <button type="submit">Create Account</button>
+  </form>
+</body>
+</html>

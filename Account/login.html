@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous"></script>
+  
+  <script src="login.js" defer></script>
+  
+</head>
+<body>
+  <form class="signup-form" id="login-form">
+    <h2>Login</h2>
+    <label>Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label>Password:</label>
+    <input type="password" id="password" name="password" required>
+    
+    <div id="message" style="margin: 10px 0; text-align: center; font-weight: bold; font-size: 14px;"></div>
+
+    <a href="sign_up.html">Don't have an account? Create one here</a>
+    <button type="submit">Login</button>
+  </form>
+</body>
+</html>

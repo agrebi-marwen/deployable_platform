@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - Sector Control</title>
+  <link rel="stylesheet" href="../global.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <div id="security-overlay" class="overlay" style="display: none;">
+    <div class="security-card">
+      <h2>Authorization Required</h2>
+      <p>Enter the temporal administrative clearance code to access Sector Control.</p>
+      <input type="password" id="admin-pass-input" placeholder="••••••••••••" autofocus>
+      <button onclick="checkAdminPassword()" class="submit-btn">Authorize Terminal</button>
+      <div id="auth-error" class="status-msg" style="color: #ef4444; margin-top: 15px;"></div>
+    </div>
+  </div>
+
+  <div class="admin-wrapper" id="admin-panel-content" style="display: none;">
+    <div class="admin-header">
+      <h1>Sector Control</h1>
+      <p>Manage the temporal timeline. Deploy challenges on the left; approve traveler solutions on the right.</p>
+    </div>
+
+    <div class="admin-grid">
+      <div class="panel-card">
+        <h2>Deploy New Anomaly</h2>
+        <form id="challenge-form">
+          <div class="form-group">
+            <label for="title">Anomaly Title</label>
+            <input type="text" id="title" placeholder="e.g., Chrono-Trigger Buffer Overflow" required>
+          </div>
+
+          <div class="form-group">
+            <label for="points_worth">Points Worth (EP)</label>
+            <input type="number" id="points_worth" value="100" min="10" max="1000" step="10" required>
+          </div>
+
+          <div class="form-group">
+            <label for="instructions">Instructions & Mission Details</label>
+            <textarea id="instructions" placeholder="Describe the steps and code required for the traveler..." required></textarea>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="switch-label">
+              <input type="checkbox" id="is_active" checked>
+              <span class="custom-switch"></span>
+              Activate immediately in terminal feed
+            </label>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">Deploy Anomaly</button>
+          <div id="creation-message" class="status-msg"></div>
+        </form>
+      </div>
+
+      <div class="panel-card">
+        <h2>Pending Submissions</h2>
+        <div class="submissions-container" id="submissions-list">
+          <p class="empty-state">Scanning the streams for incoming transmissions...</p>
+        </div>
+      </div>
+    </div>
+
+    <a href="../Dashboard/dashboard.html" class="back-dashboard">← Return to Dashboard</a>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

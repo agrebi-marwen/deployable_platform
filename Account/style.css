@@ -1,0 +1,162 @@
+/* Custom Reset & Variables matching The Time Portal */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #030712;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --accent-blue: #3b82f6;
+  --accent-orange: #f97316;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --accent-orange-glow: rgba(249, 115, 22, 0.2);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cybernetic Grid Background */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 35px 35px;
+  background-position: center;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glassmorphic Form Container */
+.signup-form {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 50px var(--accent-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.signup-form:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 60px var(--accent-orange-glow);
+}
+
+/* Form Titles and Labels */
+h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-bottom: 8px;
+  background: linear-gradient(180deg, #ffffff 50%, #9ca3af 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  margin-bottom: -6px;
+}
+
+/* Futuristic Input Fields */
+input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+input:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+}
+
+/* Action Button */
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-orange), #f95c16);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  padding: 14px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Style links (Redirect anchor text) */
+.signup-form a, #a_style {
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 10px;
+  transition: color 0.2s ease;
+}
+
+.signup-form a:hover, #a_style:hover {
+  color: var(--accent-blue);
+}
+
+/* Alert Notification Container */
+#message {
+  margin-top: 5px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+}

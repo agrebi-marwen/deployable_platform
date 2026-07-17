@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deploy Temporal Patch</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../global.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous"></script>
+  <script src="submit.js" defer></script>
+</head>
+<body>
+
+  <div class="grid-background"></div>
+
+  <header class="dash-navbar">
+    <div class="logo">
+      <a href="dashboard.html" style="text-decoration: none; color: inherit;">
+        <span class="logo-icon">←</span> Back to Command Center
+      </a>
+    </div>
+  </header>
+
+  <div class="submit-layout-container">
+    
+    <main class="challenge-details-card">
+      <div class="section-badge" id="challenge-month">Month Anomaly</div>
+      <h1 id="challenge-title">Loading Challenge...</h1>
+      <div class="challenge-reward" id="challenge-points">Reward: -- EP</div>
+      
+      <div class="challenge-instructions-box">
+        <h3>Mission Briefing</h3>
+        <p id="challenge-instructions">Retrieving data blocks from the temporal database...</p>
+      </div>
+    </main>
+
+    <aside class="submission-panel">
+      
+      <div class="submission-card">
+        <h3>Transmutation Portal</h3>
+        <p class="sub-text">Deploy your solution link to patch this anomaly.</p>
+        
+        <form id="submission-form">
+          <label for="submission-url">Repository URL</label>
+          <input 
+            type="url" 
+            id="submission-url" 
+            placeholder="https://github.com/username/repository" 
+            pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
+            title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
+            required>
+          <button type="submit" id="submit-btn">Initialize Patch</button>
+        </form>
+        <div id="submission-message"></div>
+      </div>
+
+    </aside>
+
+  </div>
+
+
+  <footer class="temporal-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <!-- Footers matching high-tech SVG Logo Icon -->
+          <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+            <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
+            <polyline class="clock-hands" points="12 6 12 12 16 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="1.5" fill="#f97316"/>
+          </svg>
+          The Time Portal
+        </div>
+        <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
+      </div>
+      
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="/index.html">Home Portal</a></li>
+          <li><a href="/Dashboard/dashboard.html">Anomalies</a></li>
+          <li><a href="/index.html#leaderboard">Registry Standings</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Connect</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.facebook.com/ComputerSocietyINSAT/" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Platform</a></li>
+          <li><a href="https://insat.rnu.tn" target="_blank" rel="noopener noreferrer">INSAT Space</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 IEEE Computer Society INSAT Student Branch Chapter. All rights reserved.</p>
+      <p class="system-status"><span class="status-indicator"></span> Temporal Core: Operational</p>
+    </div>
+  </footer>
+
+</body>
+</html>
