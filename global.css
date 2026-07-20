@@ -588,3 +588,146 @@ body {
 }
 
 
+
+@media (max-width: 900px) {
+  .stats-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .submit-layout-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*  MOBILE DEVICES  */
+@media (max-width: 600px) {
+ 
+  .navbar, 
+  .dash-navbar {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 5%;
+    position: relative; 
+  }
+
+  .nav-links, 
+  .dash-nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .user-profile-nav {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+  }
+
+
+  .hero h1 {
+    font-size: 2.25rem;
+    letter-spacing: -1px;
+  }
+
+  .hero .subtitle {
+    font-size: 1rem;
+  }
+
+  .section-title,
+  .leaderboard-header h2,
+  .log-archive-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .challenge-section h2 {
+    font-size: 1.5rem;
+  }
+
+
+  .hero {
+    margin: 40px auto;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .features,
+  .challenges-grid {
+    grid-template-columns: 1fr; 
+    padding: 0 16px;
+  }
+
+  .challenge-section,
+  .leaderboard-card,
+  .card,
+  .challenge-details-card,
+  .submission-card {
+    padding: 20px; 
+
+  .challenge-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+
+  .leaderboard-card,
+  .modal-table-container,
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboard-table th, 
+  .leaderboard-table td,
+  .log-table th,
+  .log-table td,
+  .modal-table-container td,
+  .modal-table-container th {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    white-space: nowrap; 
+  }
+
+
+  .col-rank { width: auto; }
+  .col-name { width: auto; }
+  .col-points { width: auto; }
+
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+
+  .temporal-footer {
+    padding: 40px 20px 20px 20px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
