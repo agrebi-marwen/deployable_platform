@@ -4,11 +4,5 @@
   "main": "index.js",
   "dependencies": {
     "express": "^4.19.2"
-  },
-  "devDependencies": {
-    "javascript-obfuscator": "^5.5.0"
-  },
-  "scripts": {
-    "build": "node node_modules/javascript-obfuscator/bin/javascript-obfuscator.js ./ --output ./ --compact true --self-defending true --disable-console-output false"
   }
 }
