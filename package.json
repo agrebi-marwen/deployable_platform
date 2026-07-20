@@ -8,7 +8,7 @@
   "devDependencies": {
     "javascript-obfuscator": "^5.5.0"
   },
-  "scripts": {
-  "build": "npx javascript-obfuscator ./ --output ./ --compact true --self-defending true --disable-console-output false"
+"scripts": {
+  "build": "node node_modules/javascript-obfuscator/bin/javascript-obfuscator.js ./ --output ./ --compact true --self-defending true --disable-console-output false"
 }
 }
