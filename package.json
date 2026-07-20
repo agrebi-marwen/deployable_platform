@@ -7,7 +7,7 @@
   },
   "devDependencies": {
     "javascript-obfuscator": "^5.5.0"
-  }
+  },
   "scripts": {
     "build": "javascript-obfuscator ./ --output ./ --compact true --self-defending true --disable-console-output false"
   }
