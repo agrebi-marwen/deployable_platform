@@ -738,175 +738,115 @@ body {
 }
 
 /* =========================================================================
-   MOBILE PERFORMANCE — Disable expensive effects on phones
-   This targets all touch-capable devices under 600px width.
+   MOBILE — FLAT SIMPLE DESIGN (under 600px)
+   No shadows, no animations, no gradients, no spotlight.
+   Just solid black/gray backgrounds with thin borders.
    ========================================================================= */
 @media (max-width: 600px) {
 
-  /* Remove spotlight and cursor ring — they are invisible on touch screens anyway */
+  /* Kill all heavy visual layers */
   .cursor-spotlight-layer,
   .cursor-light-ring {
     display: none !important;
   }
 
-  /* Remove the radial-gradient glow from cards — saves massive GPU cost per card */
-  .card::after {
-    display: none;
-  }
-
-  /* Simplify card shadows to a single, lighter shadow — no dual-shadow neomorphism */
-  .card {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 20px;
-  }
-
-  /* Disable the top-edge highlight on mobile (saves one paint layer per card) */
+  .card::after,
   .card::before {
     display: none;
   }
 
-  /* Remove hover transforms on mobile — touch devices don't have hover */
-  .card:hover {
-    transform: none;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    border-color: rgba(255, 255, 255, 0.06);
-    will-change: auto;
-  }
-
-  /* Simplify badge shadows */
-  .badge {
+  /* Flat cards — no neomorphism, no shadows, no gradients */
+  .card {
+    background: #1a1a1a;
     box-shadow: none;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-  }
-
-  /* Simplify CTA button — no neomorphism shadow */
-  .cta-btn {
-    box-shadow: none !important;
-    border: 1px solid rgba(249, 115, 22, 0.2) !important;
-  }
-
-  .cta-btn:hover {
-    box-shadow: none !important;
-    transform: none !important;
-  }
-
-  .cta-btn:active {
-    box-shadow: none !important;
-    transform: none !important;
-  }
-
-  /* Simplify primary/secondary buttons */
-  .btn {
-    box-shadow: none;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .btn-primary {
-    border-color: rgba(249, 115, 22, 0.25);
-  }
-
-  .btn-primary:hover {
-    transform: none;
-  }
-
-  .btn-primary:active {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .btn-secondary:hover {
-    transform: none;
-  }
-
-  .btn-secondary:active {
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* Simplify leaderboard card */
-  .leaderboard-card {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    border-radius: 12px;
     padding: 20px;
-  }
-
-  /* Remove hover effects from leaderboard rows and challenge cards */
-  .leaderboard-table tbody tr:hover {
-    background: transparent;
-  }
-
-  .challenge-card {
     transition: none;
   }
 
-  .challenge-card:hover {
+  .card:hover {
     transform: none;
     box-shadow: none;
-    background: rgba(255, 255, 255, 0.02);
+    border-color: #333;
+    will-change: auto;
   }
 
-  /* Disable portal animations on mobile — save compositor cycles */
-  .temporal-portal-icon {
-    filter: none;
-  }
-
-  .temporal-portal-icon .outer-ring,
-  .temporal-portal-icon .inner-ring {
-    animation: none;
-  }
-
-  /* Disable pulse animation on mobile */
-  .status-indicator {
-    animation: none;
+  .card-number {
     box-shadow: none;
+    background: #222;
+    color: #666;
+    border: 1px solid #333;
   }
 
-  /* Layout adjustments */
-  .navbar,
-  .dash-navbar {
+  .badge {
+    box-shadow: none;
+    background: #111;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  /* Flat buttons — just color, no shadows */
+  .cta-btn,
+  .btn,
+  .btn-primary,
+  .btn-secondary {
+    box-shadow: none !important;
+    background: #1a1a1a !important;
+    border: 1px solid #444 !important;
+    border-radius: 8px !important;
+    transition: none !important;
+  }
+
+  .cta-btn:hover, .btn-primary:hover, .btn-secondary:hover,
+  .cta-btn:active, .btn-primary:active, .btn-secondary:active {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .cta-btn { border-color: rgba(249, 115, 22, 0.4) !important; }
+
+  /* Navbar — flat */
+  .navbar, .dash-navbar {
+    background: #0a0a0a;
+    box-shadow: none;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px 5%;
+    gap: 12px;
+    padding: 14px 5%;
     position: relative;
+    border-bottom: 1px solid #222;
   }
 
-  .nav-links,
-  .dash-nav-links {
+  .nav-links a:hover {
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .nav-links, .dash-nav-links {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
   }
 
   .user-profile-nav {
     width: 100%;
     justify-content: space-between;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 12px;
+    border-top: 1px solid #222;
+    padding-top: 10px;
+  }
+
+  /* Hero — flat */
+  .hero {
+    margin: 30px auto;
+    padding: 0 16px;
   }
 
   .hero h1 {
-    font-size: 2.25rem;
+    font-size: 2rem;
     letter-spacing: -1px;
   }
 
-  .hero .subtitle {
-    font-size: 1rem;
-  }
-
-  .section-title,
-  .leaderboard-header h2,
-  .log-archive-header h1 {
-    font-size: 1.6rem;
-  }
-
-  .challenge-section h2 {
-    font-size: 1.5rem;
-  }
-
-  .hero {
-    margin: 40px auto;
-  }
+  .hero .subtitle { font-size: 1rem; }
 
   .hero-actions {
     flex-direction: column;
@@ -918,22 +858,75 @@ body {
     text-align: center;
   }
 
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
-  .features,
-  .challenges-grid {
+  /* Features grid — single column, flat */
+  .features, .challenges-grid {
     grid-template-columns: 1fr;
     padding: 0 16px;
+    gap: 12px;
   }
 
+  /* Leaderboard — flat card */
+  .leaderboard-card {
+    background: #111;
+    border: 1px solid #222;
+    box-shadow: none;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .leaderboard-card, .modal-table-container, .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboard-table tbody tr:hover { background: transparent; }
+
+  .leaderboard-table th,
+  .leaderboard-table td,
+  .log-table th, .log-table td,
+  .modal-table-container td, .modal-table-container th {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .col-rank, .col-name, .col-points { width: auto; }
+
+  /* Challenges — flat */
+  .challenge-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 16px;
+    transition: none;
+  }
+
+  .challenge-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #222;
+    background: #111;
+  }
+
+  .challenge-card .action-btn {
+    background: rgba(249, 115, 22, 0.15);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    border-radius: 8px;
+    transition: none;
+  }
+
+  .challenge-card .action-btn:hover {
+    box-shadow: none;
+    background: #f97316;
+  }
+
+  /* Stats */
+  .stats-row { grid-template-columns: 1fr; }
+
   .challenge-section,
-  .leaderboard-card,
-  .card,
-  .challenge-details-card,
-  .submission-card {
-    padding: 20px;
+  .leaderboard-card, .card,
+  .challenge-details-card, .submission-card {
+    padding: 16px;
   }
 
   .challenge-meta {
@@ -941,42 +934,43 @@ body {
     gap: 8px;
   }
 
-  .leaderboard-card,
-  .modal-table-container,
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  /* Kill all animations on mobile */
+  .temporal-portal-icon {
+    filter: none;
+  }
+  .temporal-portal-icon .outer-ring,
+  .temporal-portal-icon .inner-ring {
+    animation: none;
+  }
+  .status-indicator {
+    animation: none;
+    box-shadow: none;
   }
 
-  .leaderboard-table th,
-  .leaderboard-table td,
-  .log-table th,
-  .log-table td,
-  .modal-table-container td,
-  .modal-table-container th {
-    padding: 10px 8px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
+  /* Typography */
+  .section-title,
+  .leaderboard-header h2,
+  .log-archive-header h1 { font-size: 1.5rem; }
 
-  .col-rank { width: auto; }
-  .col-name { width: auto; }
-  .col-points { width: auto; }
+  .challenge-section h2 { font-size: 1.3rem; }
 
   .modal-content {
     width: 95%;
-    padding: 20px;
+    padding: 16px;
     max-height: 90vh;
     overflow-y: auto;
   }
 
+  /* Footer — flat */
   .temporal-footer {
-    padding: 40px 20px 20px 20px;
+    background: #0a0a0a;
+    padding: 30px 16px 16px;
+    margin-top: 40px;
   }
 
   .footer-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
 
   .footer-bottom {
