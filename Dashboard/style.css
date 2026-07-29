@@ -633,6 +633,7 @@ body {
   font-weight: 600;
 }
 
+
 /* ==========================================================================
    SUBMIT PAGE — TWO-COLUMN LAYOUT
    Used by: submit.html
@@ -655,66 +656,30 @@ body {
 
 /* Left panel: challenge briefing */
 .challenge-details-card {
-  background: #131313;
-  box-shadow: var(--neu-shadow-outset),
-              0 0 0 1px rgba(45, 45, 45, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--card-bg);
+  box-shadow: var(--neu-shadow-outset);
+  border: var(--neu-border);
   border-radius: 24px;
-  padding: 48px;
+  padding: 40px;
   position: relative;
   overflow: hidden;
-  contain: layout style;
-}
-
-/* Top-edge highlight */
-.challenge-details-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  pointer-events: none;
-  z-index: 1;
 }
 
 .challenge-details-card h1 {
   font-family: var(--font-display);
-  font-size: 2.6rem;
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 10px;
-  line-height: 1.2;
-  letter-spacing: -1px;
-  background: linear-gradient(180deg, #ffffff 40%, #9ca3af 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Epoch badge styling */
-.challenge-details-card .epoch-badge {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--accent-orange);
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  padding: 5px 14px;
-  border-radius: 20px;
-  margin-bottom: 18px;
 }
 
 .challenge-reward {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #10b981;
-  margin-bottom: 36px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--success-green);
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .challenge-instructions-box {
@@ -723,22 +688,19 @@ body {
 
 .challenge-instructions-box h3 {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: var(--accent-orange);
-  margin-bottom: 16px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+  margin-bottom: 12px;
 }
 
 .challenge-instructions-box p {
-  color: #b0b8c4;
-  line-height: 1.9;
-  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  font-size: 0.95rem;
   white-space: pre-wrap;
-  margin-bottom: 30px;
 }
 
 /* Right panel: submission form column wrapper */
@@ -750,78 +712,53 @@ body {
 
 /* The card used for the URL form (and any future side cards) */
 .submission-card {
-  background: #131313;
-  box-shadow: var(--neu-shadow-outset),
-              0 0 0 1px rgba(45, 45, 45, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--card-bg);
+  box-shadow: var(--neu-shadow-outset);
+  border: var(--neu-border);
   border-radius: 24px;
   padding: 30px;
   position: relative;
   overflow: hidden;
-  contain: layout style;
-}
-
-/* Top-edge highlight for submission card */
-.submission-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.15), transparent);
-  pointer-events: none;
-  z-index: 1;
 }
 
 .submission-card h3 {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  margin-bottom: 4px;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 1.25rem;
+  margin-bottom: 6px;
 }
 
 .sub-text {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   margin-bottom: 24px;
-  line-height: 1.5;
 }
 
 .submission-card label {
   display: block;
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: var(--text-secondary);
   margin-bottom: 8px;
-  font-weight: 600;
 }
 
 .submission-card input {
   width: 100%;
-  background: #0a0a0a;
-  box-shadow: inset 4px 4px 10px #000000, inset -4px -4px 10px #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-color);
+  box-shadow: var(--neu-shadow-inset);
+  border: var(--neu-border);
   border-radius: 14px;
   padding: 14px 18px;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
   outline: none;
-  margin-bottom: 20px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.submission-card input::placeholder {
-  color: #555;
-  font-style: italic;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
 }
 
 .submission-card input:focus {
-  box-shadow: inset 4px 4px 10px #000000, inset -4px -4px 10px #1a1a1a, 0 0 12px rgba(59, 130, 246, 0.3);
-  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: var(--neu-shadow-inset-focus);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .submission-card button {
@@ -829,37 +766,32 @@ body {
   background: var(--neu-btn-gradient);
   color: var(--accent-orange);
   box-shadow: var(--neu-shadow-outset);
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  border: 1px solid rgba(249, 115, 22, 0.25);
   border-radius: 14px;
-  padding: 16px;
+  padding: 14px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  text-transform: uppercase;
+  transition: all 0.2s ease;
 }
 
 .submission-card button:hover:not(:disabled) {
   box-shadow: var(--neu-shadow-outset-hover);
   color: #fff;
   border-color: var(--accent-orange);
-  transform: translateY(-2px);
 }
 
 .submission-card button:active:not(:disabled) {
-  transform: translateY(0);
   box-shadow: var(--neu-shadow-inset);
 }
 
 .submission-card button:disabled {
-  background: #0a0a0a;
-  box-shadow: inset 4px 4px 10px #000000, inset -4px -4px 10px #1a1a1a;
+  background: var(--bg-color);
+  box-shadow: var(--neu-shadow-inset-sm);
   color: var(--text-secondary);
   cursor: not-allowed;
   opacity: 0.6;
-  transform: none;
 }
 
 /* Feedback message shown below the submit button */
@@ -867,10 +799,9 @@ body {
   text-align: center;
   font-size: 0.85rem;
   font-weight: 600;
-  margin-top: 14px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  margin-top: 12px;
+}
+
 
 /* ==========================================================================
    SUBMISSIONS PAGE — FULL LOG ARCHIVE TABLE
