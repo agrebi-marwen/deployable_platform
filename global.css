@@ -2,17 +2,15 @@
    OPTIMIZED STYLESHEET — Same Design, Better Performance
    =============================================================================
    Key optimizations applied:
-   1. Reduced box-shadow blur radii where possible (less GPU cost)
-   2. Replaced backdrop-filter blur with semi-transparent solid background
+   1. Reduced box-shadow blur radii (less GPU cost)
+   2. Replaced backdrop-filter blur with solid background color
    3. Replaced "transition: all" with specific property transitions
-   4. Added will-change hints for animated/hover elements
-   5. Added contain: layout style for cards to isolate paint areas
-   6. Reduced animation frequency on SVG icons
-   7. Reduced navbar shadow depth
-   8. Reduced leaderboard glow
+   4. Added contain: layout style for cards to isolate paint areas
+   5. Reduced animation frequency on SVG icons
+   6. MOBILE: spotlight, card glow, and heavy effects disabled on touch devices
    =============================================================================
-   NOTE: The cursor spotlight and card glow are RE-ENABLED here.
    Keep using your original JS file (pasted_content_2.txt) — it works perfectly.
+   On mobile, the JS still runs but the CSS hides the heavy visual effects.
 */
 
 * {
@@ -54,10 +52,7 @@ body {
 
 /* =========================================================================
    CURSOR SPOTLIGHT & CURSOR LIGHT RING
-   OPTIMIZED: kept the radial-gradient but the blur radius is already handled
-   by the original CSS values. The JS uses requestAnimationFrame + lerp for
-   smooth following — this is already efficient.
-   The opacity transition (0.4s) is kept so the fade-in/out is smooth.
+   These stay enabled on desktop. On mobile they are hidden via media query.
    ========================================================================= */
 .cursor-spotlight-layer {
   position: fixed;
@@ -153,7 +148,6 @@ body {
   font-weight: 500;
   padding: 8px 16px;
   border-radius: 12px;
-  /* OPTIMIZED: transition only changed properties instead of "all" */
   transition: color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
@@ -171,7 +165,6 @@ body {
   font-weight: 700 !important;
   box-shadow: var(--neu-shadow-outset) !important;
   border: 1px solid rgba(249, 115, 22, 0.2) !important;
-  /* OPTIMIZED: specific properties + shorter duration */
   transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
 }
 
@@ -237,7 +230,6 @@ body {
   border-radius: 30px;
   font-weight: 700;
   font-size: 0.95rem;
-  /* OPTIMIZED: specific properties */
   transition: transform 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -297,11 +289,11 @@ body {
 /*
    CARD — OPTIMIZED NEOMORPHISM
    Changes from original:
-   1. Reduced shadow blur from 30px → 20px (halves GPU pixel sampling)
-   2. Added contain: layout style to isolate paint to card bounds
-   3. will-change only applied on hover (GPU layer promoted only when needed)
-   4. Top-edge highlight kept (static linear-gradient, nearly zero cost)
-   5. Card spotlight (::after) RE-ENABLED — works with your JS --card-mouse-x/y
+   1. Reduced shadow blur from 30px → 20px
+   2. contain: layout style to isolate paint to card bounds
+   3. will-change only applied on hover
+   4. Top-edge highlight kept (static linear-gradient)
+   5. Card spotlight (::after) enabled on desktop, disabled on mobile
 */
 .card {
   background: #131313;
@@ -312,11 +304,9 @@ body {
   padding: 32px;
   position: relative;
   overflow: hidden;
-  /* OPTIMIZED: specific transitions instead of "all" */
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               border-color 0.3s ease;
-  /* OPTIMIZED: isolate card rendering from siblings */
   contain: layout style;
 }
 
@@ -335,10 +325,8 @@ body {
 }
 
 /*
-   Card spotlight glow — RE-ENABLED.
-   This works with your JS which sets --card-mouse-x and --card-mouse-y.
-   The radial-gradient is scoped to the card (not full viewport), so it's
-   much lighter than the full-screen spotlight.
+   Card spotlight glow — enabled on desktop, removed on mobile via media query.
+   Works with your JS which sets --card-mouse-x and --card-mouse-y.
 */
 .card::after {
   content: "";
@@ -362,7 +350,6 @@ body {
   box-shadow: var(--neu-shadow-outset-hover),
               0 0 0 1px rgba(55, 55, 55, 0.5);
   border-color: rgba(249, 115, 22, 0.25);
-  /* OPTIMIZED: promote to GPU layer only on hover */
   will-change: transform, box-shadow;
 }
 
@@ -434,7 +421,6 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   padding: 32px;
-  /* OPTIMIZED: removed the large 40px diffuse glow — reduced from 2 shadow layers to 1 */
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -500,7 +486,6 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  /* OPTIMIZED: specific transitions only */
   transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -579,9 +564,7 @@ body {
 }
 
 /* =========================================================================
-   FOOTER — OPTIMIZED
-   OPTIMIZED: removed backdrop-filter: blur() which forces a full-backdrop render pass.
-   Replaced with a solid background color that looks identical on the black page.
+   FOOTER
    ========================================================================= */
 .temporal-footer {
   margin-top: 80px;
@@ -590,7 +573,6 @@ body {
   padding: 60px 40px 30px 40px;
   position: relative;
   z-index: 10;
-  /* backdrop-filter: blur(12px); REMOVED — major performance bottleneck */
 }
 
 .footer-grid {
@@ -690,8 +672,7 @@ body {
 }
 
 /* =========================================================================
-   PORTAL SVG ICON STYLING — OPTIMIZED
-   Reduced animation speed to lower compositor load.
+   PORTAL SVG ICON STYLING
    ========================================================================= */
 .temporal-portal-icon {
   width: 24px;
@@ -756,7 +737,131 @@ body {
   }
 }
 
+/* =========================================================================
+   MOBILE PERFORMANCE — Disable expensive effects on phones
+   This targets all touch-capable devices under 600px width.
+   ========================================================================= */
 @media (max-width: 600px) {
+
+  /* Remove spotlight and cursor ring — they are invisible on touch screens anyway */
+  .cursor-spotlight-layer,
+  .cursor-light-ring {
+    display: none !important;
+  }
+
+  /* Remove the radial-gradient glow from cards — saves massive GPU cost per card */
+  .card::after {
+    display: none;
+  }
+
+  /* Simplify card shadows to a single, lighter shadow — no dual-shadow neomorphism */
+  .card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 20px;
+  }
+
+  /* Disable the top-edge highlight on mobile (saves one paint layer per card) */
+  .card::before {
+    display: none;
+  }
+
+  /* Remove hover transforms on mobile — touch devices don't have hover */
+  .card:hover {
+    transform: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.06);
+    will-change: auto;
+  }
+
+  /* Simplify badge shadows */
+  .badge {
+    box-shadow: none;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  /* Simplify CTA button — no neomorphism shadow */
+  .cta-btn {
+    box-shadow: none !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+  }
+
+  .cta-btn:hover {
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .cta-btn:active {
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* Simplify primary/secondary buttons */
+  .btn {
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-primary {
+    border-color: rgba(249, 115, 22, 0.25);
+  }
+
+  .btn-primary:hover {
+    transform: none;
+  }
+
+  .btn-primary:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary:hover {
+    transform: none;
+  }
+
+  .btn-secondary:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Simplify leaderboard card */
+  .leaderboard-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+  }
+
+  /* Remove hover effects from leaderboard rows and challenge cards */
+  .leaderboard-table tbody tr:hover {
+    background: transparent;
+  }
+
+  .challenge-card {
+    transition: none;
+  }
+
+  .challenge-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* Disable portal animations on mobile — save compositor cycles */
+  .temporal-portal-icon {
+    filter: none;
+  }
+
+  .temporal-portal-icon .outer-ring,
+  .temporal-portal-icon .inner-ring {
+    animation: none;
+  }
+
+  /* Disable pulse animation on mobile */
+  .status-indicator {
+    animation: none;
+    box-shadow: none;
+  }
+
+  /* Layout adjustments */
   .navbar,
   .dash-navbar {
     flex-direction: column;
