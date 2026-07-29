@@ -757,7 +757,7 @@ body {
 
   /* Flat cards — no neomorphism, no shadows, no gradients */
   .card {
-    background: #1a1a1a;
+    background: transparent;
     box-shadow: none;
     border: 1px solid #333;
     border-radius: 12px;
@@ -774,14 +774,14 @@ body {
 
   .card-number {
     box-shadow: none;
-    background: #222;
+    background: transparent;
     color: #666;
     border: 1px solid #333;
   }
 
   .badge {
     box-shadow: none;
-    background: #111;
+    background: transparent;
     border: 1px solid rgba(59, 130, 246, 0.3);
   }
 
@@ -791,7 +791,7 @@ body {
   .btn-primary,
   .btn-secondary {
     box-shadow: none !important;
-    background: #1a1a1a !important;
+    background: transparent !important;
     border: 1px solid #444 !important;
     border-radius: 8px !important;
     transition: none !important;
@@ -807,7 +807,7 @@ body {
 
   /* Navbar — flat */
   .navbar, .dash-navbar {
-    background: #0a0a0a;
+    background: transparent;
     box-shadow: none;
     flex-direction: column;
     gap: 12px;
@@ -867,7 +867,7 @@ body {
 
   /* Leaderboard — flat card */
   .leaderboard-card {
-    background: #111;
+    background: transparent;
     border: 1px solid #222;
     box-shadow: none;
     border-radius: 12px;
@@ -894,7 +894,7 @@ body {
 
   /* Challenges — flat */
   .challenge-card {
-    background: #111;
+    background: transparent;
     border: 1px solid #222;
     border-radius: 10px;
     padding: 16px;
@@ -905,11 +905,11 @@ body {
     transform: none;
     box-shadow: none;
     border-color: #222;
-    background: #111;
+    background: transparent;
   }
 
   .challenge-card .action-btn {
-    background: rgba(249, 115, 22, 0.15);
+    background: transparent;
     border: 1px solid rgba(249, 115, 22, 0.3);
     border-radius: 8px;
     transition: none;
@@ -963,7 +963,7 @@ body {
 
   /* Footer — flat */
   .temporal-footer {
-    background: #0a0a0a;
+    background: transparent;
     padding: 30px 16px 16px;
     margin-top: 40px;
   }
