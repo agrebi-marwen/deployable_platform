@@ -1,8 +1,14 @@
 /**
  * Simple Starfield Background
  * Lightweight 2D canvas – no WebGL, no lag.
+ * OPTIMIZED: disabled on mobile devices (screens < 600px) for performance.
  */
 (function () {
+  // Skip entirely on mobile — galaxy background is too heavy for phones
+  if (window.innerWidth <= 600 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) {
+    return;
+  }
+
   const vertexShaderSource = `
     attribute vec2 position;
     varying vec2 vUv;
