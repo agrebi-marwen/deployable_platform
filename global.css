@@ -979,3 +979,9 @@ body {
     text-align: center;
   }
 }
+
+
+.space{
+  display: inline-block;
+  width: 20px; /* Adjust the width as needed */
+}
