@@ -563,6 +563,82 @@ body {
   box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
 }
 
+/* PERF: Homepage challenge card specific styles (extracted from inline) */
+.challenge-card-homepage {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  margin-bottom: 15px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.challenge-card-homepage:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.challenge-card-homepage-epoch {
+  font-size: 0.75rem;
+  color: #f97316;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.challenge-card-homepage-title {
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+.challenge-card-homepage-desc {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.challenge-card-homepage-meta {
+  text-align: right;
+  min-width: 100px;
+}
+
+.challenge-card-homepage-points {
+  display: block;
+  color: #10b981;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.challenge-card-homepage-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #f97316;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.challenge-card-homepage-btn:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+}
+
 /* =========================================================================
    FOOTER
    ========================================================================= */

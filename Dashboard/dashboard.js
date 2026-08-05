@@ -141,11 +141,26 @@ async function fetchUserProfile() {
 async function fetchChallenges() {
     challengesList.innerHTML = `<div class="loading-state">Scanning temporal streams...</div>`;
 
-    const { data: challenges, error } = await supabaseClient
-        .from('challenges')
-        .select('id, title, instructions, month_year, points_worth, is_active')
-        .eq('is_active', true) 
-        .order('created_at', { ascending: false });
+    // PERF: Check cache first (5-minute TTL)
+    const cacheKey = 'active_challenges';
+    const cached = window.apiCache?.get(`supabase_${cacheKey}`);
+    let challenges, error;
+
+    if (cached) {
+        ({ data: challenges, error } = cached);
+    } else {
+        const result = await supabaseClient
+            .from('challenges')
+            .select('id, title, instructions, month_year, points_worth, is_active')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+        challenges = result.data;
+        error = result.error;
+        // Cache the result
+        if (window.apiCache) {
+            window.apiCache.set(`supabase_${cacheKey}`, { data: challenges, error });
+        }
+    }
 
     if (error) {
         challengesList.innerHTML = `<div class="loading-state">Temporal scanner offline: ${escapeHtml(error.message)}</div>`;
@@ -157,7 +172,8 @@ async function fetchChallenges() {
         return;
     }
 
-    challengesList.innerHTML = ""; 
+    // PERF: Batch DOM updates with DocumentFragment (single reflow instead of multiple)
+    const fragment = document.createDocumentFragment();
 
     challenges.forEach(challenge => {
         const card = document.createElement('div');
@@ -175,8 +191,12 @@ async function fetchChallenges() {
             <h3>${escapeHtml(challenge.title)}</h3>
             <span class="enter-link">Initiate Synchronization →</span>
         `;
-        challengesList.appendChild(card);
+        fragment.appendChild(card);
     });
+    
+    // Single DOM write
+    challengesList.innerHTML = "";
+    challengesList.appendChild(fragment);
 }
 
 // ==========================================
@@ -186,18 +206,20 @@ async function fetchLeaderboard() {
     const tbody = document.getElementById('leaderboard-tbody');
     tbody.innerHTML = `<tr><td colspan="3" class="modal-loading">Scanning timelines...</td></tr>`;
 
+    // PERF: Pagination - load 50 at a time instead of unlimited
     const { data: rankings, error } = await supabaseClient
         .from('profiles')
         .select('username, total_points')
         .order('total_points', { ascending: false })
-        .limit(10);
+        .limit(50);
 
     if (error) {
         tbody.innerHTML = `<tr><td colspan="3" class="modal-loading">Failed to read registry: ${escapeHtml(error.message)}</td></tr>`;
         return;
     }
 
-    tbody.innerHTML = "";
+    // PERF: Batch DOM updates with DocumentFragment
+    const fragment = document.createDocumentFragment();
     rankings.forEach((profile, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -205,8 +227,55 @@ async function fetchLeaderboard() {
             <td>${escapeHtml(profile.username)}</td>
             <td>${escapeHtml(profile.total_points ?? 0)} EP</td>
         `;
-        tbody.appendChild(row);
+        fragment.appendChild(row);
     });
+    
+    // Single DOM write
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
+    
+    // Add Load More button if there are 50 results
+    if (rankings.length === 50) {
+        const loadMoreRow = document.createElement('tr');
+        loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button onclick="loadMoreLeaderboard()" style="padding: 8px 16px; background: #f97316; color: white; border: none; border-radius: 6px; cursor: pointer;">Load More Travelers</button></td>`;
+        tbody.appendChild(loadMoreRow);
+    }
+}
+
+// Load additional leaderboard entries
+let leaderboardOffset = 50;
+async function loadMoreLeaderboard() {
+    const tbody = document.getElementById('leaderboard-tbody');
+    const lastRow = tbody.lastChild;
+    if (lastRow) lastRow.remove(); // Remove Load More button
+    
+    const { data: rankings, error } = await supabaseClient
+        .from('profiles')
+        .select('username, total_points')
+        .order('total_points', { ascending: false })
+        .range(leaderboardOffset, leaderboardOffset + 49);
+    
+    if (!error && rankings?.length > 0) {
+        const fragment = document.createDocumentFragment();
+        rankings.forEach((profile, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>#${leaderboardOffset + index + 1}</strong></td>
+                <td>${escapeHtml(profile.username)}</td>
+                <td>${escapeHtml(profile.total_points ?? 0)} EP</td>
+            `;
+            fragment.appendChild(row);
+        });
+        tbody.appendChild(fragment);
+        leaderboardOffset += 50;
+        
+        // Add Load More button again if full batch returned
+        if (rankings.length === 50) {
+            const loadMoreRow = document.createElement('tr');
+            loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button onclick="loadMoreLeaderboard()" style="padding: 8px 16px; background: #f97316; color: white; border: none; border-radius: 6px; cursor: pointer;">Load More Travelers</button></td>`;
+            tbody.appendChild(loadMoreRow);
+        }
+    }
 }
 
 settingsForm.addEventListener('submit', async (e) => {

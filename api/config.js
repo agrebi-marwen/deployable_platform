@@ -21,6 +21,9 @@ export default function handler(req, res) {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Content-Security-Policy', "default-src 'self'");
   
+  // PERF: Cache control - config changes rarely, cache for 1 hour
+  res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
+  
   // Handle preflight
   if (req.method === 'OPTIONS') {
     return res.status(200).end();

@@ -51,41 +51,23 @@ async function fetchLastThreeChallenges() {
         }
 
         container.innerHTML = challenges.map(ch => `
-            <div class="challenge-card" style="
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.06);
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 15px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            ">
+            <div class="challenge-card-homepage">
                 <div>
-                    <span style="font-size: 0.75rem; color: #f97316; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 4px;">
+                    <span class="challenge-card-homepage-epoch">
                         ${escapeHtml(ch.month_year || "Active Epoch")}
                     </span>
-                    <h3 style="color: #ffffff; margin: 0 0 8px 0; font-family: 'Space Grotesk', sans-serif;">
+                    <h3 class="challenge-card-homepage-title">
                         ${escapeHtml(ch.title)}
                     </h3>
-                    <p style="color: #9ca3af; font-size: 0.85rem; margin: 0; line-height: 1.4;">
+                    <p class="challenge-card-homepage-desc">
                         ${ch.instructions ? escapeHtml(ch.instructions.substring(0, 100) + (ch.instructions.length > 100 ? '...' : '')) : ''}
                     </p>
                 </div>
-                <div style="text-align: right; min-width: 100px;">
-                    <span style="display: block; color: #10b981; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">
+                <div class="challenge-card-homepage-meta">
+                    <span class="challenge-card-homepage-points">
                         +${escapeHtml(ch.points_worth)} EP
                     </span>
-                    <a href="Dashboard/dashboard.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="action-btn" style="
-                        display: inline-block;
-                        padding: 8px 12px;
-                        background: #f97316;
-                        color: #ffffff;
-                        text-decoration: none;
-                        border-radius: 6px;
-                        font-size: 0.8rem;
-                        font-weight: 600;
-                    ">
+                    <a href="Dashboard/dashboard.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
                         View Paradox
                     </a>
                 </div>
