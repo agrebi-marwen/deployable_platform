@@ -1,14 +1,29 @@
 // API SETTINGS - Loaded from centralized config.js
-const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.SUPABASE_CONFIG;
- 
-// API CONNECTION
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
+let supabaseClient = null;
+
+// Initialize Supabase client after config loads
+async function initSupabaseClient() {
+  const config = await waitForConfig();
+  if (!config) {
+    console.error('Failed to initialize Supabase client');
+    return;
   }
-});
+  
+  supabaseClient = supabase.createClient(config.url, config.anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+  
+  // Start loading data after client is ready
+  fetchLastThreeChallenges();
+  loadPublicLeaderboard();
+}
+
+// Initialize on page load
+initSupabaseClient();
 
 // Escape untrusted values before interpolating into innerHTML (prevents XSS)
 function escapeHtml(value) {

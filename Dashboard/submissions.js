@@ -1,6 +1,22 @@
 // 1. Configure & Initialize Supabase - Loaded from centralized config.js
-const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.SUPABASE_CONFIG; 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient = null;
+
+// Initialize Supabase client after config loads
+async function initSupabaseClient() {
+  const config = await waitForConfig();
+  if (!config) {
+    console.error('Failed to initialize Supabase client');
+    return;
+  }
+  
+  supabaseClient = supabase.createClient(config.url, config.anonKey);
+  
+  // Initialize submissions page after client is ready
+  initSubmissionsPage();
+}
+
+// Initialize client immediately
+initSupabaseClient();
 
 // Escape untrusted values before interpolating into innerHTML (prevents XSS)
 function escapeHtml(value) {

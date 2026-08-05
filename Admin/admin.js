@@ -1,7 +1,22 @@
 // API CONNECTION - Loaded from centralized config.js
-const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.SUPABASE_CONFIG;
+let supabaseClient = null;
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase client after config loads
+async function initSupabaseClient() {
+  const config = await waitForConfig();
+  if (!config) {
+    console.error('Failed to initialize Supabase client');
+    return;
+  }
+  
+  supabaseClient = supabase.createClient(config.url, config.anonKey);
+  
+  // Verify admin role after client is ready
+  verifyAdminRole();
+}
+
+// Initialize client
+initSupabaseClient();
 
 // Escape untrusted values before interpolating into innerHTML (prevents XSS)
 function escapeHtml(value) {

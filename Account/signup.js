@@ -1,23 +1,37 @@
 // API SETTINGS - Loaded from centralized config.js
-const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.SUPABASE_CONFIG;
+let supabaseClient = null;
 
-// API CONNECTION
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
+// Initialize Supabase client after config loads
+async function initSupabaseClient() {
+  const config = await waitForConfig();
+  if (!config) {
+    console.error('Failed to initialize Supabase client');
+    return;
   }
-});
+  
+  supabaseClient = supabase.createClient(config.url, config.anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+  
+  // Check session after client is ready
+  checkSessionAndRedirect();
+}
 
-//    CHECK ACTIVITY
+// Initialize client
+initSupabaseClient();
+
+// CHECK ACTIVITY
 async function checkSessionAndRedirect() {
+    if (!supabaseClient) return;
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session && session.user) {
         window.location.href = "../Dashboard/dashboard.html";
     }
 }
-checkSessionAndRedirect(); 
 
 // ELEMENTS
 const form = document.getElementById('signup-form');
