@@ -1,6 +1,5 @@
-// API SETTINGS
-const SUPABASE_URL = "https://sahcbybmqhnctxeycfrp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhaGNieWJtcWhuY3R4ZXljZnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MTY0MjksImV4cCI6MjA5OTA5MjQyOX0.EQ27PPE9nd40e9g5GJhZh3CJLN12jKZ6byxSkFZmkjk";
+// API SETTINGS - Loaded from centralized config.js
+const { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.SUPABASE_CONFIG;
 
 // API CONNECTION
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
