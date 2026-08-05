@@ -46,6 +46,23 @@ form.addEventListener('submit', async (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    // Check rate limit
+    try {
+        const rateLimitResponse = await fetch('../api/rateLimit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        if (!rateLimitResponse.ok) {
+            const rateLimitData = await rateLimitResponse.json();
+            messageEl.style.color = "red";
+            messageEl.textContent = "Error: " + rateLimitData.error;
+            return;
+        }
+    } catch (err) {
+        // Rate limiting service unavailable, proceed anyway
+    }
     
     const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,

@@ -16,9 +16,7 @@ async function loadSupabaseConfig() {
     
     window.SUPABASE_CONFIG = await response.json();
     window.SUPABASE_CONFIG_READY = true;
-    console.log('✓ Supabase config loaded securely');
   } catch (error) {
-    console.error('✗ Failed to load Supabase config:', error);
     alert('Configuration error. Please refresh the page.');
   }
 }
@@ -36,7 +34,6 @@ window.waitForConfig = function() {
     // Timeout after 5 seconds
     setTimeout(() => {
       clearInterval(checkInterval);
-      console.error('Timeout waiting for config');
       resolve(null);
     }, 5000);
   });

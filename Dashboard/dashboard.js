@@ -5,7 +5,6 @@ let supabaseClient = null;
 async function initSupabaseClient() {
   const config = await waitForConfig();
   if (!config) {
-    console.error('Failed to initialize Supabase client');
     return;
   }
   

@@ -5,9 +5,11 @@ let supabaseClient = null;
 async function initSupabaseClient() {
   const config = await waitForConfig();
   if (!config) {
-    console.error('Failed to initialize Supabase client');
     return;
   }
+  
+  // Load admin password from secure config endpoint
+  ADMIN_SECRET_KEY = config.adminPassword;
   
   supabaseClient = supabase.createClient(config.url, config.anonKey);
   
@@ -30,10 +32,7 @@ function safeUrl(value) {
     return /^https?:\/\//i.test(url) ? url : '#';
 }
 
-// SECURITY SETTINGS
-const ADMIN_SECRET_KEY = "BAGABOZ"; 
-let isRoleAuthorized = false;
-let isPasswordAuthorized = false;
+// SECURITY SETTINGS - Admin password loaded from environment via config API\nlet ADMIN_SECRET_KEY = null;\nlet isRoleAuthorized = false;\nlet isPasswordAuthorized = false;
 
 const overlay = document.getElementById('security-overlay');
 const adminPanel = document.getElementById('admin-panel-content');

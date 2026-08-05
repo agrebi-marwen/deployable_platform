@@ -1,12 +1,37 @@
 // api/config.js - Vercel serverless function to serve Supabase config securely
 export default function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: Only allow requests from your Vercel domain
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  ].filter(Boolean);
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   res.setHeader('Content-Type', 'application/json');
 
   // Return config from environment variables (never exposed to client source)
   res.status(200).json({
     url: process.env.SUPABASE_URL,
-    anonKey: process.env.SUPABASE_ANON_KEY
+    anonKey: process.env.SUPABASE_ANON_KEY,
+    adminPassword: process.env.ADMIN_PASSWORD || null
   });
 }
