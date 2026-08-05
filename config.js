@@ -24,7 +24,7 @@ async function loadSupabaseConfig() {
 }
 
 // Wait for config to be ready before accessing it
-function waitForConfig() {
+window.waitForConfig = function() {
   return new Promise((resolve) => {
     const checkInterval = setInterval(() => {
       if (window.SUPABASE_CONFIG_READY) {
@@ -40,7 +40,7 @@ function waitForConfig() {
       resolve(null);
     }, 5000);
   });
-}
+};
 
 // Load config immediately
 loadSupabaseConfig();
