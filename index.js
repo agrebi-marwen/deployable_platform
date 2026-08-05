@@ -67,7 +67,7 @@ async function fetchLastThreeChallenges() {
                     <span class="challenge-card-homepage-points">
                         +${escapeHtml(ch.points_worth)} EP
                     </span>
-                    <a href="Dashboard/dashboard.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
+                    <a href="dashboard/dashboard.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
                         View Paradox
                     </a>
                 </div>
@@ -139,7 +139,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (authBtn) {
                 authBtn.outerHTML = `
                     <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
-                        <a href="Dashboard/dashboard.html" style="font-weight: bold; font-size: 14px; color: #fff; text-decoration: none; border-bottom: 1px dashed #f97316; padding-bottom: 2px;">
+                        <a href="dashboard/dashboard.html" style="font-weight: bold; font-size: 14px; color: #fff; text-decoration: none; border-bottom: 1px dashed #f97316; padding-bottom: 2px;">
                             🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
                         </a>
                         <button id="logout-btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">Log Out</button>
@@ -150,7 +150,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
             if (heroCtaBtn) {
                 heroCtaBtn.textContent = "Enter Command Center";
-                heroCtaBtn.setAttribute('href', 'Dashboard/dashboard.html');
+                heroCtaBtn.setAttribute('href', 'dashboard/dashboard.html');
             }
         } catch (e) {
             console.error("Error setting dynamic auth layout:", e);

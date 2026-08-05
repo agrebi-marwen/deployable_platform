@@ -34,7 +34,7 @@ async function initSubmitPage() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     
     if (!session || !session.user) {
-        window.location.href = "../Account/login.html";
+        window.location.href = "../account/login.html";
         return;
     }
     

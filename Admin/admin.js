@@ -52,7 +52,7 @@ async function verifyAdminRole() {
 
     if (sessionError || !session || !session.user) {
         alert("Unauthorized terminal. Please login.");
-        window.location.href = "../Account/login.html";
+        window.location.href = "../account/login.html";
         return;
     }
 
@@ -64,7 +64,7 @@ async function verifyAdminRole() {
 
     if (profileError || !profile || profile.role !== 'admin') {
         alert("ACCESS DENIED: Administrative credentials required.");
-        window.location.href = "../Dashboard/dashboard.html";
+        window.location.href = "../dashboard/dashboard.html";
         return;
     }
 

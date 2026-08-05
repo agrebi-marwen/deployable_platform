@@ -56,7 +56,7 @@ async function initDashboard() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
     if (!session || !session.user) {
-        window.location.href = "../Account/login.html";
+        window.location.href = "../account/login.html";
         return;
     }
 
@@ -373,9 +373,9 @@ function setupEventListeners() {
 let clickTracker = 0;
 let clickTimeout;
 
-// This is the Base64 encoded string of "../Admin/admin.html"
+// This is the Base64 encoded string of "../admin/admin.html"
 // Anyone inspecting your JS file will only see a random string of characters!
-const ENCODED_ROUTE = "Li4vQWRtaW4vYWRtaW4uaHRtbA=="; 
+const ENCODED_ROUTE = "Li4vYWRtaW4vYWRtaW4uaHRtbA=="; 
 
 function triggerStealthRedirect() {
     // Decode the path dynamically in memory right before redirecting

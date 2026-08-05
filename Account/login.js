@@ -29,7 +29,7 @@ async function checkSessionAndRedirect() {
     if (!supabaseClient) return;
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session && session.user) {
-        window.location.href = "../Dashboard/dashboard.html";
+        window.location.href = "../dashboard/dashboard.html";
     }
 }
 
@@ -78,7 +78,7 @@ form.addEventListener('submit', async (e) => {
         
         // Redirect the user to your main project dashboard
         setTimeout(() => {
-            window.location.href = "../Dashboard/dashboard.html";
+            window.location.href = "../dashboard/dashboard.html";
         }, 1000);
     }
 });

@@ -31,7 +31,7 @@ async function initSubmissionsPage() {
     const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
     
     if (authError || !session || !session.user) {
-        window.location.href = "../Account/login.html";
+        window.location.href = "../account/login.html";
         return;
     }
     

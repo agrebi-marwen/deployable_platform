@@ -29,7 +29,7 @@ async function checkSessionAndRedirect() {
     if (!supabaseClient) return;
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session && session.user) {
-        window.location.href = "../Dashboard/dashboard.html";
+        window.location.href = "../dashboard/dashboard.html";
     }
 }
 
