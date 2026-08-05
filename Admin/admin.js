@@ -40,10 +40,12 @@ const adminPanel = document.getElementById('admin-panel-content');
 const authError = document.getElementById('auth-error');
 const passInput = document.getElementById('admin-pass-input');
 
-
-passInput.addEventListener('keypress', (e) => {
+// Add event listener only if element exists
+if (passInput) {
+  passInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.checkAdminPassword();
-});
+  });
+}
 
 // DATABASE ROLE VERIFICATION 
 async function verifyAdminRole() {
@@ -94,9 +96,6 @@ window.checkAdminPassword = function() {
         passInput.focus();
     }
 };
-
-
-verifyAdminRole();
 
 // SUBMIT NEW CHALLENGES
 const challengeForm = document.getElementById('challenge-form');
