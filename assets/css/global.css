@@ -79,7 +79,8 @@
 
 /* Dark-mode-heavy effects tuned down so the light canvas stays readable */
 [data-theme="light"] #galaxy-bg-canvas {
-  opacity: 0.22;
+  opacity: 0.55;
+  filter: invert(1); /* black void -> soft white canvas, white stars -> dark */
 }
 
 [data-theme="light"] .cursor-spotlight-layer {
@@ -95,6 +96,21 @@
 [data-theme="light"] .cursor-light-ring {
   border-color: rgba(15, 23, 42, 0.5);
   box-shadow: 0 0 12px rgba(15, 23, 42, 0.15), inset 0 0 8px rgba(234, 88, 12, 0.2);
+}
+
+/* The logo rings/hands are white in the dark theme; flip them for light mode */
+[data-theme="light"] .temporal-portal-icon .inner-ring,
+[data-theme="light"] .temporal-portal-icon .clock-hands {
+  stroke: var(--text-primary);
+}
+
+/* Cards and footer kept dark in dark mode; flip their surfaces for light mode */
+[data-theme="light"] .card {
+  background: var(--card-bg);
+}
+
+[data-theme="light"] .temporal-footer {
+  background: #dfe4ec;
 }
 
 /* =========================================================================
