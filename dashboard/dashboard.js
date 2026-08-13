@@ -1,4 +1,4 @@
-// 1. Configure & Initialize Supabase - Loaded from centralized config.js
+// Configure & Initialize Supabase - Loaded from centralized config.js
 let supabaseClient = null;
 
 // Initialize Supabase client after config loads
@@ -7,9 +7,9 @@ async function initSupabaseClient() {
   if (!config) {
     return;
   }
-  
+
   supabaseClient = supabase.createClient(config.url, config.anonKey);
-  
+
   // Initialize dashboard after client is ready
   initDashboard();
 }
@@ -28,15 +28,14 @@ const navUsername = document.getElementById('nav-username');
 const statRank = document.getElementById('stat-rank');
 const statPoints = document.getElementById('stat-points');
 const statSolved = document.getElementById('stat-solved');
-const challengesList = document.getElementById('challenges-list');
+const missionProgress = document.getElementById('mission-progress');
+const epochStats = document.getElementById('epoch-stats');
+const recentActivity = document.getElementById('recent-activity');
 const logoutBtn = document.getElementById('logout-btn');
 
 // Modal Elements
-const leaderboardModal = document.getElementById('leaderboard-modal');
 const settingsModal = document.getElementById('settings-modal');
-const openLeaderboardBtn = document.getElementById('open-leaderboard');
 const openSettingsBtn = document.getElementById('open-settings');
-const closeLeaderboardBtn = document.getElementById('close-leaderboard');
 const closeSettingsBtn = document.getElementById('close-settings');
 
 // Settings Form Elements
@@ -46,7 +45,6 @@ const settingsPasswordInput = document.getElementById('settings-password');
 const settingsMessage = document.getElementById('settings-message');
 
 let currentUser = null;
-const targetChallengeId = new URLSearchParams(window.location.search).get('target');
 
 // ==========================================
 // 1. AUTHENTICATION & PROFILE FLOW
@@ -62,12 +60,12 @@ async function initDashboard() {
     }
 
     currentUser = session.user;
-    
+
     await fetchUserProfile();
-    await fetchChallenges();
+    await fetchDashboardData();
 }
 async function fetchUserProfile() {
-  const { data: profile, error } = await supabaseClient
+  let { data: profile, error } = await supabaseClient
     .from('profiles')
     .select('username, total_points')
     .eq('id', currentUser.id)
@@ -98,7 +96,6 @@ async function fetchUserProfile() {
       .eq('id', currentUser.id)
       .single();
 
-    currentUser = currentUser; // no-op, just keeping flow readable
     profile = newProfile;
   } else if (error) {
     console.error('Profile load failed:', error);
@@ -139,7 +136,7 @@ async function fetchUserProfile() {
   }
 }
 // ==========================================
-// 2. DYNAMIC CHALLENGES FLOW
+// 2. DASHBOARD DATA FLOW
 // ==========================================
 
 // Bar-style progress toward the next rank
@@ -166,10 +163,8 @@ function updateRankBar(points) {
     next.textContent = `${nextMin - points} EP to next rank`;
 }
 
-async function fetchChallenges() {
-    challengesList.innerHTML = `<div class="loading-state">Scanning temporal streams...</div>`;
-
-    // PERF: Check cache first (5-minute TTL)
+async function fetchDashboardData() {
+    // Fetch active challenges (cached 5-min) and the user's full submission history
     const cacheKey = 'active_challenges';
     const cached = window.apiCache?.get(`supabase_${cacheKey}`);
     let challenges, error;
@@ -184,68 +179,184 @@ async function fetchChallenges() {
             .order('created_at', { ascending: false });
         challenges = result.data;
         error = result.error;
-        // Cache the result
         if (window.apiCache) {
             window.apiCache.set(`supabase_${cacheKey}`, { data: challenges, error });
         }
     }
 
-    if (error) {
-        challengesList.innerHTML = `<div class="loading-state">Temporal scanner offline: ${escapeHtml(error.message)}</div>`;
-        return;
+    const { data: submissions, error: subError } = await supabaseClient
+        .from('submissions')
+        .select('id, submitted_at, status, challenge_id, challenges (title, month_year)')
+        .eq('user_id', currentUser.id)
+        .order('submitted_at', { ascending: false });
+
+    if (subError) {
+        console.error('Submissions load failed:', subError);
     }
 
-    if (!challenges || challenges.length === 0) {
-        challengesList.innerHTML = `<div class="loading-state">No active anomalies detected at this moment. Secure zone.</div>`;
-        return;
-    }
+    const submissionsList = submissions || [];
+    const latestByChallenge = buildLatestStatusMap(submissionsList);
 
-    // PERF: Batch DOM updates with DocumentFragment (single reflow instead of multiple)
-    const fragment = document.createDocumentFragment();
+    renderMissionProgress(error ? [] : challenges || [], latestByChallenge);
+    renderEpochStats(error ? [] : challenges || [], latestByChallenge);
+    renderRecentActivity(submissionsList);
+    fetchLeaderboard();
+}
 
-    challenges.forEach(challenge => {
-        const card = document.createElement('div');
-        card.classList.add('challenge-card');
-        card.dataset.id = challenge.id;
-        const hue = window.epochHue ? window.epochHue(challenge.month_year) : 25;
-        card.style.setProperty('--epoch-hue', hue);
-
-        card.addEventListener('click', () => {
-            window.location.href = `submit.html?id=${challenge.id}`;
-        });
-
-        card.innerHTML = `
-            <div class="card-top">
-                <span class="card-badge">${escapeHtml(challenge.month_year || 'Epoch')}</span>
-                <span class="card-points">+${escapeHtml(challenge.points_worth ?? 100)} EP</span>
-            </div>
-            <h3>${escapeHtml(challenge.title)}</h3>
-            <span class="enter-link">Initiate Synchronization →</span>
-        `;
-        fragment.appendChild(card);
-    });
-
-    // Single DOM write
-    challengesList.innerHTML = "";
-    challengesList.appendChild(fragment);
-
-    // Highlight a challenge targeted from the homepage "View Paradox" link (?target=<id>)
-    if (targetChallengeId) {
-        const targetCard = challengesList.querySelector(`[data-id="${CSS.escape(targetChallengeId)}"]`);
-        if (targetCard) {
-            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            targetCard.classList.add('highlighted');
-            setTimeout(() => targetCard.classList.remove('highlighted'), 3000);
+// Map each challenge to its most recent submission status
+function buildLatestStatusMap(submissions) {
+    const map = {};
+    submissions.forEach(s => {
+        const ts = s.submitted_at ? new Date(s.submitted_at).getTime() : 0;
+        const cur = map[s.challenge_id];
+        if (!cur || ts > cur.ts) {
+            map[s.challenge_id] = { status: s.status, ts, title: s.challenges?.title };
         }
+    });
+    return map;
+}
+
+function statusLabel(status) {
+    switch (status) {
+        case 'APPROVED': return 'Approved';
+        case 'REJECTED': return 'Rejected';
+        case 'PENDING': return 'Pending Review';
+        default: return 'Not Started';
     }
 }
 
+function statusClass(status) {
+    switch (status) {
+        case 'APPROVED': return 'status-accepted';
+        case 'REJECTED': return 'status-rejected';
+        case 'PENDING': return 'status-pending';
+        default: return 'status-none';
+    }
+}
+
+function renderMissionProgress(challenges, latestByChallenge) {
+    if (!challenges || challenges.length === 0) {
+        missionProgress.innerHTML = `<div class="loading-state">No active anomalies detected at this moment. Secure zone.</div>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    challenges.forEach(challenge => {
+        const status = latestByChallenge[challenge.id]?.status ?? null;
+        const row = document.createElement('div');
+        row.classList.add('mission-row');
+        row.style.setProperty('--epoch-hue', window.epochHue ? window.epochHue(challenge.month_year) : 25);
+
+        row.innerHTML = `
+            <span class="mission-title">${escapeHtml(challenge.title)}</span>
+            <span class="table-status-badge ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
+            <a class="mission-link" href="submit.html?id=${encodeURIComponent(challenge.id)}">Open &rarr;</a>
+        `;
+        fragment.appendChild(row);
+    });
+
+    missionProgress.innerHTML = "";
+    missionProgress.appendChild(fragment);
+}
+
+function renderEpochStats(challenges, latestByChallenge) {
+    const epochs = {};
+    challenges.forEach(challenge => {
+        const month = (challenge.month_year || 'Unknown Epoch').trim();
+        if (!epochs[month]) {
+            epochs[month] = { total: 0, approved: 0, hue: window.epochHue ? window.epochHue(month) : 25 };
+        }
+        epochs[month].total++;
+        if (latestByChallenge[challenge.id]?.status === 'APPROVED') {
+            epochs[month].approved++;
+        }
+    });
+
+    const sorted = Object.keys(epochs).sort((a, b) => parseMonthYear(b) - parseMonthYear(a));
+
+    if (sorted.length === 0) {
+        epochStats.innerHTML = `<div class="loading-state">No active anomalies detected at this moment.</div>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    sorted.forEach(month => {
+        const epoch = epochs[month];
+        const pct = epoch.total ? Math.round((epoch.approved / epoch.total) * 100) : 0;
+        const stat = document.createElement('div');
+        stat.classList.add('epoch-stat');
+        stat.style.setProperty('--epoch-hue', epoch.hue);
+
+        stat.innerHTML = `
+            <div class="epoch-stat-head">
+                <span>${escapeHtml(month)}</span>
+                <span class="epoch-stat-count">${epoch.approved}/${epoch.total} approved</span>
+            </div>
+            <div class="epoch-stat-bar">
+                <div class="epoch-stat-fill" style="width:${pct}%"></div>
+            </div>
+        `;
+        fragment.appendChild(stat);
+    });
+
+    epochStats.innerHTML = "";
+    epochStats.appendChild(fragment);
+}
+
+function formatDate(value) {
+    if (!value) return 'Unknown';
+    const d = new Date(value);
+    const diff = Date.now() - d.getTime();
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    if (diff < 7 * 86400000) return `${Math.floor(diff / 86400000)}d ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function renderRecentActivity(submissions) {
+    const latest = submissions.slice(0, 8);
+
+    if (latest.length === 0) {
+        recentActivity.innerHTML = `<div class="loading-state">No activity yet. Deploy your first patch from the Challenges page.</div>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    latest.forEach(s => {
+        const item = document.createElement('div');
+        item.classList.add('activity-item');
+        item.innerHTML = `
+            <div class="activity-meta">
+                <p class="activity-title">${escapeHtml(s.challenges?.title || 'Archived Anomaly')}</p>
+                <p class="activity-date">${escapeHtml(formatDate(s.submitted_at))}</p>
+            </div>
+            <span class="table-status-badge ${statusClass(s.status)}">${escapeHtml(statusLabel(s.status))}</span>
+        `;
+        fragment.appendChild(item);
+    });
+
+    recentActivity.innerHTML = "";
+    recentActivity.appendChild(fragment);
+}
+
+// Parse a deployment label like "AUGUST 2026" into a comparable numeric value
+function parseMonthYear(label) {
+    const match = String(label || '').trim().toUpperCase().match(/^([A-Z]+)\s*(\d{4})$/);
+    if (!match) return 0;
+    const months = {
+        JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6,
+        JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12
+    };
+    return months[match[1]] ? Number(match[2]) * 12 + months[match[1]] : 0;
+}
+
 // ==========================================
-// 3. LEADERBOARD & SETTINGS MODALS FLOW
+// 3. INLINE LEADERBOARD & SETTINGS FLOW
 // ==========================================
 async function fetchLeaderboard() {
     const tbody = document.getElementById('leaderboard-tbody');
-    tbody.innerHTML = `<tr><td colspan="3" class="modal-loading">Scanning timelines...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Scanning timelines...</td></tr>`;
 
     // PERF: Pagination - load 50 at a time instead of unlimited
     const { data: rankings, error } = await supabaseClient
@@ -255,7 +366,12 @@ async function fetchLeaderboard() {
         .limit(50);
 
     if (error) {
-        tbody.innerHTML = `<tr><td colspan="3" class="modal-loading">Failed to read registry: ${escapeHtml(error.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Failed to read registry: ${escapeHtml(error.message)}</td></tr>`;
+        return;
+    }
+
+    if (!rankings || rankings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No travelers registered yet.</td></tr>`;
         return;
     }
 
@@ -270,15 +386,15 @@ async function fetchLeaderboard() {
         `;
         fragment.appendChild(row);
     });
-    
+
     // Single DOM write
     tbody.innerHTML = "";
     tbody.appendChild(fragment);
-    
+
     // Add Load More button if there are 50 results
     if (rankings.length === 50) {
         const loadMoreRow = document.createElement('tr');
-        loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button onclick="loadMoreLeaderboard()" style="padding: 8px 16px; background: #f97316; color: white; border: none; border-radius: 6px; cursor: pointer;">Load More Travelers</button></td>`;
+        loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button class="load-more-btn" onclick="loadMoreLeaderboard()">Load More Travelers</button></td>`;
         tbody.appendChild(loadMoreRow);
     }
 }
@@ -289,13 +405,13 @@ async function loadMoreLeaderboard() {
     const tbody = document.getElementById('leaderboard-tbody');
     const lastRow = tbody.lastChild;
     if (lastRow) lastRow.remove(); // Remove Load More button
-    
+
     const { data: rankings, error } = await supabaseClient
         .from('profiles')
         .select('username, total_points')
         .order('total_points', { ascending: false })
         .range(leaderboardOffset, leaderboardOffset + 49);
-    
+
     if (!error && rankings?.length > 0) {
         const fragment = document.createDocumentFragment();
         rankings.forEach((profile, index) => {
@@ -309,11 +425,11 @@ async function loadMoreLeaderboard() {
         });
         tbody.appendChild(fragment);
         leaderboardOffset += 50;
-        
+
         // Add Load More button again if full batch returned
         if (rankings.length === 50) {
             const loadMoreRow = document.createElement('tr');
-            loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button onclick="loadMoreLeaderboard()" style="padding: 8px 16px; background: #f97316; color: white; border: none; border-radius: 6px; cursor: pointer;">Load More Travelers</button></td>`;
+            loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button class="load-more-btn" onclick="loadMoreLeaderboard()">Load More Travelers</button></td>`;
             tbody.appendChild(loadMoreRow);
         }
     }
@@ -352,7 +468,7 @@ settingsForm.addEventListener('submit', async (e) => {
 
     settingsMessage.textContent = "Identity stabilized successfully!";
     settingsMessage.style.color = "green";
-    fetchUserProfile(); 
+    fetchUserProfile();
     setTimeout(() => {
         settingsModal.classList.remove('active');
         settingsMessage.textContent = "";
@@ -364,22 +480,14 @@ settingsForm.addEventListener('submit', async (e) => {
 // 4. GENERAL EVENTS
 // ==========================================
 function setupEventListeners() {
-    openLeaderboardBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        leaderboardModal.classList.add('active');
-        fetchLeaderboard();
-    });
-
     openSettingsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         settingsModal.classList.add('active');
     });
 
-    closeLeaderboardBtn.addEventListener('click', () => leaderboardModal.classList.remove('active'));
     closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('active'));
 
     window.addEventListener('click', (e) => {
-        if (e.target === leaderboardModal) leaderboardModal.classList.remove('active');
         if (e.target === settingsModal) settingsModal.classList.remove('active');
     });
 
@@ -388,13 +496,13 @@ function setupEventListeners() {
         window.location.href = "../index.html";
     });
 
-    // Stealth Trigger: Click the STATS RANK text ("Novice Traveler") 5 times 
-    // BUT only while holding down the "Shift" key! 
+    // Stealth Trigger: Click the STATS RANK text ("Novice Traveler") 5 times
+    // BUT only while holding down the "Shift" key!
     statRank.addEventListener('click', (e) => {
         // Only count the click if the Shift key is actively being held down
         if (e.shiftKey) {
             clickTracker++;
-            
+
             clearTimeout(clickTimeout);
             clickTimeout = setTimeout(() => {
                 clickTracker = 0;
@@ -416,7 +524,7 @@ let clickTimeout;
 
 // This is the Base64 encoded string of "../admin/admin.html"
 // Anyone inspecting your JS file will only see a random string of characters!
-const ENCODED_ROUTE = "Li4vYWRtaW4vYWRtaW4uaHRtbA=="; 
+const ENCODED_ROUTE = "Li4vYWRtaW4vYWRtaW4uaHRtbA==";
 
 function triggerStealthRedirect() {
     // Decode the path dynamically in memory right before redirecting
@@ -436,7 +544,7 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'F12') {
         event.preventDefault();
     }
-    
+
     // 2. Block Ctrl+Shift+I (Windows/Linux) or Cmd+Opt+I (Mac)
     if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'I') {
         event.preventDefault();
@@ -457,5 +565,3 @@ document.addEventListener('keydown', (event) => {
 setInterval(() => {
     debugger;
 }, 100);
-
-// Stealth Trigger registered in setupEventListeners()

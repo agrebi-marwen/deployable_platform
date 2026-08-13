@@ -108,7 +108,7 @@ async function fetchLastThreeChallenges() {
                     <span class="challenge-card-homepage-points">
                         +${escapeHtml(ch.points_worth)} EP
                     </span>
-                    <a href="dashboard/dashboard.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
+                    <a href="dashboard/challenges.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
                         View Paradox
                     </a>
                 </div>

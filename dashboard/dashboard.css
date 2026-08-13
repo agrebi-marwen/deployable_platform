@@ -278,14 +278,6 @@ body {
    Used by: dashboard.html (rendered dynamically via dashboard.js)
    ========================================================================== */
 
-.challenges-section {
-  margin-top: 10px;
-}
-
-.challenges-section .section-subtitle {
-  margin: 0 auto 38px;
-}
-
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -535,62 +527,6 @@ body {
 
 .close-modal:hover {
   color: #ef4444;
-}
-
-/* Leaderboard table inside modal */
-.modal-table-container {
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-/* ==========================================================================
-   DASHBOARD — MODAL LEADERBOARD TABLE REPAIR
-   ========================================================================== */
-
-/* Force the modal table to stretch cleanly and behave like a proper table */
-.modal-table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-family: var(--font-body);
-}
-
-/* Format the Table Headers */
-.modal-table-container th {
-  padding: 12px 16px;
-  color: var(--accent-orange);
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Format the Table Data Cells with proper spacing to prevent merging */
-.modal-table-container td {
-  padding: 14px 16px;
-  color: #e5e7eb;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-/* Highlight the ranking numbers */
-.modal-table-container td strong {
-  color: var(--accent-blue);
-  font-family: var(--font-display);
-}
-
-/* Subtle hover effect on rows */
-.modal-table-container tbody tr:hover {
-  background: rgba(255, 255, 255, 0.01);
-}
-
-.modal-loading {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 30px;
-  font-size: 0.9rem;
 }
 
 /* Settings modal form layout */
@@ -946,5 +882,293 @@ body {
 
 .table-error {
   color: #ef4444 !important;
+}
+
+/* ==========================================================================
+   CHALLENGES ARCHIVE PAGE — epoch-grouped challenge listings
+   Used by: challenges.html (rendered dynamically via challenges.js)
+   ========================================================================== */
+
+.challenges-page-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 44px;
+}
+
+.challenges-page-header .section-subtitle {
+  margin: 0 auto;
+}
+
+.epoch-section {
+  margin-bottom: 48px;
+}
+
+.epoch-section + .epoch-section {
+  padding-top: 48px;
+  border-top: 1px solid hsla(var(--epoch-hue, 25) 60% 55% / 0.2);
+}
+
+.epoch-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.epoch-month {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+}
+
+.epoch-count {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.challenge-desc {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-archived {
+  cursor: default;
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+
+.card-archived:hover {
+  transform: none;
+  box-shadow: var(--neu-shadow-outset);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+}
+
+.card-archived .enter-link {
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   DASHBOARD — OVERVIEW PANELS
+   Used by: dashboard.html (mission progress, activity, epoch stats)
+   ========================================================================== */
+
+.panel-section {
+  margin-top: 40px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.panel-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.panel-header .panel-note {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--card-bg);
+  border: 1px solid hsl(var(--epoch-hue, 25) 55% 50% / 0.25);
+  border-radius: 14px;
+  padding: 14px 18px;
+  transition: border-color 0.2s;
+}
+
+.mission-row:hover {
+  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.5);
+}
+
+.mission-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.mission-link {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.mission-row:hover .mission-link {
+  color: hsl(var(--epoch-hue, 25) 85% 60%);
+}
+
+.status-none {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--card-bg);
+  border: var(--neu-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.activity-meta {
+  min-width: 0;
+}
+
+.activity-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.epoch-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.epoch-stat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+}
+
+.epoch-stat-head .epoch-stat-count {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.epoch-stat-bar {
+  height: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.epoch-stat-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, hsl(var(--epoch-hue, 25) 80% 50%), hsl(var(--epoch-hue, 25) 85% 60%));
+  box-shadow: 0 0 10px hsl(var(--epoch-hue, 25) 80% 50% / 0.5);
+  transition: width 0.8s ease;
+}
+
+/* Inline leaderboard (replaces the old modal) */
+.leaderboard-section {
+  margin-top: 48px;
+}
+
+.leaderboard-section .panel-header h2 {
+  font-size: 1.3rem;
+}
+
+.load-more-btn {
+  display: block;
+  margin: 24px auto 0;
+  padding: 10px 20px;
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--accent-orange);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.load-more-btn:hover {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(249, 115, 22, 0.6);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .epoch-header {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mission-row {
+    flex-wrap: wrap;
+  }
+
+  .mission-link {
+    margin-left: auto;
+  }
 }
 

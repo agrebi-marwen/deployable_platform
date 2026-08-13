@@ -34,10 +34,11 @@
       </svg>
       DASHBOARD
     </div>
-    
+
     <nav class="dash-nav-links">
-      <a href="submissions.html" id="open-submissions">Submissions</a>
-      <a href="#" id="open-leaderboard">Leaderboard</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="submissions.html">Submissions</a>
+      <a href="#leaderboard">Leaderboard</a>
       <a href="#" id="open-settings">Settings</a>
     </nav>
 
@@ -48,7 +49,7 @@
   </header>
 
   <div class="dashboard-container">
-    
+
     <section class="stats-row">
       <div class="stat-card">
         <p class="stat-label">Temporal Rank</p>
@@ -68,42 +69,61 @@
       </div>
     </section>
 
-    <section class="challenges-section">
-      <h2 class="section-title">Active Anomalies</h2>
-      <p class="section-subtitle">Select an active anomaly to view its instructions and deploy a patch.</p>
-      
-      <div class="challenges-grid" id="challenges-list">
-        <div class="loading-state">Scanning the temporal stream...</div>
+    <section class="panel-section">
+      <div class="panel-header">
+        <h2>Mission Progress</h2>
+        <span class="panel-note">Active anomalies and your latest deployment status</span>
+      </div>
+      <div id="mission-progress" class="mission-list">
+        <div class="loading-state">Scanning active anomalies...</div>
       </div>
     </section>
 
-  </div>
+    <div class="dashboard-grid">
+      <section class="panel-section">
+        <div class="panel-header">
+          <h2>Per-Epoch Stats</h2>
+          <span class="panel-note">Approved patches per deployment epoch</span>
+        </div>
+        <div id="epoch-stats" class="epoch-stats">
+          <div class="loading-state">Compiling epoch reports...</div>
+        </div>
+      </section>
 
+      <section class="panel-section">
+        <div class="panel-header">
+          <h2>Recent Activity</h2>
+          <a class="panel-note" href="submissions.html" style="text-decoration: none;">View all &rarr;</a>
+        </div>
+        <div id="recent-activity" class="activity-list">
+          <div class="loading-state">Streaming recent activity...</div>
+        </div>
+      </section>
+    </div>
 
-  <div class="modal-overlay" id="leaderboard-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🏆 Registry of Elite Time Travelers</h2>
-        <button class="close-modal" id="close-leaderboard">&times;</button>
+    <section class="panel-section leaderboard-section" id="leaderboard">
+      <div class="panel-header">
+        <h2>Registry of Elite Time Travelers</h2>
+        <span class="panel-note">Real-time standings stabilizing the timeline</span>
       </div>
-      <p class="modal-subtitle">Real-time standings of travelers stabilizing the timeline.</p>
-      <div class="modal-table-container">
-        <table>
+      <div class="leaderboard-card">
+        <table class="leaderboard-table">
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Traveler Name</th>
-              <th>Energy Points (EP)</th>
+              <th class="col-rank">Rank</th>
+              <th class="col-name">Traveler Name</th>
+              <th class="col-points">Energy Points (EP)</th>
             </tr>
           </thead>
           <tbody id="leaderboard-tbody">
             <tr>
-              <td colspan="3" class="modal-loading">Querying active timelines...</td>
+              <td colspan="3" class="table-loading">Scanning historical registers...</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
+
   </div>
 
 
@@ -114,11 +134,11 @@
         <button class="close-modal" id="close-settings">&times;</button>
       </div>
       <p class="modal-subtitle">Configure your public credentials and security protocols.</p>
-      
-      
+
+
       <form id="settings-form" class="settings-form-layout">
         <div class="form-group">
-          <label for="settings-username">Public Username</label>  
+          <label for="settings-username">Public Username</label>
           <input type="text" id="settings-username" placeholder="New username" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" title="Usernames can only contain letters, numbers, and underscores (3-50 chars).">
         </div>
 
@@ -137,7 +157,6 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="logo">
-          <!-- Footers matching high-tech SVG Logo Icon -->
           <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
             <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
@@ -148,13 +167,13 @@
         </div>
         <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
       </div>
-      
+
       <div class="footer-links-group">
         <h4>Navigation</h4>
         <ul class="footer-links">
           <li><a href="/index.html">Home Portal</a></li>
-          <li><a href="/dashboard/dashboard.html">Anomalies</a></li>
-          <li><a href="/index.html#leaderboard">Registry Standings</a></li>
+          <li><a href="/dashboard/dashboard.html">Dashboard</a></li>
+          <li><a href="/dashboard/challenges.html">Challenges</a></li>
         </ul>
       </div>
 

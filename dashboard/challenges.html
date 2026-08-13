@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transmission Logs Archive</title>
-  
+  <title>Challenge Archive</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23f97316'/></svg>">
-
   <link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="../assets/css/global.css">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" 
-        integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" 
-        crossorigin="anonymous" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous" defer></script>
   <script src="../assets/js/config.js" defer></script>
   <script src="../assets/js/api-cache.js" defer></script>
+  <script src="../assets/js/galaxy-bg.js" defer></script>
   <script src="../assets/js/cursor-lighting.js" defer></script>
   <script src="../assets/js/creative.js" defer></script>
-  <script src="submissions.js" defer></script>
+  <script src="challenges.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23f97316'/></svg>">
+
 </head>
 <body>
 
@@ -28,47 +26,46 @@
 
   <header class="dash-navbar">
     <div class="logo">
-      <a href="dashboard.html" style="text-decoration: none; color: inherit;">
-        <span class="logo-icon">←</span> Back to Command Center
-      </a>
+      <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
+        <polyline class="clock-hands" points="12 6 12 12 16 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="1.5" fill="#f97316"/>
+      </svg>
+      CHALLENGE ARCHIVE
     </div>
-    <div class="nav-title">Temporal Log Stream</div>
+
+    <nav class="dash-nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="challenges.html" aria-current="page">Challenges</a>
+      <a href="submissions.html">Submissions</a>
+      <a href="dashboard.html#leaderboard">Leaderboard</a>
+    </nav>
+
+    <div class="user-profile-nav">
+      <span id="nav-username">Loading Traveler...</span>
+      <button id="logout-btn" class="btn-logout">De-authorize</button>
+    </div>
   </header>
 
-  <div class="submissions-dashboard-container">
-    <header class="log-archive-header">
-      <div class="section-badge">System Archive</div>
-      <h1>Patch Transmission History</h1>
-      <p class="subtitle">Track real-time synchronization states of your paradox solutions across the grid.</p>
-    </header>
+  <div class="dashboard-container">
 
-    <main class="log-archive-card">
-      <div class="table-container">
-        <table class="log-table">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Paradox Target</th>
-              <th>Resource URL</th>
-              <th>Sync Status</th>
-            </tr>
-          </thead>
-          <tbody id="logs-table-body">
-            <tr>
-              <td colspan="4" class="table-loading">Initializing query systems...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <section class="challenges-page-header">
+      <span class="section-badge">Epoch Archive</span>
+      <h2 class="section-title">All Challenges</h2>
+      <p class="section-subtitle">Every anomaly ever deployed, grouped by its deployment epoch. Active anomalies await your patch.</p>
+    </section>
+
+    <div id="challenges-archive">
+      <div class="loading-state">Scanning the temporal archive...</div>
+    </div>
+
   </div>
-
 
   <footer class="temporal-footer">
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="logo">
-          <!-- Footers matching high-tech SVG Logo Icon -->
           <svg class="logo-icon temporal-portal-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle class="outer-ring" cx="12" cy="12" r="10" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
             <circle class="inner-ring" cx="12" cy="12" r="6" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 1" opacity="0.4"/>
@@ -79,13 +76,13 @@
         </div>
         <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
       </div>
-      
+
       <div class="footer-links-group">
         <h4>Navigation</h4>
         <ul class="footer-links">
           <li><a href="/index.html">Home Portal</a></li>
-          <li><a href="/dashboard/challenges.html">Challenges</a></li>
           <li><a href="/dashboard/dashboard.html">Dashboard</a></li>
+          <li><a href="/dashboard/challenges.html">Challenges</a></li>
         </ul>
       </div>
 
