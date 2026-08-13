@@ -11,7 +11,7 @@
   --neu-shadow-inset: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a;
   --neu-shadow-inset-focus: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a, 0 0 10px rgba(249, 115, 22, 0.35);
   --neu-btn-gradient: linear-gradient(145deg, #181a22, #14161c);
-  --neu-border: 1px solid rgba(255, 255, 255, 0.05);
+  --neu-border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 body {
@@ -83,7 +83,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(255, 255, 255, 0.1) 0%,
+    rgba(var(--rgb-white, 255, 255, 255), 0.1) 0%,
     rgba(249, 115, 22, 0.04) 40%,
     transparent 80%
   );
@@ -92,7 +92,7 @@ body {
 .panel-card h2 {
   font-size: 1.4rem;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
   padding-bottom: 12px;
   color: var(--accent-orange);
 }
@@ -153,7 +153,7 @@ textarea {
 
 .submit-btn:hover {
   box-shadow: var(--neu-shadow-outset-hover);
-  color: #fff;
+  color: var(--text-primary);
   border-color: var(--accent-orange);
 }
 
@@ -212,7 +212,7 @@ textarea {
 .btn-approve:hover {
   box-shadow: var(--neu-shadow-outset-hover);
   background: #10b981;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .btn-approve:active {
@@ -227,7 +227,7 @@ textarea {
 .btn-reject:hover {
   box-shadow: var(--neu-shadow-outset-hover);
   background: #ef4444;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .btn-reject:active {

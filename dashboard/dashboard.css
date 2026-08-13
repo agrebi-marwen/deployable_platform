@@ -29,7 +29,7 @@
   --neu-shadow-inset: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a;
   --neu-shadow-inset-focus: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a, 0 0 10px rgba(59, 130, 246, 0.35);
   --neu-btn-gradient: linear-gradient(145deg, #181a22, #14161c);
-  --neu-border: 1px solid rgba(255, 255, 255, 0.05);
+  --neu-border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 body {
@@ -49,8 +49,8 @@ body {
   width: 100%;
   height: 100%;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: -1;
   pointer-events: none;
@@ -243,7 +243,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(255, 255, 255, 0.1) 0%,
+    rgba(var(--rgb-white, 255, 255, 255), 0.1) 0%,
     rgba(249, 115, 22, 0.04) 40%,
     transparent 80%
   );
@@ -310,7 +310,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(255, 255, 255, 0.12) 0%,
+    rgba(var(--rgb-white, 255, 255, 255), 0.12) 0%,
     rgba(249, 115, 22, 0.05) 40%,
     transparent 80%
   );
@@ -331,7 +331,7 @@ body {
 @keyframes challenge-highlight {
   0%   { border-color: rgba(249, 115, 22, 0.9); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.25); }
   70%  { border-color: rgba(249, 115, 22, 0.5); box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.3), 0 0 15px rgba(249, 115, 22, 0.15); }
-  100% { border-color: var(--neu-border-color, rgba(255, 255, 255, 0.08)); box-shadow: none; }
+  100% { border-color: var(--neu-border-color, rgba(var(--rgb-white, 255, 255, 255), 0.08)); box-shadow: none; }
 }
 
 .card-top {
@@ -412,7 +412,7 @@ body {
   height: 10px;
   margin-top: 14px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.08);
   overflow: hidden;
 }
 
@@ -550,14 +550,14 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
 }
 
 .modal-table-container td {
   padding: 14px 16px;
-  color: #e5e7eb;
+  color: var(--text-strong);
   font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.03);
 }
 
 .modal-table-container td strong {
@@ -566,7 +566,7 @@ body {
 }
 
 .modal-table-container tbody tr:hover {
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
 }
 
 .modal-loading {
@@ -629,7 +629,7 @@ body {
 
 .btn-save-settings:hover {
   box-shadow: var(--neu-shadow-outset-hover);
-  color: #fff;
+  color: var(--text-primary);
   border-color: var(--accent-orange);
 }
 
@@ -689,7 +689,7 @@ body {
   color: var(--success-green);
   margin-bottom: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 .challenge-instructions-box {
@@ -788,7 +788,7 @@ body {
 
 .submission-card button:hover:not(:disabled) {
   box-shadow: var(--neu-shadow-outset-hover);
-  color: #fff;
+  color: var(--text-primary);
   border-color: var(--accent-orange);
 }
 
@@ -847,7 +847,7 @@ body {
 .log-archive-card {
   background: rgba(17, 24, 39, 0.4);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -867,7 +867,7 @@ body {
 }
 
 .log-table th {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.02);
   padding: 16px 24px;
   color: var(--accent-orange);
   font-family: var(--font-display);
@@ -875,13 +875,13 @@ body {
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 .log-table td {
   padding: 18px 24px;
-  color: #d1d5db;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-strong);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.03);
 }
 
 .log-table tbody tr {
@@ -889,18 +889,18 @@ body {
 }
 
 .log-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
 }
 
 /* Column-specific overrides */
 .col-time {
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
   font-size: 0.8rem;
 }
 
 .col-title {
   font-weight: 600;
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
 }
 
 /* Clickable URL links inside the table */
@@ -922,7 +922,7 @@ body {
 .table-error {
   text-align: center;
   padding: 50px 0 !important;
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
   font-style: italic;
   font-size: 0.95rem;
 }
@@ -978,8 +978,8 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.04);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
   padding: 4px 12px;
   border-radius: 20px;
 }
@@ -1093,9 +1093,9 @@ body {
 }
 
 .status-none {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.05);
   color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.1);
 }
 
 .epoch-stats {
@@ -1124,7 +1124,7 @@ body {
 .epoch-stat-bar {
   height: 8px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.08);
   overflow: hidden;
 }
 

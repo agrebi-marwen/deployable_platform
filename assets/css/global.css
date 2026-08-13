@@ -38,7 +38,104 @@
   --neu-shadow-inset-focus:  inset 6px 6px 16px #000000, inset -6px -6px 16px #282828, 0 0 12px rgba(59, 130, 246, 0.4);
   --neu-shadow-inset-sm:     inset 4px 4px 10px #000000, inset -4px -4px 10px #282828;
   --neu-btn-gradient:        linear-gradient(145deg, #1a1a1a, #0a0a0a);
-  --neu-border:              1px solid rgba(255, 255, 255, 0.08);
+  --neu-border:              1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
+
+  /* Theme-agnostic tokens (flipped in [data-theme="light"]) */
+  --rgb-white: 255, 255, 255;
+  --text-strong: #e5e7eb;
+  --text-muted: #6b7280;
+  --text-faint: #9ca3af;
+}
+
+/* =========================================================================
+   LIGHT THEME
+   Applied when theme.js sets data-theme="light" on <html>.
+   Since global.css is loaded last on every page, these tokens win all ties.
+   ========================================================================= */
+[data-theme="light"] {
+  --bg-color: #eef1f6;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-strong: #1e293b;
+  --text-muted: #64748b;
+  --text-faint: #64748b;
+  --accent-blue: #2563eb;
+  --accent-orange: #ea580c;
+  --accent-glow: rgba(234, 88, 12, 0.14);
+  --success-green: #0d9668;
+  --pending-yellow: #d97706;
+  --rgb-white: 15, 23, 42;
+
+  --neu-shadow-outset:       8px 8px 20px #cbd5e1,  -8px -8px 20px #ffffff;
+  --neu-shadow-outset-hover: 10px 10px 26px #c7d2e0, -10px -10px 26px #ffffff;
+  --neu-shadow-outset-sm:    4px 4px 10px #d1d5db,    -4px -4px 10px #ffffff;
+  --neu-shadow-inset:        inset 6px 6px 16px #d8dfe9, inset -6px -6px 16px #ffffff;
+  --neu-shadow-inset-focus:  inset 6px 6px 16px #d8dfe9, inset -6px -6px 16px #ffffff, 0 0 12px rgba(37, 99, 235, 0.35);
+  --neu-shadow-inset-sm:     inset 4px 4px 10px #d8dfe9, inset -4px -4px 10px #ffffff;
+  --neu-btn-gradient:        linear-gradient(145deg, #ffffff, #e7ebf1);
+  --neu-border:              1px solid rgba(15, 23, 42, 0.12);
+}
+
+/* Dark-mode-heavy effects tuned down so the light canvas stays readable */
+[data-theme="light"] #galaxy-bg-canvas {
+  opacity: 0.22;
+}
+
+[data-theme="light"] .cursor-spotlight-layer {
+  background: radial-gradient(
+    circle 120px at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(15, 23, 42, 0.08) 0%,
+    rgba(234, 88, 12, 0.06) 45%,
+    rgba(37, 99, 235, 0.04) 70%,
+    transparent 100%
+  );
+}
+
+[data-theme="light"] .cursor-light-ring {
+  border-color: rgba(15, 23, 42, 0.5);
+  box-shadow: 0 0 12px rgba(15, 23, 42, 0.15), inset 0 0 8px rgba(234, 88, 12, 0.2);
+}
+
+/* =========================================================================
+   THEME TOGGLE BUTTON — shown on every page navbar
+   ========================================================================= */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-shadow-outset-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle:hover {
+  color: var(--accent-orange);
+  border-color: rgba(249, 115, 22, 0.5);
+  transform: rotate(15deg);
+}
+
+.theme-toggle:active {
+  transform: scale(0.92);
+}
+
+.theme-toggle-fixed {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 1000;
 }
 
 body {
@@ -66,7 +163,7 @@ body {
   transition: opacity 0.4s ease;
   background: radial-gradient(
     circle 120px at var(--mouse-x, -500px) var(--mouse-y, -500px),
-    rgba(255, 255, 255, 0.16) 0%,
+    rgba(var(--rgb-white, 255, 255, 255), 0.16) 0%,
     rgba(249, 115, 22, 0.08) 45%,
     rgba(59, 130, 246, 0.03) 70%,
     transparent 100%
@@ -83,8 +180,8 @@ body {
   pointer-events: none;
   z-index: 9998;
   opacity: 0;
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2), inset 0 0 8px rgba(249, 115, 22, 0.2);
+  border: 1.5px solid rgba(var(--rgb-white, 255, 255, 255), 0.5);
+  box-shadow: 0 0 12px rgba(var(--rgb-white, 255, 255, 255), 0.2), inset 0 0 8px rgba(249, 115, 22, 0.2);
   transition: opacity 0.3s ease;
   will-change: transform;
 }
@@ -171,7 +268,7 @@ body {
 .cta-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--neu-shadow-outset-hover) !important;
-  color: #fff !important;
+  color: var(--text-primary) !important;
   border-color: var(--accent-orange) !important;
 }
 
@@ -206,7 +303,7 @@ body {
   line-height: 1.1;
   letter-spacing: -2px;
   margin-bottom: 24px;
-  background: linear-gradient(180deg, #ffffff 50%, #9ca3af 100%);
+  background: linear-gradient(180deg, var(--text-primary) 50%, var(--text-faint) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -239,7 +336,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  color: #fff;
+  color: var(--text-primary);
   box-shadow: var(--neu-shadow-outset-hover);
   border-color: var(--accent-orange);
 }
@@ -285,7 +382,7 @@ body {
   background: #131313;
   box-shadow: var(--neu-shadow-outset),
               0 0 0 1px rgba(45, 45, 45, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.09);
   border-radius: 24px;
   padding: 32px;
   position: relative;
@@ -304,7 +401,7 @@ body {
   left: 10%;
   right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--rgb-white, 255, 255, 255), 0.12), transparent);
   border-radius: 1px;
   pointer-events: none;
   z-index: 1;
@@ -325,7 +422,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(255, 255, 255, 0.12) 0%,
+    rgba(var(--rgb-white, 255, 255, 255), 0.12) 0%,
     rgba(249, 115, 22, 0.06) 40%,
     transparent 80%
   );
@@ -372,7 +469,7 @@ body {
   font-weight: 700;
   margin-top: 12px;
   margin-bottom: 12px;
-  background: linear-gradient(180deg, #ffffff 50%, #9ca3af 100%);
+  background: linear-gradient(180deg, var(--text-primary) 50%, var(--text-faint) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -477,13 +574,13 @@ body {
   color: var(--text-secondary);
   padding: 6px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.12);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.02);
   transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .team-links a:hover {
-  color: #fff;
+  color: var(--text-primary);
   border-color: rgba(249, 115, 22, 0.5);
   background: rgba(249, 115, 22, 0.08);
 }
@@ -509,14 +606,14 @@ body {
   font-weight: 700;
   margin-top: 12px;
   margin-bottom: 12px;
-  background: linear-gradient(180deg, #ffffff 50%, #9ca3af 100%);
+  background: linear-gradient(180deg, var(--text-primary) 50%, var(--text-faint) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .leaderboard-card {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
   border-radius: 24px;
   padding: 32px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
@@ -534,13 +631,13 @@ body {
   color: var(--text-secondary);
   letter-spacing: 1.5px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
 }
 
 .leaderboard-table td {
   padding: 18px 12px;
   font-size: 0.95rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.03);
 }
 
 .col-rank { text-align: left; width: 15%; }
@@ -548,7 +645,7 @@ body {
 .col-points { text-align: right; width: 25%; color: var(--accent-orange); font-weight: 700; }
 
 .leaderboard-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
 }
 
 .table-loading {
@@ -564,20 +661,20 @@ body {
 .challenges-section {
   margin-top: 40px;
   padding-top: 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 .challenges-section h2 {
   font-family: 'Space Grotesk', sans-serif;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 1.8rem;
   margin-bottom: 24px;
 }
 
 /* PERF: Homepage challenge card specific styles (extracted from inline) */
 .challenge-card-homepage {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.02) !important;
+  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.06) !important;
   border-radius: 12px !important;
   padding: 20px !important;
   margin-bottom: 15px !important;
@@ -588,7 +685,7 @@ body {
 }
 
 .challenge-card-homepage:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: rgba(var(--rgb-white, 255, 255, 255), 0.04) !important;
   border-color: rgba(249, 115, 22, 0.3) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
@@ -604,14 +701,14 @@ body {
 }
 
 .challenge-card-homepage-title {
-  color: #ffffff;
+  color: var(--text-primary);
   margin: 0 0 8px 0;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
 }
 
 .challenge-card-homepage-desc {
-  color: #9ca3af;
+  color: var(--text-faint);
   font-size: 0.85rem;
   margin: 0;
   line-height: 1.4;
@@ -634,7 +731,7 @@ body {
   display: inline-block;
   padding: 8px 12px;
   background: #f97316;
-  color: #ffffff;
+  color: var(--text-primary);
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -656,7 +753,7 @@ body {
 .temporal-footer {
   margin-top: 80px;
   background: #0a0b12;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
   padding: 60px 40px 30px 40px;
   position: relative;
   z-index: 10;
@@ -669,14 +766,14 @@ body {
   grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
   padding-bottom: 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
 }
 
 .footer-brand .logo {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 1.3rem;
-  color: #ffffff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -684,7 +781,7 @@ body {
 }
 
 .footer-tagline {
-  color: #9ca3af;
+  color: var(--text-faint);
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 0.9rem;
   line-height: 1.6;
@@ -712,14 +809,14 @@ body {
 
 .footer-links a {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #9ca3af;
+  color: var(--text-faint);
   text-decoration: none;
   font-size: 0.88rem;
   transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .footer-bottom {
@@ -739,7 +836,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #9ca3af;
+  color: var(--text-faint);
 }
 
 .status-indicator {
