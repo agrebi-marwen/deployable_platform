@@ -593,9 +593,9 @@
    ========================================================================= */
 .submit-layout-container {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.7fr 1fr;
   gap: 30px;
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 40px auto;
   padding: 0 5%;
 }
@@ -612,43 +612,46 @@
     inset -3px -3px 0 rgba(0, 0, 0, 0.45),
     inset 3px 3px 0 rgba(255, 255, 255, 0.07),
     var(--shadow-hard);
-  padding: 40px;
+  padding: 48px;
 }
 
 .challenge-details-card .section-badge {
+  font-size: 19px;
+  padding: 4px 14px;
   color: hsl(var(--epoch-hue, 25) 90% 62%);
   border-color: hsl(var(--epoch-hue, 25) 75% 48%);
 }
 
 .challenge-details-card h1 {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 26px;
+  line-height: 1.4;
   text-transform: uppercase;
   color: hsl(var(--epoch-hue, 25) 30% 90%);
-  margin: 14px 0 10px;
+  margin: 16px 0 12px;
 }
 
 .challenge-reward {
   font-family: var(--font-meta);
-  font-size: 19px;
+  font-size: 22px;
   color: var(--neon-green);
-  margin-bottom: 28px;
-  padding-bottom: 20px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
   border-bottom: var(--border-thin);
 }
 
 .challenge-instructions-box h3 {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 15px;
   text-transform: uppercase;
   color: var(--neon-orange);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .challenge-instructions-box p {
   color: var(--text-mid);
-  line-height: 1.75;
-  font-size: 15px;
+  line-height: 1.85;
+  font-size: 17px;
   white-space: pre-wrap;
 }
 
