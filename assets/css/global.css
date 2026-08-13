@@ -1173,3 +1173,129 @@ body {
   display: inline-block;
   width: 20px; /* Adjust the width as needed */
 }
+
+/* =========================================================================
+   CREATIVE — Portal transition, particle burst, time ruler, epoch colors
+   ========================================================================= */
+
+/* ---- Portal overlay (page-to-page navigation) ---- */
+#portal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(from 0deg,
+    #0f1117 0deg, #f97316 45deg, #0f1117 90deg,
+    #3b82f6 135deg, #0f1117 180deg, #a855f7 225deg,
+    #0f1117 270deg, #f97316 315deg, #0f1117 360deg);
+  border-radius: 50%;
+  transform: scale(0.1) rotate(0deg);
+}
+
+#portal-overlay.active {
+  animation: portal-open 0.5s ease-out forwards;
+}
+
+@keyframes portal-open {
+  0%   { opacity: 0; transform: scale(0.1) rotate(0deg); }
+  55%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(3) rotate(360deg); }
+}
+
+/* ---- Submit success particle burst ---- */
+.burst-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.burst-particle {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  will-change: transform, opacity;
+  animation: particle-fly 0.9s ease-out forwards;
+}
+
+@keyframes particle-fly {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.2); opacity: 0; }
+}
+
+/* ---- Homepage scroll time-ruler ---- */
+.time-ruler {
+  position: fixed;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 40vh;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 200;
+}
+
+.time-ruler-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  border-radius: 3px;
+  background: hsl(var(--travel-hue, 35) 80% 55%);
+  box-shadow: 0 0 10px hsl(var(--travel-hue, 35) 80% 55% / 0.7);
+  transition: background-color 0.2s ease;
+}
+
+/* ---- Homepage scroll time-travel accents (scoped to .home) ---- */
+.home .hero h1 {
+  background: linear-gradient(180deg, #ffffff 50%, hsl(var(--travel-hue, 220) 35% 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.home .section-badge {
+  color: hsl(var(--travel-hue, 220) 90% 62%);
+  border-color: hsl(var(--travel-hue, 220) 60% 55% / 0.4);
+  background: hsl(var(--travel-hue, 220) 70% 50% / 0.15);
+}
+
+.home .team-links a:hover {
+  border-color: hsl(var(--travel-hue, 220) 70% 55% / 0.6);
+  background: hsl(var(--travel-hue, 220) 70% 50% / 0.1);
+}
+
+/* ---- Epoch color coding (homepage challenge cards) ---- */
+.challenge-card-homepage {
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35) !important;
+}
+
+.challenge-card-homepage:hover {
+  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.6) !important;
+}
+
+.challenge-card-homepage-epoch {
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+}
+
+.challenge-card-homepage-points {
+  color: hsl(var(--epoch-hue, 25) 80% 55%);
+}
+
+.challenge-card-homepage-btn {
+  background: hsl(var(--epoch-hue, 25) 85% 55%);
+}
+
+.challenge-card-homepage-btn:hover {
+  background: hsl(var(--epoch-hue, 25) 80% 48%);
+}
+
+@media (max-width: 600px) {
+  .time-ruler {
+    display: none;
+  }
+}

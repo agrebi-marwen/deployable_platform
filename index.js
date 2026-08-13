@@ -89,8 +89,10 @@ async function fetchLastThreeChallenges() {
             return;
         }
 
-        container.innerHTML = challenges.map(ch => `
-            <div class="challenge-card-homepage">
+        container.innerHTML = challenges.map(ch => {
+            const hue = window.epochHue ? window.epochHue(ch.month_year) : 25;
+            return `
+            <div class="challenge-card-homepage" style="--epoch-hue: ${hue};">
                 <div>
                     <span class="challenge-card-homepage-epoch">
                         ${escapeHtml(ch.month_year || "Active Epoch")}
@@ -111,7 +113,8 @@ async function fetchLastThreeChallenges() {
                     </a>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     } catch (err) {
         console.error("❌ Challenges Error:", err);
         container.innerHTML = `<p style="color: #ef4444; font-size: 0.9rem;">Error accessing temporal stream: ${escapeHtml(err.message)}</p>`;

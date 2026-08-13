@@ -73,6 +73,12 @@ async function loadChallengeDetails() {
     challengeMonth.textContent = challenge.month_year || "Active Paradox";
     challengePoints.textContent = `Reward: ${challenge.points_worth} EP`;
     challengeInstructions.textContent = challenge.instructions;
+
+    // Tint the challenge header with this month's epoch hue
+    const detailsCard = document.querySelector('.challenge-details-card');
+    if (detailsCard && window.applyEpochColor && window.epochHue) {
+        window.applyEpochColor(detailsCard, window.epochHue(challenge.month_year));
+    }
 }
 
 // Handle Form Submission
@@ -118,6 +124,13 @@ submissionForm.addEventListener('submit', async (e) => {
         submissionMessage.style.color = "#10b981";
         submissionUrl.value = "";
         submitBtn.textContent = "Patch Synchronized";
+
+        // Sparkle burst from the submit button
+        if (window.burstParticles) {
+            const rect = submitBtn.getBoundingClientRect();
+            const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
+            window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
+        }
         
         setTimeout(() => {
             submitBtn.disabled = false;

@@ -15,6 +15,7 @@
   <script src="../assets/js/api-cache.js" defer></script>
   <script src="../assets/js/galaxy-bg.js" defer></script>
   <script src="../assets/js/cursor-lighting.js" defer></script>
+  <script src="../assets/js/creative.js" defer></script>
   <script src="dashboard.js" defer></script>
   <link rel="stylesheet" href="../assets/css/global.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23f97316'/></svg>">
@@ -53,6 +54,15 @@
       <div class="stat-card">
         <p class="stat-label">Temporal Rank</p>
         <h3 id="stat-rank">Novice Traveler</h3>
+        <div class="rank-dial">
+          <svg viewBox="0 0 120 120">
+            <circle class="dial-track" cx="60" cy="60" r="46"></circle>
+            <circle class="dial-progress" id="dial-progress" cx="60" cy="60" r="46"></circle>
+            <line class="dial-hand" id="dial-hand" x1="60" y1="60" x2="100" y2="60"></line>
+            <circle class="dial-pin" cx="60" cy="60" r="4"></circle>
+          </svg>
+          <div class="dial-caption" id="dial-next">Reaching next rank</div>
+        </div>
       </div>
       <div class="stat-card">
         <p class="stat-label">Energy Points</p>
