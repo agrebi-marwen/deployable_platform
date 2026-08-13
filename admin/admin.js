@@ -225,7 +225,26 @@ function renderSubmissions(submissions, challengeLookup) {
             </div>
         `;
         submissionsList.appendChild(card);
-    });
+});
+
+// RESOLVE PENDING 
+window.resolveSubmission = async (id, status) => {
+    if (!isRoleAuthorized || !isPasswordAuthorized) {
+        alert("Terminal unauthorized.");
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('submissions')
+        .update({ status: status })
+        .eq('id', id);
+
+    if (error) {
+        alert("Failure adjusting status: " + error.message);
+    } else {
+        fetchPendingSubmissions();
+    }
+};
 }
 
 submissionsList.addEventListener('click', async (e) => {
@@ -281,21 +300,3 @@ submissionsList.addEventListener('click', async (e) => {
     }
 });
 
-// RESOLVE PENDING 
-window.resolveSubmission = async (id, status) => {
-    if (!isRoleAuthorized || !isPasswordAuthorized) {
-        alert("Terminal unauthorized.");
-        return;
-    }
-
-    const { error } = await supabaseClient
-        .from('submissions')
-        .update({ status: status })
-        .eq('id', id);
-
-    if (error) {
-        alert("Failure adjusting status: " + error.message);
-    } else {
-        fetchPendingSubmissions();
-    }
-};

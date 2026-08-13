@@ -218,12 +218,6 @@ body {
   margin-bottom: 40px;
 }
 
-.hero-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
 .btn {
   text-decoration: none;
   padding: 14px 32px;
@@ -923,16 +917,6 @@ body {
 
   .hero .subtitle { font-size: 1rem; }
 
-  .hero-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .hero-actions .btn {
-    width: 100%;
-    text-align: center;
-  }
-
   /* Grids — single column, flat */
   .challenges-grid,
   .team-grid {
@@ -985,15 +969,9 @@ body {
   /* Stats */
   .stats-row { grid-template-columns: 1fr; }
 
-  .challenge-section,
   .leaderboard-card, .card,
   .challenge-details-card, .submission-card {
     padding: 16px;
-  }
-
-  .challenge-meta {
-    flex-direction: column;
-    gap: 8px;
   }
 
   /* Kill all animations on mobile */
@@ -1013,8 +991,6 @@ body {
   .section-title,
   .leaderboard-header h2,
   .log-archive-header h1 { font-size: 1.5rem; }
-
-  .challenge-section h2 { font-size: 1.3rem; }
 
   .modal-content {
     width: 95%;

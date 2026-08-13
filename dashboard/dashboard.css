@@ -171,15 +171,6 @@ body {
    Used by: dashboard.html (modal table), submissions.html (log table)
    ========================================================================== */
 
-/* Applied via .status-badge (generic inline badges) */
-.status-badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
 /* Applied via .table-status-badge (submissions.html datatable) */
 .table-status-badge {
   display: inline-block;
@@ -191,14 +182,13 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Colour modifier classes applied to both badge types above */
+/* Colour modifier classes applied to the badge above */
 .status-pending {
   background: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-.status-approved,
 .status-accepted {
   background: rgba(16, 185, 129, 0.1);
   color: var(--success-green);
@@ -272,42 +262,6 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--accent-orange);
-}
-
-/* Featured/active challenge box */
-.challenge-section {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 24px;
-  padding: 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.challenge-section h2 {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.challenge-meta {
-  display: flex;
-  gap: 20px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 16px;
-}
-
-.challenge-instructions {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 1rem;
-  white-space: pre-wrap;
 }
 
 /* Loading placeholder shown while challenges fetch */
@@ -632,20 +586,6 @@ body {
   background: rgba(255, 255, 255, 0.01);
 }
 
-/* Light mode support for the modal table */
-.light-mode .modal-table-container th {
-  color: #ea580c;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light-mode .modal-table-container td {
-  color: #111827;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.light-mode .modal-table-container td strong {
-  color: #2563eb;
-}
 .modal-loading {
   text-align: center;
   color: var(--text-secondary);
