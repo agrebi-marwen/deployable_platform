@@ -328,6 +328,10 @@ body {
   margin-top: 10px;
 }
 
+.challenges-section .section-subtitle {
+  margin: 0 auto 38px;
+}
+
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
