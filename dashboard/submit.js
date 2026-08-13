@@ -96,7 +96,7 @@ submissionForm.addEventListener('submit', async (e) => {
 
     if (!gitUrlRegex.test(url)) {
         submissionMessage.textContent = "Invalid URL. Please provide a valid GitHub or GitLab repository link.";
-        submissionMessage.style.color = "#ef4444";
+        submissionMessage.style.color = "#fe4e00";
         submitBtn.disabled = false;
         return; // Halt execution and don't insert into database
     }
@@ -117,11 +117,11 @@ submissionForm.addEventListener('submit', async (e) => {
     if (error) {
         console.error("Supabase insert crash details:", error);
         submissionMessage.textContent = "Failed to secure solution: " + error.message;
-        submissionMessage.style.color = "#ef4444";
+        submissionMessage.style.color = "#fe4e00";
         submitBtn.disabled = false;
     } else {
         submissionMessage.textContent = "Patch deployed successfully! Standing by for supervisor clearance.";
-        submissionMessage.style.color = "#10b981";
+        submissionMessage.style.color = "#83b5d1";
         submissionUrl.value = "";
         submitBtn.textContent = "Patch Synchronized";
 

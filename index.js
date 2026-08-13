@@ -40,10 +40,10 @@ async function initSupabaseClient() {
             if (authBtn) {
                 authBtn.outerHTML = `
                     <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
-                        <a href="dashboard/dashboard.html" style="font-weight: bold; font-size: 14px; color: #fff; text-decoration: none; border-bottom: 1px dashed #f97316; padding-bottom: 2px;">
+                        <a href="dashboard/dashboard.html" style="font-family: 'VT323', monospace; font-size: 19px; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; text-decoration: none; border-bottom: 2px dashed #83b5d1; padding-bottom: 2px;">
                             🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
                         </a>
-                        <button id="logout-btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">Log Out</button>
+                        <button id="logout-btn" style="font-family: 'VT323', monospace; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; background: #161616; border: 2px solid #000; box-shadow: 3px 3px 0 #000; color: #fe4e00; padding: 4px 14px; cursor: pointer;">Log Out</button>
                     </div>
                 `;
                 document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -117,7 +117,7 @@ async function fetchLastThreeChallenges() {
         }).join('');
     } catch (err) {
         console.error("❌ Challenges Error:", err);
-        container.innerHTML = `<p style="color: #ef4444; font-size: 0.9rem;">Error accessing temporal stream: ${escapeHtml(err.message)}</p>`;
+        container.innerHTML = `<p style="color: #fe4e00; font-size: 0.9rem;">Error accessing temporal stream: ${escapeHtml(err.message)}</p>`;
     }
 }
 
@@ -157,7 +157,7 @@ async function loadPublicLeaderboard() {
         }).join('');
     } catch (err) {
         console.error("❌ Leaderboard Error:", err);
-        tbody.innerHTML = `<tr><td colspan="3" class="table-loading" style="color: #ef4444;">Link offline.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="table-loading" style="color: #fe4e00;">Link offline.</td></tr>`;
     }
 }
 

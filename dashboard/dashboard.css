@@ -1,219 +1,133 @@
 /* ==========================================================================
-   GLOBAL RESET & DESIGN TOKENS
-   Used by: dashboard.html, submit.html, submissions.html
+   DASHBOARD SUITE — dashboard / challenges / submit / submissions
+   Design tokens come from ../assets/css/global.css (loaded last).
    ========================================================================== */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --bg-color: #16181f;
-  --card-bg: #16181f;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-blue: #3b82f6;
-  --accent-orange: #f97316;
-  --accent-glow: rgba(249, 115, 22, 0.2);
-  --success-green: #10b981;
-  --pending-yellow: #f59e0b;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-
-  /* Dark Neomorphism Tokens */
-  --neu-shadow-outset: 9px 9px 18px #0e0f14, -9px -9px 18px #1e212a;
-  --neu-shadow-outset-hover: 12px 12px 24px #0b0c10, -12px -12px 24px #21242e;
-  --neu-shadow-outset-sm: 4px 4px 10px #0e0f14, -4px -4px 10px #1e212a;
-  --neu-shadow-inset: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a;
-  --neu-shadow-inset-focus: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a, 0 0 10px rgba(59, 130, 246, 0.35);
-  --neu-btn-gradient: linear-gradient(145deg, #181a22, #14161c);
-  --neu-border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* Subtle grid pattern layered behind all page content */
-.grid-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: -1;
-  pointer-events: none;
-}
-
-
-/* ==========================================================================
-   SHARED NAVBAR
-   Used by: dashboard.html, submit.html, submissions.html
-   ========================================================================== */
-
+/* ---- Dash navbar ---- */
 .dash-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 5%;
-  background: var(--bg-color);
-  box-shadow: 0 8px 16px #0e0f14;
-  border-bottom: var(--neu-border);
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 5%;
+  background: rgba(5, 5, 5, 0.92);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-bottom: var(--border-thin);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.logo {
+.dash-navbar .logo {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--text-strong);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.logo-icon {
-  color: var(--accent-orange);
+.dash-navbar .logo a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Nav links row (Leaderboard, Settings, Submissions) */
+.nav-title {
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--neon-cyan);
+}
+
 .dash-nav-links {
   display: flex;
-  gap: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .dash-nav-links a {
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: color 0.2s ease;
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.dash-nav-links a:hover {
-  color: var(--accent-orange);
+.dash-nav-links a:hover,
+.dash-nav-links a[aria-current="page"] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--neon-cyan);
 }
 
-/* User info in top-right of navbar */
 .user-profile-nav {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 #nav-username {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mid);
 }
 
 .btn-logout {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-  padding: 6px 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s ease;
-}
-
-.btn-logout:hover {
-  background: #ef4444;
-  color: white;
-}
-
-
-/* ==========================================================================
-   SHARED BADGE & SECTION LABELS
-   Used by: dashboard.html, submit.html, submissions.html
-   ========================================================================== */
-
-.section-badge {
-  display: inline-block;
-  background: rgba(249, 115, 22, 0.15);
-  color: var(--accent-orange);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-family: var(--font-meta);
+  font-size: 17px;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  letter-spacing: 0.06em;
+  color: var(--neon-red);
+  background: var(--bg-panel);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
+.btn-logout:hover  { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.08); }
+.btn-logout:active { transform: translate(1px, 1px);  box-shadow: 1px 1px 0 var(--line); }
 
+/* ---- Section titles ---- */
 .section-title {
   font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: var(--text-strong);
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 6px;
 }
+.section-title::before { content: "▶"; color: var(--neon-cyan); }
 
 .section-subtitle {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-size: 14px;
+  color: var(--text-dim);
   margin-bottom: 28px;
 }
 
-
-/* ==========================================================================
-   SHARED STATUS BADGES
-   Used by: dashboard.html (modal table), submissions.html (log table)
-   ========================================================================== */
-
-/* Applied via .table-status-badge (submissions.html datatable) */
-.table-status-badge {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-}
-
-/* Colour modifier classes applied to the badge above */
-.status-pending {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.status-accepted {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--success-green);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.status-rejected {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-
-/* ==========================================================================
-   DASHBOARD — MAIN LAYOUT
-   Used by: dashboard.html
-   ========================================================================== */
-
+/* ---- Dashboard main ---- */
 .dashboard-container {
   max-width: 1100px;
   margin: 40px auto;
   padding: 0 5%;
+  position: relative;
+  z-index: 10;
 }
 
-/* Stats row (Rank / Points / Solved) */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -222,820 +136,89 @@ body {
 }
 
 .stat-card {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 20px;
-  padding: 24px;
   position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
+  padding: 24px 22px;
+  transition: transform 0.15s ease;
 }
-
-.stat-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(var(--rgb-white, 255, 255, 255), 0.1) 0%,
-    rgba(249, 115, 22, 0.04) 40%,
-    transparent 80%
-  );
-}
+.stat-card:hover { transform: translateY(-3px); }
 
 .stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-family: var(--font-meta);
+  font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
 }
 
 .stat-card h3 {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--accent-orange);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--neon-orange);
 }
 
-/* Loading placeholder shown while challenges fetch */
-.loading-state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 40px 20px;
-  font-size: 0.9rem;
-}
-
-
-/* ==========================================================================
-   DASHBOARD — CHALLENGES GRID & CARDS
-   Used by: dashboard.html (rendered dynamically via dashboard.js)
-   ========================================================================== */
-
-.challenges-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.challenge-card {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 20px;
-  padding: 28px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  position: relative;
-  overflow: hidden;
-}
-
-.challenge-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(var(--rgb-white, 255, 255, 255), 0.12) 0%,
-    rgba(249, 115, 22, 0.05) 40%,
-    transparent 80%
-  );
-}
-
-.challenge-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--neu-shadow-outset-hover);
-  border-color: rgba(249, 115, 22, 0.3);
-}
-
-.challenge-card.highlighted {
-  border-color: rgba(249, 115, 22, 0.9);
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.25);
-  animation: challenge-highlight 3s ease forwards;
-}
-
-@keyframes challenge-highlight {
-  0%   { border-color: rgba(249, 115, 22, 0.9); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.25); }
-  70%  { border-color: rgba(249, 115, 22, 0.5); box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.3), 0 0 15px rgba(249, 115, 22, 0.15); }
-  100% { border-color: var(--neu-border-color, rgba(var(--rgb-white, 255, 255, 255), 0.08)); box-shadow: none; }
-}
-
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-badge {
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset-sm);
-  color: var(--accent-orange);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.card-points {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--success-green);
-}
-
-.challenge-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.enter-link {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent-blue);
-  transition: color 0.2s;
-}
-
-.challenge-card:hover .enter-link {
-  color: var(--accent-orange);
-}
-
-/* ==========================================================================
-   EPOCH COLOR CODING — per-month accent hues on dashboard challenge cards
-   ========================================================================== */
-
-.challenge-card {
-  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
-}
-
-.challenge-card:hover {
-  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.6);
-}
-
-.challenge-card .card-badge {
-  color: hsl(var(--epoch-hue, 25) 90% 62%);
-  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.4);
-}
-
-.challenge-card .card-points {
-  color: hsl(var(--epoch-hue, 25) 80% 55%);
-}
-
-.challenge-card:hover .enter-link {
-  color: hsl(var(--epoch-hue, 25) 85% 60%);
-}
-
-/* ==========================================================================
-   RANK BAR — horizontal progress toward the next rank
-   ========================================================================== */
-
+/* Segmented rank bar */
 .rank-bar {
-  width: 100%;
-  height: 10px;
+  display: flex;
+  gap: 3px;
   margin-top: 14px;
-  border-radius: 6px;
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.08);
-  overflow: hidden;
 }
-
-.rank-bar-fill {
-  height: 100%;
-  width: 0;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #f97316, #fbbf24);
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.5);
-  transition: width 0.8s ease;
+.rank-bar .seg {
+  flex: 1;
+  height: 10px;
+  background: var(--bg-abyss);
+  border: 2px solid var(--line);
 }
+.rank-bar .seg.on  { background: linear-gradient(180deg, #fe4e00, #d94300); }
+.rank-bar .seg.half { background: var(--neon-yellow); }
 
 .rank-bar-caption {
   margin-top: 8px;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.3px;
-}
-
-/* Epoch tint for the submit page challenge header */
-.challenge-details-card {
-  --epoch-hue: 25;
-}
-
-.challenge-details-card .section-badge {
-  color: hsl(var(--epoch-hue, 25) 90% 62%);
-  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.4);
-  background: hsl(var(--epoch-hue, 25) 70% 50% / 0.15);
-}
-
-.challenge-details-card h1 {
-  color: hsl(var(--epoch-hue, 25) 30% 90%);
-}
-
-
-/* ==========================================================================
-   DASHBOARD — MODALS (Leaderboard & Settings)
-   Used by: dashboard.html (toggled via dashboard.js)
-   ========================================================================== */
-
-/* Fullscreen modal backdrop */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(10, 12, 16, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-content {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset-hover);
-  border: var(--neu-border);
-  width: 90%;
-  max-width: 600px;
-  border-radius: 24px;
-  padding: 32px;
-  position: relative;
-  transform: translateY(-20px);
-  transition: transform 0.3s ease;
-  overflow: hidden;
-}
-
-.modal-overlay.active .modal-content {
-  transform: translateY(0);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.modal-header h2 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.modal-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-}
-
-.close-modal {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.8rem;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.close-modal:hover {
-  color: #ef4444;
-}
-
-/* Leaderboard table inside modal */
-.modal-table-container {
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-.modal-table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-family: var(--font-body);
-}
-
-.modal-table-container th {
-  padding: 12px 16px;
-  color: var(--accent-orange);
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-family: var(--font-meta);
+  font-size: 16px;
+  color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
+  letter-spacing: 0.06em;
 }
 
-.modal-table-container td {
-  padding: 14px 16px;
-  color: var(--text-strong);
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.03);
-}
-
-.modal-table-container td strong {
-  color: var(--accent-blue);
-  font-family: var(--font-display);
-}
-
-.modal-table-container tbody tr:hover {
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
-}
-
-.modal-loading {
+.loading-state {
   text-align: center;
-  color: var(--text-secondary);
-  padding: 30px;
-  font-size: 0.9rem;
+  padding: 40px 20px;
 }
 
-/* Settings modal form layout */
-.settings-form-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  letter-spacing: 1px;
-}
-
-.form-group input {
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset);
-  border: var(--neu-border);
-  border-radius: 14px;
-  padding: 14px 18px;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.form-group input:focus {
-  box-shadow: var(--neu-shadow-inset-focus);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-.btn-save-settings {
-  background: var(--neu-btn-gradient);
-  color: var(--accent-orange);
-  box-shadow: var(--neu-shadow-outset);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  border-radius: 14px;
-  padding: 14px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-save-settings:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  color: var(--text-primary);
-  border-color: var(--accent-orange);
-}
-
-.btn-save-settings:active {
-  box-shadow: var(--neu-shadow-inset);
-}
-
-#settings-message {
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-
-/* ==========================================================================
-   SUBMIT PAGE — TWO-COLUMN LAYOUT
-   Used by: submit.html
-   ========================================================================== */
-
-.submit-layout-container {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 30px;
-  max-width: 1800px;
-  margin: 40px auto;
-  padding: 0 5%;
-}
-
-@media (max-width: 900px) {
-  .submit-layout-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Left panel: challenge briefing */
-.challenge-details-card {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 24px;
-  padding: 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.challenge-details-card h1 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.challenge-reward {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--success-green);
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-}
-
-.challenge-instructions-box {
-  margin-top: 4px;
-}
-
-.challenge-instructions-box h3 {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--accent-orange);
-  margin-bottom: 12px;
-}
-
-.challenge-instructions-box p {
-  color: var(--text-secondary);
-  line-height: 1.75;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-}
-
-/* Right panel: submission form column wrapper */
-.submission-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* The card used for the URL form (and any future side cards) */
-.submission-card {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 24px;
-  padding: 30px;
-  position: relative;
-  overflow: hidden;
-}
-
-.submission-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  margin-bottom: 6px;
-}
-
-.sub-text {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-}
-
-.submission-card label {
-  display: block;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.submission-card input {
-  width: 100%;
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset);
-  border: var(--neu-border);
-  border-radius: 14px;
-  padding: 14px 18px;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-  margin-bottom: 16px;
-  transition: all 0.2s ease;
-}
-
-.submission-card input:focus {
-  box-shadow: var(--neu-shadow-inset-focus);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-.submission-card button {
-  width: 100%;
-  background: var(--neu-btn-gradient);
-  color: var(--accent-orange);
-  box-shadow: var(--neu-shadow-outset);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  border-radius: 14px;
-  padding: 14px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.submission-card button:hover:not(:disabled) {
-  box-shadow: var(--neu-shadow-outset-hover);
-  color: var(--text-primary);
-  border-color: var(--accent-orange);
-}
-
-.submission-card button:active:not(:disabled) {
-  box-shadow: var(--neu-shadow-inset);
-}
-
-.submission-card button:disabled {
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset-sm);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Feedback message shown below the submit button */
-#submission-message {
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-top: 12px;
-}
-
-
-/* ==========================================================================
-   SUBMISSIONS PAGE — FULL LOG ARCHIVE TABLE
-   Used by: submissions.html (populated via submissions.js)
-   ========================================================================== */
-
-.submissions-dashboard-container {
-  max-width: 1200px;
-  margin: 100px auto 40px auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 10;
-}
-
-.log-archive-header {
-  margin-bottom: 30px;
-}
-
-.log-archive-header h1 {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  color: var(--text-primary);
-  margin: 10px 0;
-  letter-spacing: -1px;
-}
-
-.log-archive-header .subtitle {
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-/* Outer card wrapping the datatable */
-.log-archive-card {
-  background: rgba(17, 24, 39, 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* Horizontal scroll wrapper for the table */
-.table-container {
-  overflow-x: auto;
-}
-
-.log-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-}
-
-.log-table th {
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.02);
-  padding: 16px 24px;
-  color: var(--accent-orange);
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-}
-
-.log-table td {
-  padding: 18px 24px;
-  color: var(--text-strong);
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.03);
-}
-
-.log-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-.log-table tbody tr:hover {
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.01);
-}
-
-/* Column-specific overrides */
-.col-time {
-  color: var(--text-muted) !important;
-  font-size: 0.8rem;
-}
-
-.col-title {
-  font-weight: 600;
-  color: var(--text-primary) !important;
-}
-
-/* Clickable URL links inside the table */
-.table-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.85rem;
-  word-break: break-all;
-  transition: color 0.2s;
-}
-
-.table-link:hover {
-  color: var(--accent-orange);
-}
-
-/* Empty, loading, and error states shown as table rows */
-.table-loading,
-.table-empty,
-.table-error {
-  text-align: center;
-  padding: 50px 0 !important;
-  color: var(--text-muted) !important;
-  font-style: italic;
-  font-size: 0.95rem;
-}
-
-.table-error {
-  color: #ef4444 !important;
-}
-
-/* ==========================================================================
-   CHALLENGES ARCHIVE PAGE — epoch-grouped challenge listings
-   Used by: challenges.html (rendered dynamically via challenges.js)
-   ========================================================================== */
-
-.challenges-page-header {
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto 44px;
-}
-
-.challenges-page-header .section-subtitle {
-  margin: 0 auto;
-}
-
-.epoch-section {
-  margin-bottom: 48px;
-}
-
-.epoch-section + .epoch-section {
-  padding-top: 48px;
-  border-top: 1px solid hsla(var(--epoch-hue, 25) 60% 55% / 0.2);
-}
-
-.epoch-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.epoch-month {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: hsl(var(--epoch-hue, 25) 85% 62%);
-}
-
-.epoch-count {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.04);
-  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.08);
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-.challenge-desc {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-archived {
-  cursor: default;
-  opacity: 0.55;
-  filter: grayscale(0.4);
-}
-
-.card-archived:hover {
-  transform: none;
-  box-shadow: var(--neu-shadow-outset);
-  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
-}
-
-.card-archived .enter-link {
-  color: var(--text-secondary);
-}
-
-/* ==========================================================================
-   DASHBOARD — OVERVIEW PANELS
-   Used by: dashboard.html (mission progress, epoch stats)
-   ========================================================================== */
-
-.panel-section {
-  margin-top: 40px;
-}
+/* ---- Panels ---- */
+.panel-section { margin-top: 40px; }
 
 .panel-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
 .panel-header h2 {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  color: var(--text-strong);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+.panel-header h2::before { content: "▶"; color: var(--neon-cyan); }
 
-.panel-header .panel-note {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+.panel-note {
+  font-size: 14px;
+  color: var(--text-dim);
 }
 
 .mission-list {
@@ -1049,176 +232,630 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: var(--card-bg);
-  border: 1px solid hsl(var(--epoch-hue, 25) 55% 50% / 0.25);
-  border-radius: 14px;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  box-shadow: var(--shadow-hard-sm);
   padding: 14px 18px;
-  transition: border-color 0.2s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.mission-row:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); }
 
-.mission-row:hover {
-  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.5);
-}
-
-.mission-meta {
-  min-width: 0;
-  flex: 1;
-}
+.mission-meta { min-width: 0; flex: 1; }
 
 .mission-title {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-family: var(--font-meta);
+  font-size: 19px;
+  color: var(--text-strong);
   display: block;
 }
 
 .mission-date {
   display: block;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 13px;
+  color: var(--text-dim);
   margin-top: 2px;
 }
 
 .mission-link {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--accent-blue);
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
   text-decoration: none;
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: color 0.15s ease;
 }
+.mission-row:hover .mission-link { color: hsl(var(--epoch-hue, 25) 85% 60%); }
 
-.mission-row:hover .mission-link {
-  color: hsl(var(--epoch-hue, 25) 85% 60%);
-}
-
-.status-none {
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.05);
-  color: var(--text-secondary);
-  border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.1);
-}
-
-.epoch-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
+.epoch-stats { display: flex; flex-direction: column; gap: 18px; }
 
 .epoch-stat-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 6px;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: hsl(var(--epoch-hue, 25) 85% 62%);
 }
 
-.epoch-stat-head .epoch-stat-count {
-  color: var(--text-secondary);
-  font-weight: 500;
+.epoch-stat-count {
+  color: var(--text-dim);
+  font-size: 15px;
 }
 
 .epoch-stat-bar {
-  height: 8px;
-  border-radius: 6px;
-  background: rgba(var(--rgb-white, 255, 255, 255), 0.08);
+  display: flex;
+  gap: 3px;
+}
+.epoch-stat-bar .seg {
+  flex: 1;
+  height: 10px;
+  background: var(--bg-abyss);
+  border: 2px solid var(--line);
+}
+.epoch-stat-bar .seg.on {
+  background: linear-gradient(180deg, hsl(var(--epoch-hue, 25) 85% 55%), hsl(var(--epoch-hue, 25) 75% 45%));
+}
+
+/* =========================================================================
+   CHALLENGES ARCHIVE PAGE
+   ========================================================================= */
+.challenges-page-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 44px;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 26px;
+}
+
+.epoch-section { margin-bottom: 48px; }
+
+.epoch-section + .epoch-section {
+  padding-top: 48px;
+  border-top: 2px dashed hsla(var(--epoch-hue, 25) 60% 55% / 0.2);
+}
+
+.epoch-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.epoch-month {
+  font-family: var(--font-display);
+  font-size: 15px;
+  text-transform: uppercase;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+}
+
+.epoch-count {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  background: var(--bg-panel);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 2px 12px;
+}
+
+.challenge-card {
+  position: relative;
+  background: var(--bg-card);
+  border: var(--border-thick);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  box-shadow: var(--shadow-hard);
+  padding: 24px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.challenge-card:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 var(--line); }
+
+.challenge-card.highlighted {
+  border-color: var(--neon-yellow);
+  box-shadow: var(--shadow-hard);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-badge {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 2px 10px;
+}
+
+.card-points {
+  font-family: var(--font-meta);
+  font-size: 19px;
+  color: hsl(var(--epoch-hue, 25) 80% 55%);
+}
+
+.challenge-card h3 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.challenge-desc {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.enter-link {
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  transition: color 0.15s ease;
+}
+.challenge-card:hover .enter-link { color: hsl(var(--epoch-hue, 25) 85% 60%); }
+
+.card-archived { cursor: default; opacity: 0.55; }
+.card-archived:hover { transform: none; box-shadow: var(--shadow-hard); }
+.card-archived .enter-link { color: var(--text-dim); }
+
+/* =========================================================================
+   MODALS
+   ========================================================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 5, 0.85);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 620px;
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
+  padding: 32px;
+  transform: translateY(-20px);
+  transition: transform 0.2s ease;
+  overflow: hidden;
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+.close-modal {
+  background: transparent;
+  border: none;
+  color: var(--text-mid);
+  font-family: var(--font-meta);
+  font-size: 26px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.close-modal:hover { color: var(--neon-red); }
+
+.modal-table-container { max-height: 350px; overflow-y: auto; }
+
+.modal-table-container table { width: 100%; border-collapse: collapse; text-align: left; }
+
+.modal-table-container th {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--neon-cyan);
+  padding: 10px 12px;
+  border-bottom: var(--border-thin);
+}
+
+.modal-table-container td {
+  font-family: var(--font-meta);
+  font-size: 18px;
+  color: var(--text-mid);
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-table-container td strong { color: var(--neon-yellow); }
+.modal-table-container tbody tr { transition: filter 0.15s ease; }
+.modal-table-container tbody tr:hover { filter: brightness(1.12); }
+
+.modal-loading {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 30px;
+  font-family: var(--font-meta);
+}
+
+.load-more-btn {
+  display: block;
+  margin: 12px auto 0;
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--neon-cyan);
+  background: var(--bg-panel);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.load-more-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.08); }
+
+/* ---- Settings form ---- */
+.settings-form-layout { display: flex; flex-direction: column; gap: 20px; }
+
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+
+.form-group label {
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.form-group input,
+.submission-card input {
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
+  padding: 12px 14px;
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+}
+.form-group input:focus,
+.submission-card input:focus { border-color: var(--neon-cyan); }
+
+.btn-save-settings {
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--brand-green);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
+}
+.btn-save-settings:hover  { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); filter: brightness(1.08); }
+.btn-save-settings:active { transform: translate(2px, 2px);  box-shadow: 2px 2px 0 var(--line); }
+
+#settings-message {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+/* =========================================================================
+   SUBMIT PAGE
+   ========================================================================= */
+.submit-layout-container {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 5%;
+}
+
+@media (max-width: 900px) {
+  .submit-layout-container { grid-template-columns: 1fr; }
+}
+
+.challenge-details-card,
+.submission-card {
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
+  padding: 40px;
+}
+
+.challenge-details-card .section-badge {
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.4);
+}
+
+.challenge-details-card h1 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-transform: uppercase;
+  color: hsl(var(--epoch-hue, 25) 30% 90%);
+  margin: 14px 0 10px;
+}
+
+.challenge-reward {
+  font-family: var(--font-meta);
+  font-size: 19px;
+  color: var(--neon-green);
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: var(--border-thin);
+}
+
+.challenge-instructions-box h3 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--neon-orange);
+  margin-bottom: 12px;
+}
+
+.challenge-instructions-box p {
+  color: var(--text-mid);
+  line-height: 1.75;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+.submission-panel { display: flex; flex-direction: column; gap: 20px; }
+
+.submission-card { padding: 30px; }
+
+.submission-card h3 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.sub-text {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+.submission-card label {
+  display: block;
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.submission-card input { width: 100%; margin-bottom: 16px; }
+
+.submission-card button {
+  width: 100%;
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--brand-green);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
+}
+.submission-card button:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); filter: brightness(1.08); }
+.submission-card button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--line); }
+.submission-card button:disabled {
+  background: var(--bg-panel);
+  color: var(--text-dim);
+  box-shadow: var(--shadow-hard-sm);
+  cursor: not-allowed;
+}
+
+#submission-message {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 12px;
+  color: var(--text-mid);
+}
+
+/* =========================================================================
+   SUBMISSIONS PAGE
+   ========================================================================= */
+.submissions-dashboard-container {
+  max-width: 1200px;
+  margin: 60px auto 40px auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.log-archive-header { margin-bottom: 30px; }
+
+.log-archive-header h1 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-transform: uppercase;
+  color: var(--text-strong);
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.log-archive-header h1::before { content: "▶"; color: var(--neon-cyan); }
+
+.log-archive-header .subtitle {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
+.log-archive-card {
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
   overflow: hidden;
 }
 
-.epoch-stat-fill {
-  height: 100%;
-  border-radius: 6px;
-  background: linear-gradient(90deg, hsl(var(--epoch-hue, 25) 80% 50%), hsl(var(--epoch-hue, 25) 85% 60%));
-  box-shadow: 0 0 10px hsl(var(--epoch-hue, 25) 80% 50% / 0.5);
-  transition: width 0.8s ease;
+.table-container { overflow-x: auto; }
+
+.log-table { width: 100%; border-collapse: collapse; text-align: left; }
+
+.log-table th {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--neon-cyan);
+  padding: 14px 24px;
+  border-bottom: var(--border-thin);
 }
 
-/* Leaderboard load-more button */
-.load-more-btn {
-  display: block;
-  margin: 24px auto 0;
-  padding: 10px 20px;
-  background: rgba(249, 115, 22, 0.12);
-  color: var(--accent-orange);
-  border: 1px solid rgba(249, 115, 22, 0.35);
-  border-radius: 10px;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.2s;
+.log-table td {
+  font-family: var(--font-meta);
+  font-size: 18px;
+  color: var(--text-mid);
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.load-more-btn:hover {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: rgba(249, 115, 22, 0.6);
+.log-table tbody tr { transition: filter 0.15s ease; }
+.log-table tbody tr:hover { filter: brightness(1.08); }
+
+.col-time  { color: var(--text-dim) !important; font-size: 16px !important; }
+.col-title { color: var(--text-strong) !important; }
+
+.table-link {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  font-size: 17px;
+  word-break: break-all;
+  transition: color 0.15s ease;
+}
+.table-link:hover { color: #fff; }
+
+.table-error { color: var(--neon-red) !important; }
+
+.table-empty,
+.table-loading {
+  text-align: center;
+  padding: 50px 0 !important;
+  color: var(--text-dim) !important;
+  font-size: 17px !important;
 }
 
-@media (max-width: 600px) {
-  .epoch-header {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .mission-row {
-    flex-wrap: wrap;
-  }
-
-  .mission-link {
-    margin-left: auto;
-  }
-}
-
-/* ==========================================================================
+/* =========================================================================
    LIGHT THEME OVERRIDES
-   Deepen epoch-colored text and swap dark surfaces so everything stays
-   readable on light backgrounds.
-   ========================================================================== */
-[data-theme="light"] .log-archive-card {
-  background: rgba(255, 255, 255, 0.65);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+   ========================================================================= */
+[data-theme="light"] .dash-navbar { background: rgba(238, 241, 246, 0.92); }
+
+[data-theme="light"] .mission-row { box-shadow: var(--shadow-hard-sm); }
+
+[data-theme="light"] .log-archive-card,
+[data-theme="light"] .challenge-details-card,
+[data-theme="light"] .submission-card,
+[data-theme="light"] .modal-content {
+  box-shadow: var(--shadow-hard);
 }
 
-[data-theme="light"] .status-pending {
-  color: #b45309;
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(180, 83, 9, 0.35);
-}
-
+[data-theme="light"] .challenge-details-card h1,
 [data-theme="light"] .epoch-month,
-[data-theme="light"] .challenge-card .card-badge,
-[data-theme="light"] .challenge-details-card .section-badge,
-[data-theme="light"] .epoch-stat-head {
+[data-theme="light"] .epoch-stat-head,
+[data-theme="light"] .challenge-card .card-badge {
   color: hsl(var(--epoch-hue, 25) 70% 32%);
 }
 
-[data-theme="light"] .challenge-details-card h1 {
-  color: hsl(var(--epoch-hue, 25) 70% 30%);
+[data-theme="light"] .challenge-card .card-points { color: hsl(var(--epoch-hue, 25) 75% 35%); }
+[data-theme="light"] .challenge-card:hover .enter-link { color: hsl(var(--epoch-hue, 25) 75% 38%); }
+[data-theme="light"] .mission-row:hover .mission-link { color: hsl(var(--epoch-hue, 25) 75% 38%); }
+
+[data-theme="light"] .epoch-stat-bar .seg.on {
+  background: linear-gradient(180deg, hsl(var(--epoch-hue, 25) 70% 42%), hsl(var(--epoch-hue, 25) 60% 34%));
 }
 
-[data-theme="light"] .challenge-card .card-points {
-  color: hsl(var(--epoch-hue, 25) 75% 35%);
-}
+[data-theme="light"] .card-archived { opacity: 0.7; }
 
-[data-theme="light"] .challenge-card:hover .enter-link,
-[data-theme="light"] .mission-row:hover .mission-link {
-  color: hsl(var(--epoch-hue, 25) 75% 38%);
+/* =========================================================================
+   MOBILE
+   ========================================================================= */
+@media (max-width: 600px) {
+  .dash-navbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 5%;
+    position: relative;
+  }
+  .dash-nav-links { justify-content: center; width: 100%; }
+  .user-profile-nav {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid #222;
+    padding-top: 10px;
+  }
+  .stats-row { grid-template-columns: 1fr; }
+  .challenges-grid { grid-template-columns: 1fr; gap: 12px; }
+  .epoch-header { flex-direction: column; gap: 6px; }
+  .mission-row { flex-wrap: wrap; }
+  .mission-link { margin-left: auto; }
+  .leaderboard-card,
+  .modal-table-container,
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
-
-[data-theme="light"] .epoch-stat-fill {
-  background: linear-gradient(90deg, hsl(var(--epoch-hue, 25) 70% 42%), hsl(var(--epoch-hue, 25) 75% 50%));
-  box-shadow: 0 0 10px hsl(var(--epoch-hue, 25) 70% 42% / 0.35);
-}
-
-[data-theme="light"] .epoch-section + .epoch-section {
-  border-top-color: hsla(var(--epoch-hue, 25) 60% 45% / 0.22);
-}
-
-[data-theme="light"] .card-archived {
-  opacity: 0.7;
-}
-

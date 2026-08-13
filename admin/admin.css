@@ -1,34 +1,25 @@
-:root {
-  --bg-color: #16181f;
-  --card-bg: #16181f;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-orange: #f97316;
-
-  /* Dark Neomorphism Tokens */
-  --neu-shadow-outset: 9px 9px 18px #0e0f14, -9px -9px 18px #1e212a;
-  --neu-shadow-outset-hover: 12px 12px 24px #0b0c10, -12px -12px 24px #21242e;
-  --neu-shadow-inset: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a;
-  --neu-shadow-inset-focus: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a, 0 0 10px rgba(249, 115, 22, 0.35);
-  --neu-btn-gradient: linear-gradient(145deg, #181a22, #14161c);
-  --neu-border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-}
+/* ==========================================================================
+   ADMIN — Sector Control
+   Design tokens come from ../assets/css/global.css (loaded last).
+   ========================================================================== */
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-primary);
+  background-color: var(--bg-abyss);
+  color: var(--text-strong);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   padding: 40px 20px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
 }
 
 .admin-wrapper {
   width: 100%;
   max-width: 1300px;
+  position: relative;
+  z-index: 10;
 }
 
 .admin-header {
@@ -37,15 +28,16 @@ body {
 }
 
 .admin-header h1 {
-  font-size: 2.2rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-transform: uppercase;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--text-strong);
 }
 
 .admin-header p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  color: var(--text-dim);
+  font-size: 15px;
 }
 
 .admin-grid {
@@ -62,39 +54,39 @@ body {
 }
 
 .panel-card {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 24px;
-  padding: 32px;
   position: relative;
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
+  padding: 32px;
   overflow: hidden;
-  transition: all 0.3s ease;
 }
 
+/* Interactive cursor spotlight (set by cursor-lighting.js) */
 .panel-card::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  border-radius: inherit;
   background: radial-gradient(
-    circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(var(--rgb-white, 255, 255, 255), 0.1) 0%,
-    rgba(249, 115, 22, 0.04) 40%,
+    circle 120px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
+    rgba(131, 181, 209, 0.1) 0%,
+    rgba(238, 198, 67, 0.04) 40%,
     transparent 80%
   );
 }
 
 .panel-card h2 {
-  font-size: 1.4rem;
+  font-family: var(--font-display);
+  font-size: 14px;
+  text-transform: uppercase;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
   padding-bottom: 12px;
-  color: var(--accent-orange);
+  border-bottom: var(--border-thin);
+  color: var(--neon-orange);
 }
 
 .form-group {
@@ -104,33 +96,33 @@ body {
 }
 
 label {
-  font-size: 0.75rem;
+  font-family: var(--font-meta);
+  font-size: 17px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   margin-bottom: 6px;
-  color: var(--text-secondary);
-  font-weight: 600;
+  color: var(--text-dim);
 }
 
 input,
 textarea,
 select {
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset);
-  border: var(--neu-border);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
   padding: 14px;
-  border-radius: 12px;
-  color: var(--text-primary);
+  color: var(--text-strong);
   font-size: 0.9rem;
+  font-family: var(--font-body);
   outline: none;
-  transition: all 0.25s ease;
+  transition: border-color 0.15s ease;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  box-shadow: var(--neu-shadow-inset-focus);
-  border-color: rgba(249, 115, 22, 0.4);
+  border-color: var(--neon-cyan);
 }
 
 textarea {
@@ -138,29 +130,72 @@ textarea {
   resize: vertical;
 }
 
+/* Pixel toggle switch */
+.checkbox-group { align-items: flex-start; }
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mid);
+}
+
+.switch-label input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 22px;
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.custom-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  background: var(--text-dim);
+  box-shadow: var(--shadow-hard-sm);
+  transition: left 0.15s ease, background 0.15s ease;
+}
+
+.switch-label input:checked + .custom-switch::after {
+  left: 24px;
+  background: var(--neon-green);
+}
+
 .submit-btn {
   width: 100%;
-  background: var(--neu-btn-gradient);
-  color: var(--accent-orange);
-  box-shadow: var(--neu-shadow-outset);
-  border: 1px solid rgba(249, 115, 22, 0.25);
+  font-family: var(--font-meta);
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--brand-green);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  border-radius: 0;
   padding: 14px;
-  border-radius: 14px;
-  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
 }
-
-.submit-btn:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  color: var(--text-primary);
-  border-color: var(--accent-orange);
-}
-
-.submit-btn:active {
-  box-shadow: var(--neu-shadow-inset);
-}
-
+.submit-btn:hover  { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); filter: brightness(1.08); }
+.submit-btn:active { transform: translate(2px, 2px);  box-shadow: 2px 2px 0 var(--line); }
 
 .submissions-container {
   display: flex;
@@ -173,66 +208,66 @@ textarea {
 
 .empty-state {
   text-align: center;
-  color: var(--text-secondary);
+  color: var(--text-dim);
   padding: 40px 0;
-  font-style: italic;
 }
 
 .sub-card {
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset);
-  border: var(--neu-border);
-  border-radius: 16px;
+  position: relative;
+  background: var(--bg-card);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  border-radius: 0;
   padding: 18px;
-  transition: border-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.15s ease;
 }
 
-.sub-card:hover {
-  border-color: rgba(249, 115, 22, 0.25);
+.sub-card:hover { box-shadow: 5px 5px 0 var(--line); }
+
+.sub-card h3 {
+  color: var(--text-strong);
+  margin: 0;
+  font-family: var(--font-meta);
+  font-size: 19px;
+}
+
+.sub-card p {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 4px 0 0 0;
 }
 
 .action-btn {
   flex: 1;
   padding: 10px;
-  border: var(--neu-border);
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  border: var(--border-thin);
+  border-radius: 0;
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: var(--neu-btn-gradient);
-  box-shadow: var(--neu-shadow-outset);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
 .btn-approve {
-  color: #34d399;
-  border-color: rgba(52, 211, 153, 0.25);
+  color: var(--neon-green);
+  background: var(--bg-abyss);
+  border-color: var(--line);
+  box-shadow: var(--shadow-hard-sm);
 }
-
-.btn-approve:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  background: #10b981;
-  color: var(--text-primary);
-}
-
-.btn-approve:active {
-  box-shadow: var(--neu-shadow-inset);
-}
+.btn-approve:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.15); }
 
 .btn-reject {
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.25);
+  color: var(--neon-red);
+  background: var(--bg-abyss);
+  border-color: var(--line);
+  box-shadow: var(--shadow-hard-sm);
 }
-
-.btn-reject:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  background: #ef4444;
-  color: var(--text-primary);
-}
-
-.btn-reject:active {
-  box-shadow: var(--neu-shadow-inset);
-}
+.btn-reject:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.15); }
 
 .status-msg {
   text-align: center;
@@ -245,22 +280,24 @@ textarea {
   display: block;
   text-align: center;
   margin-top: 25px;
-  color: var(--text-secondary);
+  color: var(--text-dim);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: color 0.15s ease;
 }
 
 .back-dashboard:hover {
-  color: var(--accent-orange);
+  color: var(--neon-orange);
 }
 
+/* ---- Security gate ---- */
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-color);
+  inset: 0;
+  background: var(--bg-abyss);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -270,10 +307,13 @@ textarea {
 .security-card {
   width: 100%;
   max-width: 450px;
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
-  border-radius: 24px;
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
+  border-radius: 0;
   padding: 40px;
   text-align: center;
   position: relative;
@@ -281,13 +321,16 @@ textarea {
 }
 
 .security-card h2 {
-  font-size: 1.6rem;
-  color: #ef4444;
+  font-family: var(--font-display);
+  font-size: 15px;
+  text-transform: uppercase;
+  color: var(--neon-red);
+  border-bottom: none;
   margin-bottom: 12px;
 }
 
 .security-card p {
-  color: var(--text-secondary);
+  color: var(--text-dim);
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 24px;
@@ -301,3 +344,10 @@ textarea {
   margin-bottom: 20px;
 }
 
+/* =========================================================================
+   LIGHT THEME
+   ========================================================================= */
+[data-theme="light"] .panel-card,
+[data-theme="light"] .security-card {
+  box-shadow: var(--shadow-hard);
+}

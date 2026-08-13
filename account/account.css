@@ -1,33 +1,11 @@
-/* Custom Reset & Variables matching The Time Portal */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --bg-color: #16181f;
-  --card-bg: #16181f;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-blue: #3b82f6;
-  --accent-orange: #f97316;
-  --accent-glow: rgba(249, 115, 22, 0.2);
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-
-  /* Dark Neomorphism Tokens */
-  --neu-shadow-outset: 9px 9px 18px #0e0f14, -9px -9px 18px #1e212a;
-  --neu-shadow-outset-hover: 12px 12px 24px #0b0c10, -12px -12px 24px #21242e;
-  --neu-shadow-inset: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a;
-  --neu-shadow-inset-focus: inset 4px 4px 8px #0e0f14, inset -4px -4px 8px #1e212a, 0 0 10px rgba(59, 130, 246, 0.35);
-  --neu-btn-gradient: linear-gradient(145deg, #181a22, #14161c);
-  --neu-border: 1px solid rgba(var(--rgb-white, 255, 255, 255), 0.05);
-}
+/* ==========================================================================
+   ACCOUNT — login / signup
+   Design tokens come from ../assets/css/global.css (loaded last).
+   ========================================================================== */
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-primary);
+  background-color: var(--bg-abyss);
+  color: var(--text-strong);
   font-family: var(--font-body);
   min-height: 100vh;
   display: flex;
@@ -37,153 +15,135 @@ body {
   overflow: hidden;
 }
 
-/* Cybernetic Grid Background */
+/* Cyber grid backdrop */
 body::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--rgb-white, 255, 255, 255), 0.02) 1px, transparent 1px);
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 35px 35px;
   background-position: center;
   z-index: -1;
   pointer-events: none;
 }
 
-/* Neumorphic Form Container */
+/* Pixel-form card */
 .signup-form {
-  background: var(--card-bg);
-  box-shadow: var(--neu-shadow-outset);
-  border: var(--neu-border);
+  position: relative;
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
+    var(--shadow-hard);
   padding: 40px;
-  border-radius: 28px;
   width: 100%;
   max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  position: relative;
+  gap: 14px;
   overflow: hidden;
-  transition: all 0.3s ease;
 }
 
+/* Interactive cursor spotlight (set by cursor-lighting.js) */
 .signup-form::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  border-radius: inherit;
   background: radial-gradient(
-    circle 110px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
-    rgba(var(--rgb-white, 255, 255, 255), 0.12) 0%,
-    rgba(249, 115, 22, 0.05) 40%,
+    circle 130px at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
+    rgba(131, 181, 209, 0.12) 0%,
+    rgba(238, 198, 67, 0.05) 40%,
     transparent 80%
   );
 }
 
-.signup-form:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  border-color: rgba(249, 115, 22, 0.25);
-}
-
-/* Form Titles and Labels */
 h2 {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -1px;
+  font-size: 18px;
+  text-transform: uppercase;
   text-align: center;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--text-strong);
 }
 
 label {
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-family: var(--font-meta);
+  font-size: 17px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-secondary);
-  margin-bottom: -6px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
 }
 
-/* Inset Input Fields */
 input {
   width: 100%;
-  background: var(--bg-color);
-  box-shadow: var(--neu-shadow-inset);
-  border: var(--neu-border);
-  border-radius: 14px;
-  padding: 14px 18px;
-  color: var(--text-primary);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+  padding: 14px 16px;
+  color: var(--text-strong);
   font-size: 0.95rem;
   font-family: var(--font-body);
   outline: none;
-  transition: all 0.25s ease;
+  transition: border-color 0.15s ease;
 }
 
 input:focus {
-  box-shadow: var(--neu-shadow-inset-focus);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: var(--neon-cyan);
 }
 
-/* Tactile Neumorphic Submit Button */
 button[type="submit"] {
   width: 100%;
-  background: var(--neu-btn-gradient);
-  color: var(--accent-orange);
-  box-shadow: var(--neu-shadow-outset);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  border-radius: 14px;
-  padding: 14px;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-meta);
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--brand-green);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  border-radius: 0;
+  padding: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 10px;
+  margin-top: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
 }
+button[type="submit"]:hover  { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); filter: brightness(1.08); }
+button[type="submit"]:active { transform: translate(2px, 2px);  box-shadow: 2px 2px 0 var(--line); }
 
-button[type="submit"]:hover {
-  box-shadow: var(--neu-shadow-outset-hover);
-  color: var(--text-primary);
-  border-color: var(--accent-orange);
-}
-
-button[type="submit"]:active {
-  box-shadow: var(--neu-shadow-inset);
-}
-
-/* Style links (Redirect anchor text) */
-.signup-form a, #a_style {
+/* Redirect links */
+.signup-form a,
+#a_style {
   text-align: center;
   text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin-top: 10px;
-  transition: color 0.2s ease;
+  color: var(--text-mid);
+  font-family: var(--font-meta);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 8px;
+  transition: color 0.15s ease;
+}
+.signup-form a:hover,
+#a_style:hover {
+  color: var(--neon-cyan);
 }
 
-.signup-form a:hover, #a_style:hover {
-  color: var(--accent-blue);
-}
-
-/* Alert Notification Container */
+/* Alert / message */
 #message {
   margin-top: 5px;
   text-align: center;
   font-weight: 600;
   font-size: 0.85rem;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   letter-spacing: 0.5px;
 }
 
-
-
+/* =========================================================================
+   LIGHT THEME
+   ========================================================================= */
+[data-theme="light"] .signup-form { box-shadow: var(--shadow-hard); }

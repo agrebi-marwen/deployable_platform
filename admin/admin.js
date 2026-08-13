@@ -131,10 +131,10 @@ challengeForm.addEventListener('submit', async (e) => {
         .insert([{ title, instructions, month_year, points_worth, is_active }]);
 
     if (error) {
-        creationMessage.style.color = "#ef4444";
+        creationMessage.style.color = "#fe4e00";
         creationMessage.textContent = "Failed: " + error.message;
     } else {
-        creationMessage.style.color = "#10b981";
+        creationMessage.style.color = "#83b5d1";
         creationMessage.textContent = `Success! Anomaly deployed under timeline index: ${month_year}`;
         challengeForm.reset();
         document.getElementById('is_active').checked = true;
@@ -191,37 +191,26 @@ function renderSubmissions(submissions, challengeLookup) {
 
         const card = document.createElement('div');
         card.className = "sub-card";
-        card.style.cssText = `
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        `;
-
 
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h3 style="color: #ffffff; margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;">${escapeHtml(challengeTitle)}</h3>
-                    <p style="color: #6b7280; font-size: 0.75rem; margin: 4px 0 0 0;">Traveler: <strong>${escapeHtml(username)}</strong> • ${escapeHtml(date)}</p>
+                    <h3 style="color: #ffffff; margin: 0; font-family: 'VT323', monospace; font-size: 1.25rem;">${escapeHtml(challengeTitle)}</h3>
+                    <p style="color: #6e8296; font-size: 0.8rem; margin: 4px 0 0 0;">Traveler: <strong>${escapeHtml(username)}</strong> • ${escapeHtml(date)}</p>
                 </div>
-                <span style="font-size: 0.75rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 3px 8px; border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; font-weight: 700;">PENDING</span>
+                <span style="font-size: 0.8rem; color: #eec643; background: rgba(238, 198, 67, 0.1); padding: 3px 8px; border: 2px solid #eec643; font-family: 'VT323', monospace; text-transform: uppercase;">PENDING</span>
             </div>
             
-            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.02);">
-                <span style="color: #6b7280; font-size: 0.75rem; display:block; margin-bottom:2px;">Repository Payload URL:</span>
-                <a href="${escapeHtml(safeUrl(sub.submission_url))}" target="_blank" rel="noopener noreferrer" style="color: #f97316; font-size: 0.85rem; word-break: break-all; text-decoration: none;">
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
+                <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Repository Payload URL:</span>
+                <a href="${escapeHtml(safeUrl(sub.submission_url))}" target="_blank" rel="noopener noreferrer" style="color: #83b5d1; font-size: 0.9rem; word-break: break-all; text-decoration: none;">
                     ${escapeHtml(sub.submission_url)} ↗
                 </a>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <button class="action-btn btn-approve" data-id="${escapeHtml(sub.id)}" data-action="APPROVED" style="flex: 1; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; border-radius: 6px; cursor: pointer; font-family: 'Space Grotesk'; font-weight: 600; font-size: 0.85rem;">Approve Patch</button>
-                <button class="action-btn btn-reject" data-id="${escapeHtml(sub.id)}" data-action="REJECTED" style="flex: 1; padding: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 6px; cursor: pointer; font-family: 'Space Grotesk'; font-weight: 600; font-size: 0.85rem;">Reject Patch</button>
+                <button class="action-btn btn-approve" data-id="${escapeHtml(sub.id)}" data-action="APPROVED">Approve Patch</button>
+                <button class="action-btn btn-reject" data-id="${escapeHtml(sub.id)}" data-action="REJECTED">Reject Patch</button>
             </div>
         `;
         submissionsList.appendChild(card);

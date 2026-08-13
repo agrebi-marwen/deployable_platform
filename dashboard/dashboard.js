@@ -141,11 +141,16 @@ async function fetchUserProfile() {
 // 2. DASHBOARD DATA FLOW
 // ==========================================
 
-// Bar-style progress toward the next rank
+// Segmented progress toward the next rank
 function updateRankBar(points) {
-    const fill = document.getElementById('rank-bar-fill');
+    const bar = document.getElementById('rank-bar');
     const next = document.getElementById('rank-bar-next');
-    if (!fill || !next) return;
+    if (!bar || !next) return;
+
+    const segs = bar.querySelectorAll('.seg');
+    if (!segs.length) return;
+
+    const SEGMENTS = segs.length;
 
     let currentMin = 0, nextMin = 500;
     if (points >= 1000) {
@@ -155,13 +160,17 @@ function updateRankBar(points) {
     }
 
     if (nextMin === null) {
-        fill.style.width = '100%';
+        segs.forEach(s => s.classList.add('on'));
         next.textContent = 'Highest rank reached';
         return;
     }
 
     const progress = Math.min(1, Math.max(0, (points - currentMin) / (nextMin - currentMin)));
-    fill.style.width = (progress * 100).toFixed(1) + '%';
+    const filled = Math.round(progress * SEGMENTS);
+    segs.forEach((s, i) => {
+        s.classList.toggle('on', i < filled);
+        s.classList.toggle('half', i === filled && progress < 1 && filled < SEGMENTS);
+    });
     next.textContent = `${nextMin - points} EP to next rank`;
 }
 
@@ -297,7 +306,7 @@ function renderEpochStats(challenges, latestByChallenge) {
                 <span class="epoch-stat-count">${epoch.approved}/${epoch.total} approved</span>
             </div>
             <div class="epoch-stat-bar">
-                <div class="epoch-stat-fill" style="width:${pct}%"></div>
+                ${buildSegments(pct)}
             </div>
         `;
         fragment.appendChild(stat);
@@ -305,6 +314,16 @@ function renderEpochStats(challenges, latestByChallenge) {
 
     epochStats.innerHTML = "";
     epochStats.appendChild(fragment);
+}
+
+function buildSegments(pct) {
+    const SEGMENTS = 10;
+    const filled = Math.round(Math.min(100, Math.max(0, pct)) / 100 * SEGMENTS);
+    let html = '';
+    for (let i = 0; i < SEGMENTS; i++) {
+        html += `<div class="seg${i < filled ? ' on' : ''}"></div>`;
+    }
+    return html;
 }
 
 function formatDate(value) {

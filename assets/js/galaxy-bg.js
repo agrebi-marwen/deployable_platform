@@ -192,10 +192,10 @@
       document.body.appendChild(canvas);
     }
 
-    const gl = canvas.getContext('webgl', { alpha: false });
+    const gl = canvas.getContext('webgl', { alpha: true });
     if (!gl) return;
 
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(0, 0, 0, 0);
 
     function createShader(gl, type, source) {
       const shader = gl.createShader(type);
@@ -269,14 +269,14 @@
       density: 0.2,
       hueShift: 0.0,
       speed: 0.2,
-      glowIntensity: 0.1,
+      glowIntensity: 0.12,
       saturation: 0.0,
       mouseRepulsion: false,
       twinkleIntensity: 0.0,
       rotationSpeed: 0.0,
       repulsionStrength: 6.0,
       autoCenterRepulsion: 0.0,
-      transparent: false
+      transparent: true
     };
 
     function resize() {
@@ -341,6 +341,12 @@
 
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Reduced motion: render a single static frame, no animation loop
+      render(0);
+      return;
     }
 
     animationId = requestAnimationFrame(render);
