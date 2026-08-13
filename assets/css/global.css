@@ -30,13 +30,9 @@
   --neon-orange: #fe4e00;    /* Flame Orange — streak, danger */
   --neon-red: #fe4e00;       /* Flame Orange — boss, danger */
 
-  /* ---- Action & rarity ---- */
+  /* ---- Action ---- */
   --brand-green: #fe4e00;
   --button-cream: #345995;
-  --rarity-common: #83b5d1;
-  --rarity-rare: #345995;
-  --rarity-epic: #fe4e00;
-  --rarity-legendary: #eec643;
 
   /* ---- Text neutrals ---- */
   --text-strong: #ffffff;
@@ -90,39 +86,10 @@ a { text-decoration: none; color: inherit; }
 ::-webkit-scrollbar-track { background: var(--bg-abyss); border-left: var(--border-thin); }
 ::-webkit-scrollbar-thumb { background: var(--bg-panel); border: 2px solid var(--line); }
 
-.grid-background { display: none; }
-
 .space {
   display: inline-block;
   width: 20px;
 }
-
-/* =============================================================================
-   CORE UTILITIES — DESIGN.md §4
-   ============================================================================= */
-
-/* 8-bit bevel frame — tactile handheld edge */
-.bevel {
-  border: var(--border-thick);
-  border-radius: 0;
-  box-shadow:
-    inset -3px -3px 0 rgba(0, 0, 0, 0.45),
-    inset 3px 3px 0 rgba(255, 255, 255, 0.07),
-    var(--shadow-hard);
-}
-
-/* Segmented pixel-block progress bar */
-.seg-bar { display: flex; gap: 3px; }
-.seg-bar .seg {
-  flex: 1;
-  height: 14px;
-  background: var(--bg-abyss);
-  border: 2px solid var(--line);
-}
-.seg-bar .seg.on      { background: linear-gradient(180deg, #fe4e00, #d94300); }
-.seg-bar .seg.on.cyan { background: linear-gradient(180deg, #83b5d1, #6a9cbd); }
-.seg-bar .seg.on.violet { background: linear-gradient(180deg, #345995, #2a4a80); }
-.seg-bar .seg.half    { background: var(--neon-yellow); }
 
 /* =============================================================================
    BUTTONS — DESIGN.md §5.2
@@ -148,10 +115,6 @@ a { text-decoration: none; color: inherit; }
 }
 .btn:hover  { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); filter: brightness(1.08); }
 .btn:active { transform: translate(2px, 2px);  box-shadow: 2px 2px 0 var(--line); }
-
-.btn--cyan  { background: var(--neon-cyan); color: var(--ink); }
-.btn--pink  { background: var(--neon-yellow); color: var(--ink); }
-.btn--cream { background: var(--button-cream); color: #fff; }
 
 /* Landing hero buttons (kept class names for index.html) */
 .btn-primary   { background: var(--brand-green); color: #fff; }
@@ -209,21 +172,6 @@ a { text-decoration: none; color: inherit; }
 .status-accepted { background: var(--neon-green); color: var(--ink); }
 .status-rejected { background: var(--neon-red); color: #fff; }
 .status-none     { background: var(--bg-panel); color: var(--text-mid); }
-
-/* HUD pill (nav stat chips) */
-.hud-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-meta);
-  font-size: 18px;
-  color: var(--text-strong);
-  background: var(--bg-panel);
-  border: var(--border-thin);
-  box-shadow: var(--shadow-hard-sm);
-  padding: 6px 14px;
-}
-.hud-pill .bolt { color: var(--neon-cyan); }
 
 /* =============================================================================
    THEME TOGGLE — gamified pixel square (light mode kept)
@@ -346,8 +294,6 @@ a { text-decoration: none; color: inherit; }
   padding: 2px 10px;
   margin-left: 4px;
 }
-
-.logo-icon { color: var(--neon-cyan); }
 
 .nav-links {
   display: flex;
