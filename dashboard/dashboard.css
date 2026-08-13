@@ -529,6 +529,53 @@ body {
   color: #ef4444;
 }
 
+/* Leaderboard table inside modal */
+.modal-table-container {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.modal-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-body);
+}
+
+.modal-table-container th {
+  padding: 12px 16px;
+  color: var(--accent-orange);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-table-container td {
+  padding: 14px 16px;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.modal-table-container td strong {
+  color: var(--accent-blue);
+  font-family: var(--font-display);
+}
+
+.modal-table-container tbody tr:hover {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.modal-loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 30px;
+  font-size: 0.9rem;
+}
+
 /* Settings modal form layout */
 .settings-form-layout {
   display: flex;
@@ -1089,15 +1136,7 @@ body {
   transition: width 0.8s ease;
 }
 
-/* Inline leaderboard (replaces the old modal) */
-.leaderboard-section {
-  margin-top: 48px;
-}
-
-.leaderboard-section .panel-header h2 {
-  font-size: 1.3rem;
-}
-
+/* Leaderboard load-more button */
 .load-more-btn {
   display: block;
   margin: 24px auto 0;

@@ -38,7 +38,7 @@
     <nav class="dash-nav-links">
       <a href="challenges.html">Challenges</a>
       <a href="submissions.html">Submissions</a>
-      <a href="#leaderboard">Leaderboard</a>
+      <a href="#" id="open-leaderboard">Leaderboard</a>
       <a href="#" id="open-settings">Settings</a>
     </nav>
 
@@ -89,29 +89,33 @@
       </div>
     </section>
 
-    <section class="panel-section leaderboard-section" id="leaderboard">
-      <div class="panel-header">
-        <h2>Registry of Elite Time Travelers</h2>
-        <span class="panel-note">Real-time standings stabilizing the timeline</span>
+  </div>
+
+
+  <div class="modal-overlay" id="leaderboard-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🏆 Registry of Elite Time Travelers</h2>
+        <button class="close-modal" id="close-leaderboard">&times;</button>
       </div>
-      <div class="leaderboard-card">
-        <table class="leaderboard-table">
+      <p class="modal-subtitle">Real-time standings of travelers stabilizing the timeline.</p>
+      <div class="modal-table-container">
+        <table>
           <thead>
             <tr>
-              <th class="col-rank">Rank</th>
-              <th class="col-name">Traveler Name</th>
-              <th class="col-points">Energy Points (EP)</th>
+              <th>Rank</th>
+              <th>Traveler Name</th>
+              <th>Energy Points (EP)</th>
             </tr>
           </thead>
           <tbody id="leaderboard-tbody">
             <tr>
-              <td colspan="3" class="table-loading">Scanning historical registers...</td>
+              <td colspan="3" class="modal-loading">Querying active timelines...</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </section>
-
+    </div>
   </div>
 
 

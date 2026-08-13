@@ -33,8 +33,11 @@ const epochStats = document.getElementById('epoch-stats');
 const logoutBtn = document.getElementById('logout-btn');
 
 // Modal Elements
+const leaderboardModal = document.getElementById('leaderboard-modal');
 const settingsModal = document.getElementById('settings-modal');
+const openLeaderboardBtn = document.getElementById('open-leaderboard');
 const openSettingsBtn = document.getElementById('open-settings');
+const closeLeaderboardBtn = document.getElementById('close-leaderboard');
 const closeSettingsBtn = document.getElementById('close-settings');
 
 // Settings Form Elements
@@ -198,7 +201,6 @@ async function fetchDashboardData() {
 
     renderMissionProgress(error ? [] : challenges || [], latestByChallenge);
     renderEpochStats(error ? [] : challenges || [], latestByChallenge);
-    fetchLeaderboard();
 }
 
 // Map each challenge to its most recent submission status
@@ -456,14 +458,22 @@ settingsForm.addEventListener('submit', async (e) => {
 // 4. GENERAL EVENTS
 // ==========================================
 function setupEventListeners() {
+    openLeaderboardBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        leaderboardModal.classList.add('active');
+        fetchLeaderboard();
+    });
+
     openSettingsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         settingsModal.classList.add('active');
     });
 
+    closeLeaderboardBtn.addEventListener('click', () => leaderboardModal.classList.remove('active'));
     closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('active'));
 
     window.addEventListener('click', (e) => {
+        if (e.target === leaderboardModal) leaderboardModal.classList.remove('active');
         if (e.target === settingsModal) settingsModal.classList.remove('active');
     });
 
