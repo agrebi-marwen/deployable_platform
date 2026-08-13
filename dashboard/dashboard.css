@@ -617,7 +617,7 @@
 
 .challenge-details-card .section-badge {
   color: hsl(var(--epoch-hue, 25) 90% 62%);
-  border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.4);
+  border-color: hsl(var(--epoch-hue, 25) 75% 48%);
 }
 
 .challenge-details-card h1 {
