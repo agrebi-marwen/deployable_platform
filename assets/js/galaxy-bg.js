@@ -325,7 +325,6 @@
 
     let animationId;
     function render(t) {
-      animationId = requestAnimationFrame(render);
       const timeSec = t * 0.001;
 
       gl.uniform1f(uLocations.uTime, timeSec);
@@ -343,13 +342,18 @@
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
+    function frame(t) {
+      render(t);
+      animationId = requestAnimationFrame(frame);
+    }
+
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       // Reduced motion: render a single static frame, no animation loop
       render(0);
       return;
     }
 
-    animationId = requestAnimationFrame(render);
+    animationId = requestAnimationFrame(frame);
   }
 
   if (document.readyState === 'loading') {

@@ -56,7 +56,7 @@ form.addEventListener('submit', async (e) => {
 
         if (!rateLimitResponse.ok) {
             const rateLimitData = await rateLimitResponse.json();
-            messageEl.style.color = "red";
+            messageEl.style.color = "#fe4e00";
             messageEl.textContent = "Error: " + rateLimitData.error;
             return;
         }
@@ -70,10 +70,10 @@ form.addEventListener('submit', async (e) => {
     });
 
     if (error) {
-        messageEl.style.color = "red";
+        messageEl.style.color = "#fe4e00";
         messageEl.textContent = "Error: " + error.message;
     } else {
-        messageEl.style.color = "green";
+        messageEl.style.color = "#83b5d1";
         messageEl.textContent = "Success! Redirecting...";
         
         // Redirect the user to your main project dashboard

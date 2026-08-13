@@ -86,7 +86,7 @@ submissionForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     submitBtn.disabled = true;
     submissionMessage.textContent = "Syncing solution into portal...";
-    submissionMessage.style.color = "white";
+    submissionMessage.style.color = "var(--text-strong)";
 
     const url = submissionUrl.value.trim();
 

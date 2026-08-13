@@ -435,7 +435,7 @@ async function loadMoreLeaderboard() {
 settingsForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     settingsMessage.textContent = "Updating protocol...";
-    settingsMessage.style.color = "white";
+    settingsMessage.style.color = "var(--text-strong)";
 
     const newUsername = settingsUsernameInput.value.trim();
     const newPassword = settingsPasswordInput.value;
@@ -447,7 +447,7 @@ settingsForm.addEventListener('submit', async (e) => {
 
     if (profileError) {
         settingsMessage.textContent = "Error: " + profileError.message;
-        settingsMessage.style.color = "red";
+        settingsMessage.style.color = "#fe4e00";
         return;
     }
 
@@ -458,13 +458,13 @@ settingsForm.addEventListener('submit', async (e) => {
 
         if (authError) {
             settingsMessage.textContent = "Username saved, but password failed: " + authError.message;
-            settingsMessage.style.color = "red";
+            settingsMessage.style.color = "#fe4e00";
             return;
         }
     }
 
     settingsMessage.textContent = "Identity stabilized successfully!";
-    settingsMessage.style.color = "green";
+    settingsMessage.style.color = "#83b5d1";
     fetchUserProfile();
     setTimeout(() => {
         settingsModal.classList.remove('active');

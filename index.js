@@ -40,10 +40,10 @@ async function initSupabaseClient() {
             if (authBtn) {
                 authBtn.outerHTML = `
                     <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
-                        <a href="dashboard/dashboard.html" style="font-family: 'VT323', monospace; font-size: 19px; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; text-decoration: none; border-bottom: 2px dashed #83b5d1; padding-bottom: 2px;">
+                        <a href="dashboard/dashboard.html" style="font-family: 'VT323', monospace; font-size: 19px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-strong); text-decoration: none; border-bottom: 2px dashed var(--neon-cyan); padding-bottom: 2px;">
                             🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
                         </a>
-                        <button id="logout-btn" style="font-family: 'VT323', monospace; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; background: #161616; border: 2px solid #000; box-shadow: 3px 3px 0 #000; color: #fe4e00; padding: 4px 14px; cursor: pointer;">Log Out</button>
+                        <button id="logout-btn" style="font-family: 'VT323', monospace; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-panel); border: 2px solid var(--line); box-shadow: var(--shadow-hard-sm); color: var(--neon-red); padding: 4px 14px; cursor: pointer;">Log Out</button>
                     </div>
                 `;
                 document.getElementById('logout-btn').addEventListener('click', handleLogout);

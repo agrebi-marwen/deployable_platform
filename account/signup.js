@@ -67,14 +67,14 @@ form.addEventListener('submit', async (e) => {
     // Password strength validation
     const strengthCheck = validatePasswordStrength(password);
     if (!strengthCheck.valid) {
-        messageEl.style.color = "red";
+        messageEl.style.color = "#fe4e00";
         messageEl.textContent = "Error: " + strengthCheck.message;
         return;
     }
 
     // Validate passwords match
     if (password !== confirmPassword) {
-        messageEl.style.color = "red";
+        messageEl.style.color = "#fe4e00";
         messageEl.textContent = "Passwords do not match!";
         return;
     }
@@ -89,7 +89,7 @@ form.addEventListener('submit', async (e) => {
 
         if (!rateLimitResponse.ok) {
             const rateLimitData = await rateLimitResponse.json();
-            messageEl.style.color = "red";
+            messageEl.style.color = "#fe4e00";
             messageEl.textContent = "Error: " + rateLimitData.error;
             return;
         }
@@ -105,7 +105,7 @@ form.addEventListener('submit', async (e) => {
         .maybeSingle(); 
 
     if (existingProfile) {
-        messageEl.style.color = "red";
+        messageEl.style.color = "#fe4e00";
         messageEl.textContent = "Error: Username is already taken!";
         return; 
     }
@@ -126,7 +126,7 @@ form.addEventListener('submit', async (e) => {
     });
 
     if (error) {
-        messageEl.style.color = "red";
+        messageEl.style.color = "#fe4e00";
         if (error.message.includes("already registered")) {
             messageEl.textContent = "Error: Email is already registered!";
         } else {
@@ -134,7 +134,7 @@ form.addEventListener('submit', async (e) => {
         }
         console.error(error);
     } else {
-        messageEl.style.color = "green";
+        messageEl.style.color = "#83b5d1";
         messageEl.textContent = "Success! Account created. Redirecting to login...";
         form.reset();
 

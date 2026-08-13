@@ -274,8 +274,8 @@ a { text-decoration: none; color: inherit; }
   position: fixed;
   top: 0;
   left: 0;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   pointer-events: none;
   z-index: 9998;
   opacity: 0;
@@ -732,7 +732,7 @@ a { text-decoration: none; color: inherit; }
   font-family: var(--font-meta);
   font-size: 16px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--ink);
   background: hsl(var(--epoch-hue, 25) 85% 55%);
   border: 2px solid var(--line);
   box-shadow: var(--shadow-hard-sm);
@@ -903,6 +903,25 @@ a { text-decoration: none; color: inherit; }
   background: rgba(238, 241, 246, 0.92);
 }
 
+[data-theme="light"] .nav-links a:hover {
+  color: var(--text-strong);
+  background: rgba(22, 32, 43, 0.06);
+  border-color: hsl(205 70% 40%);
+}
+
+[data-theme="light"] .footer-links a:hover { color: var(--text-strong); }
+
+[data-theme="light"] .team-links a:hover {
+  color: var(--text-strong);
+  border-color: hsl(205 70% 40%);
+}
+
+[data-theme="light"] .tagline {
+  color: hsl(205 70% 35%);
+  border-color: rgba(52, 89, 149, 0.4);
+  background: rgba(52, 89, 149, 0.06);
+}
+
 [data-theme="light"] .hero h1,
 [data-theme="light"] .hero h1 .grad {
   text-shadow:
@@ -914,6 +933,16 @@ a { text-decoration: none; color: inherit; }
 [data-theme="light"] .leaderboard-card,
 [data-theme="light"] .challenge-card-homepage {
   box-shadow: var(--shadow-hard);
+}
+
+[data-theme="light"] .challenge-card-homepage-epoch,
+[data-theme="light"] .challenge-card-homepage-points {
+  color: hsl(var(--epoch-hue, 25) 75% 32%);
+}
+
+[data-theme="light"] .challenge-card-homepage-btn {
+  background: hsl(var(--epoch-hue, 25) 70% 45%);
+  color: var(--ink);
 }
 
 /* =============================================================================

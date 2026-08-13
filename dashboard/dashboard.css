@@ -803,6 +803,17 @@
    ========================================================================= */
 [data-theme="light"] .dash-navbar { background: rgba(238, 241, 246, 0.92); }
 
+[data-theme="light"] .nav-title { color: hsl(205 70% 35%); }
+
+[data-theme="light"] .dash-nav-links a:hover,
+[data-theme="light"] .dash-nav-links a[aria-current="page"] {
+  color: var(--text-strong);
+  background: rgba(22, 32, 43, 0.06);
+  border-color: hsl(205 70% 40%);
+}
+
+[data-theme="light"] .table-link:hover { color: var(--text-strong); }
+
 [data-theme="light"] .mission-row { box-shadow: var(--shadow-hard-sm); }
 
 [data-theme="light"] .log-archive-card,

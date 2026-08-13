@@ -195,7 +195,7 @@ function renderSubmissions(submissions, challengeLookup) {
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h3 style="color: #ffffff; margin: 0; font-family: 'VT323', monospace; font-size: 1.25rem;">${escapeHtml(challengeTitle)}</h3>
+                    <h3 style="color: var(--text-strong); margin: 0; font-family: 'VT323', monospace; font-size: 1.25rem;">${escapeHtml(challengeTitle)}</h3>
                     <p style="color: #6e8296; font-size: 0.8rem; margin: 4px 0 0 0;">Traveler: <strong>${escapeHtml(username)}</strong> • ${escapeHtml(date)}</p>
                 </div>
                 <span style="font-size: 0.8rem; color: #eec643; background: rgba(238, 198, 67, 0.1); padding: 3px 8px; border: 2px solid #eec643; font-family: 'VT323', monospace; text-transform: uppercase;">PENDING</span>
