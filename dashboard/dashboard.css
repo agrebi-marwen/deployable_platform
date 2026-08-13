@@ -595,7 +595,7 @@
   display: grid;
   grid-template-columns: 1.7fr 1fr;
   gap: 30px;
-  max-width: 1320px;
+  max-width: 1800px;
   margin: 40px auto;
   padding: 0 5%;
 }
