@@ -239,7 +239,7 @@ function renderMissionProgress(challenges, latestByChallenge) {
     }
 
     const fragment = document.createDocumentFragment();
-    challenges.forEach(challenge => {
+    challenges.slice(0, 3).forEach(challenge => {
         const entry = latestByChallenge[challenge.id];
         const status = entry?.status ?? null;
         const row = document.createElement('div');
