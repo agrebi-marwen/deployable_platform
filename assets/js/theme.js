@@ -4,6 +4,7 @@
   'use strict';
 
   var STORAGE_KEY = 'timeportal_theme';
+  window.THEME_VERSION = '2.0.0';
   var root = document.documentElement;
 
   // Restore persisted preference (default: dark)
