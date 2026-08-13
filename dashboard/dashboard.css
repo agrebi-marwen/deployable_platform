@@ -1191,8 +1191,13 @@ body {
 
 [data-theme="light"] .epoch-month,
 [data-theme="light"] .challenge-card .card-badge,
+[data-theme="light"] .challenge-details-card .section-badge,
 [data-theme="light"] .epoch-stat-head {
   color: hsl(var(--epoch-hue, 25) 70% 32%);
+}
+
+[data-theme="light"] .challenge-details-card h1 {
+  color: hsl(var(--epoch-hue, 25) 70% 30%);
 }
 
 [data-theme="light"] .challenge-card .card-points {
