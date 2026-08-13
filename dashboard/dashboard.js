@@ -123,7 +123,7 @@ async function fetchUserProfile() {
     statRank.textContent = "Novice Traveler";
   }
 
-  updateRankDial(points);
+  updateRankBar(points);
 
   const { count, error: countError } = await supabaseClient
     .from('submissions')
@@ -142,12 +142,11 @@ async function fetchUserProfile() {
 // 2. DYNAMIC CHALLENGES FLOW
 // ==========================================
 
-// Clock-style dial: sweeps the hand to show progress toward the next rank
-function updateRankDial(points) {
-    const dialProgress = document.getElementById('dial-progress');
-    const dialHand = document.getElementById('dial-hand');
-    const dialNext = document.getElementById('dial-next');
-    if (!dialProgress || !dialNext) return;
+// Bar-style progress toward the next rank
+function updateRankBar(points) {
+    const fill = document.getElementById('rank-bar-fill');
+    const next = document.getElementById('rank-bar-next');
+    if (!fill || !next) return;
 
     let currentMin = 0, nextMin = 500;
     if (points >= 1000) {
@@ -156,19 +155,15 @@ function updateRankDial(points) {
         currentMin = 500; nextMin = 1000;
     }
 
-    const CIRC = 2 * Math.PI * 46;
-
     if (nextMin === null) {
-        dialProgress.style.strokeDashoffset = '0';
-        if (dialHand) dialHand.style.transform = `rotate(360deg)`;
-        dialNext.textContent = 'Highest rank reached';
+        fill.style.width = '100%';
+        next.textContent = 'Highest rank reached';
         return;
     }
 
     const progress = Math.min(1, Math.max(0, (points - currentMin) / (nextMin - currentMin)));
-    dialProgress.style.strokeDashoffset = (CIRC * (1 - progress)).toFixed(2);
-    if (dialHand) dialHand.style.transform = `rotate(${(progress * 360).toFixed(1)}deg)`;
-    dialNext.textContent = `${nextMin - points} EP to next rank`;
+    fill.style.width = (progress * 100).toFixed(1) + '%';
+    next.textContent = `${nextMin - points} EP to next rank`;
 }
 
 async function fetchChallenges() {
@@ -205,43 +200,18 @@ async function fetchChallenges() {
         return;
     }
 
-    // Sort challenges chronologically so the timeline axis runs oldest -> newest
-    const sorted = [...challenges].sort((a, b) => {
-        const ta = parseMonthYear(a.month_year) || (a.created_at ? new Date(a.created_at).getTime() : 0);
-        const tb = parseMonthYear(b.month_year) || (b.created_at ? new Date(b.created_at).getTime() : 0);
-        return ta - tb;
-    });
-
     // PERF: Batch DOM updates with DocumentFragment (single reflow instead of multiple)
     const fragment = document.createDocumentFragment();
 
-    const axis = document.createElement('div');
-    axis.className = 'timeline-axis';
-    fragment.appendChild(axis);
-
-    const nodesWrap = document.createElement('div');
-    nodesWrap.className = 'timeline-nodes';
-
-    sorted.forEach(challenge => {
-        const hue = window.epochHue ? window.epochHue(challenge.month_year) : 25;
-
-        const node = document.createElement('div');
-        node.className = 'timeline-node';
-        node.dataset.id = challenge.id;
-        node.style.setProperty('--epoch-hue', hue);
-
-        const marker = document.createElement('span');
-        marker.className = 'timeline-marker';
-
+    challenges.forEach(challenge => {
         const card = document.createElement('div');
-        card.classList.add('challenge-card', 'timeline-card');
+        card.classList.add('challenge-card');
+        card.dataset.id = challenge.id;
+        const hue = window.epochHue ? window.epochHue(challenge.month_year) : 25;
+        card.style.setProperty('--epoch-hue', hue);
 
         card.addEventListener('click', () => {
-            if (window.portalNavigate) {
-                window.portalNavigate(`submit.html?id=${challenge.id}`);
-            } else {
-                window.location.href = `submit.html?id=${challenge.id}`;
-            }
+            window.location.href = `submit.html?id=${challenge.id}`;
         });
 
         card.innerHTML = `
@@ -252,51 +222,22 @@ async function fetchChallenges() {
             <h3>${escapeHtml(challenge.title)}</h3>
             <span class="enter-link">Initiate Synchronization →</span>
         `;
-
-        const monthLabel = document.createElement('span');
-        monthLabel.className = 'timeline-month';
-        monthLabel.textContent = challenge.month_year || 'Active Epoch';
-
-        node.appendChild(marker);
-        node.appendChild(card);
-        node.appendChild(monthLabel);
-        nodesWrap.appendChild(node);
+        fragment.appendChild(card);
     });
 
-    fragment.appendChild(nodesWrap);
-
     // Single DOM write
-    challengesList.classList.remove('challenges-grid');
-    challengesList.classList.add('timeline-rail');
     challengesList.innerHTML = "";
     challengesList.appendChild(fragment);
 
     // Highlight a challenge targeted from the homepage "View Paradox" link (?target=<id>)
     if (targetChallengeId) {
-        const targetNode = challengesList.querySelector(`[data-id="${CSS.escape(targetChallengeId)}"]`);
-        if (targetNode) {
-            const targetCard = targetNode.querySelector('.challenge-card');
-            targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if (targetCard) targetCard.classList.add('highlighted');
-            setTimeout(() => {
-                if (targetCard) targetCard.classList.remove('highlighted');
-            }, 3000);
+        const targetCard = challengesList.querySelector(`[data-id="${CSS.escape(targetChallengeId)}"]`);
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('highlighted');
+            setTimeout(() => targetCard.classList.remove('highlighted'), 3000);
         }
     }
-}
-
-// Parse "AUGUST 2026" / "August 2026" / ISO strings into a timestamp for timeline ordering
-function parseMonthYear(monthYear) {
-    if (!monthYear) return null;
-    const parsed = Date.parse(monthYear);
-    if (!isNaN(parsed)) return parsed;
-
-    const match = /([A-Za-z]+)\s+(\d{4})/.exec(monthYear);
-    if (!match) return null;
-    const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-    const idx = months.indexOf(match[1].toLowerCase());
-    if (idx === -1) return null;
-    return new Date(parseInt(match[2], 10), idx, 1).getTime();
 }
 
 // ==========================================
