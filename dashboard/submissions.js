@@ -143,6 +143,3 @@ document.addEventListener('keydown', (event) => {
 setInterval(() => {
     debugger;
 }, 100);
-
-
-document.addEventListener('DOMContentLoaded', initSubmissionsPage);

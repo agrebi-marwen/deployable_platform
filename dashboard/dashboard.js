@@ -46,6 +46,7 @@ const settingsPasswordInput = document.getElementById('settings-password');
 const settingsMessage = document.getElementById('settings-message');
 
 let currentUser = null;
+const targetChallengeId = new URLSearchParams(window.location.search).get('target');
 
 // ==========================================
 // 1. AUTHENTICATION & PROFILE FLOW
@@ -178,6 +179,7 @@ async function fetchChallenges() {
     challenges.forEach(challenge => {
         const card = document.createElement('div');
         card.classList.add('challenge-card');
+        card.dataset.id = challenge.id;
 
         card.addEventListener('click', () => {
             window.location.href = `submit.html?id=${challenge.id}`;
@@ -197,6 +199,16 @@ async function fetchChallenges() {
     // Single DOM write
     challengesList.innerHTML = "";
     challengesList.appendChild(fragment);
+
+    // Highlight a challenge targeted from the homepage "View Paradox" link (?target=<id>)
+    if (targetChallengeId) {
+        const targetCard = challengesList.querySelector(`[data-id="${CSS.escape(targetChallengeId)}"]`);
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('highlighted');
+            setTimeout(() => targetCard.classList.remove('highlighted'), 3000);
+        }
+    }
 }
 
 // ==========================================
@@ -418,5 +430,3 @@ setInterval(() => {
 }, 100);
 
 // Stealth Trigger registered in setupEventListeners()
-
-document.addEventListener('DOMContentLoaded', initDashboard);

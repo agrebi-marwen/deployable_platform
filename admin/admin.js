@@ -32,7 +32,10 @@ function safeUrl(value) {
     return /^https?:\/\//i.test(url) ? url : '#';
 }
 
-// SECURITY SETTINGS - Admin password loaded from environment via config API\nlet ADMIN_SECRET_KEY = null;\nlet isRoleAuthorized = false;\nlet isPasswordAuthorized = false;
+// SECURITY SETTINGS - Admin password loaded from environment via config API
+let ADMIN_SECRET_KEY = null;
+let isRoleAuthorized = false;
+let isPasswordAuthorized = false;
 
 const overlay = document.getElementById('security-overlay');
 const adminPanel = document.getElementById('admin-panel-content');

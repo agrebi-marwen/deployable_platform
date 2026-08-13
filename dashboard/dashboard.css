@@ -372,6 +372,18 @@ body {
   border-color: rgba(249, 115, 22, 0.3);
 }
 
+.challenge-card.highlighted {
+  border-color: rgba(249, 115, 22, 0.9);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.25);
+  animation: challenge-highlight 3s ease forwards;
+}
+
+@keyframes challenge-highlight {
+  0%   { border-color: rgba(249, 115, 22, 0.9); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.6), 0 0 30px rgba(249, 115, 22, 0.25); }
+  70%  { border-color: rgba(249, 115, 22, 0.5); box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.3), 0 0 15px rgba(249, 115, 22, 0.15); }
+  100% { border-color: var(--neu-border-color, rgba(255, 255, 255, 0.08)); box-shadow: none; }
+}
+
 .card-top {
   display: flex;
   justify-content: space-between;

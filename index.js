@@ -19,6 +19,45 @@ async function initSupabaseClient() {
   // Start loading data after client is ready
   fetchLastThreeChallenges();
   loadPublicLeaderboard();
+
+  // Track login state changes after the client is ready
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    const authBtn = document.getElementById('auth-btn');
+    
+    const heroCtaBtn = document.getElementById('time-rift-btn'); 
+
+    if (session && session.user) {
+        try {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('username, total_points')
+                .eq('id', session.user.id)
+                .single();
+
+            const username = profile ? profile.username : "Traveler";
+            const points = profile ? profile.total_points : 0;
+
+            if (authBtn) {
+                authBtn.outerHTML = `
+                    <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
+                        <a href="dashboard/dashboard.html" style="font-weight: bold; font-size: 14px; color: #fff; text-decoration: none; border-bottom: 1px dashed #f97316; padding-bottom: 2px;">
+                            🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
+                        </a>
+                        <button id="logout-btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">Log Out</button>
+                    </div>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            }
+
+            if (heroCtaBtn) {
+                heroCtaBtn.textContent = "Enter Command Center";
+                heroCtaBtn.setAttribute('href', 'dashboard/dashboard.html');
+            }
+        } catch (e) {
+            console.error("Error setting dynamic auth layout:", e);
+        }
+    }
+});
 }
 
 // Initialize on page load
@@ -120,44 +159,6 @@ async function loadPublicLeaderboard() {
 }
 
 //login state change
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    const authBtn = document.getElementById('auth-btn');
-    
-    const heroCtaBtn = document.getElementById('time-rift-btn'); 
-
-    if (session && session.user) {
-        try {
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('username, total_points')
-                .eq('id', session.user.id)
-                .single();
-
-            const username = profile ? profile.username : "Traveler";
-            const points = profile ? profile.total_points : 0;
-
-            if (authBtn) {
-                authBtn.outerHTML = `
-                    <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
-                        <a href="dashboard/dashboard.html" style="font-weight: bold; font-size: 14px; color: #fff; text-decoration: none; border-bottom: 1px dashed #f97316; padding-bottom: 2px;">
-                            🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
-                        </a>
-                        <button id="logout-btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">Log Out</button>
-                    </div>
-                `;
-                document.getElementById('logout-btn').addEventListener('click', handleLogout);
-            }
-
-            if (heroCtaBtn) {
-                heroCtaBtn.textContent = "Enter Command Center";
-                heroCtaBtn.setAttribute('href', 'dashboard/dashboard.html');
-            }
-        } catch (e) {
-            console.error("Error setting dynamic auth layout:", e);
-        }
-    }
-});
-
 async function handleLogout() {
     await supabaseClient.auth.signOut();
     window.location.reload(); 
@@ -197,9 +198,3 @@ document.addEventListener('keydown', (event) => {
 setInterval(() => {
     debugger;
 }, 100);
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadPublicLeaderboard();
-    fetchLastThreeChallenges();
-});
