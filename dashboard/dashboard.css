@@ -965,7 +965,7 @@ body {
 
 /* ==========================================================================
    DASHBOARD — OVERVIEW PANELS
-   Used by: dashboard.html (mission progress, activity, epoch stats)
+   Used by: dashboard.html (mission progress, epoch stats)
    ========================================================================== */
 
 .panel-section {
@@ -991,13 +991,6 @@ body {
   color: var(--text-secondary);
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 32px;
-  align-items: start;
-}
-
 .mission-list {
   display: flex;
   flex-direction: column;
@@ -1020,11 +1013,23 @@ body {
   border-color: hsl(var(--epoch-hue, 25) 70% 55% / 0.5);
 }
 
+.mission-meta {
+  min-width: 0;
+  flex: 1;
+}
+
 .mission-title {
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
-  flex: 1;
+  display: block;
+}
+
+.mission-date {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
 }
 
 .mission-link {
@@ -1044,42 +1049,6 @@ body {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: var(--card-bg);
-  border: var(--neu-border);
-  border-radius: 12px;
-  padding: 12px 16px;
-}
-
-.activity-meta {
-  min-width: 0;
-}
-
-.activity-title {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.activity-date {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 2px;
 }
 
 .epoch-stats {
@@ -1148,13 +1117,6 @@ body {
 .load-more-btn:hover {
   background: rgba(249, 115, 22, 0.2);
   border-color: rgba(249, 115, 22, 0.6);
-}
-
-@media (max-width: 900px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
 }
 
 @media (max-width: 600px) {

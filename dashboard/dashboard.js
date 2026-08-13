@@ -30,7 +30,6 @@ const statPoints = document.getElementById('stat-points');
 const statSolved = document.getElementById('stat-solved');
 const missionProgress = document.getElementById('mission-progress');
 const epochStats = document.getElementById('epoch-stats');
-const recentActivity = document.getElementById('recent-activity');
 const logoutBtn = document.getElementById('logout-btn');
 
 // Modal Elements
@@ -186,7 +185,7 @@ async function fetchDashboardData() {
 
     const { data: submissions, error: subError } = await supabaseClient
         .from('submissions')
-        .select('id, submitted_at, status, challenge_id, challenges (title, month_year)')
+        .select('id, submitted_at, status, challenge_id')
         .eq('user_id', currentUser.id)
         .order('submitted_at', { ascending: false });
 
@@ -199,7 +198,6 @@ async function fetchDashboardData() {
 
     renderMissionProgress(error ? [] : challenges || [], latestByChallenge);
     renderEpochStats(error ? [] : challenges || [], latestByChallenge);
-    renderRecentActivity(submissionsList);
     fetchLeaderboard();
 }
 
@@ -210,7 +208,7 @@ function buildLatestStatusMap(submissions) {
         const ts = s.submitted_at ? new Date(s.submitted_at).getTime() : 0;
         const cur = map[s.challenge_id];
         if (!cur || ts > cur.ts) {
-            map[s.challenge_id] = { status: s.status, ts, title: s.challenges?.title };
+            map[s.challenge_id] = { status: s.status, ts };
         }
     });
     return map;
@@ -242,13 +240,17 @@ function renderMissionProgress(challenges, latestByChallenge) {
 
     const fragment = document.createDocumentFragment();
     challenges.forEach(challenge => {
-        const status = latestByChallenge[challenge.id]?.status ?? null;
+        const entry = latestByChallenge[challenge.id];
+        const status = entry?.status ?? null;
         const row = document.createElement('div');
         row.classList.add('mission-row');
         row.style.setProperty('--epoch-hue', window.epochHue ? window.epochHue(challenge.month_year) : 25);
 
         row.innerHTML = `
-            <span class="mission-title">${escapeHtml(challenge.title)}</span>
+            <div class="mission-meta">
+                <span class="mission-title">${escapeHtml(challenge.title)}</span>
+                <span class="mission-date">${status ? 'Last deployment ' + escapeHtml(formatDate(entry.ts)) : 'Awaiting first deployment'}</span>
+            </div>
             <span class="table-status-badge ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
             <a class="mission-link" href="submit.html?id=${encodeURIComponent(challenge.id)}">Open &rarr;</a>
         `;
@@ -312,32 +314,6 @@ function formatDate(value) {
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
     if (diff < 7 * 86400000) return `${Math.floor(diff / 86400000)}d ago`;
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-
-function renderRecentActivity(submissions) {
-    const latest = submissions.slice(0, 8);
-
-    if (latest.length === 0) {
-        recentActivity.innerHTML = `<div class="loading-state">No activity yet. Deploy your first patch from the Challenges page.</div>`;
-        return;
-    }
-
-    const fragment = document.createDocumentFragment();
-    latest.forEach(s => {
-        const item = document.createElement('div');
-        item.classList.add('activity-item');
-        item.innerHTML = `
-            <div class="activity-meta">
-                <p class="activity-title">${escapeHtml(s.challenges?.title || 'Archived Anomaly')}</p>
-                <p class="activity-date">${escapeHtml(formatDate(s.submitted_at))}</p>
-            </div>
-            <span class="table-status-badge ${statusClass(s.status)}">${escapeHtml(statusLabel(s.status))}</span>
-        `;
-        fragment.appendChild(item);
-    });
-
-    recentActivity.innerHTML = "";
-    recentActivity.appendChild(fragment);
 }
 
 // Parse a deployment label like "AUGUST 2026" into a comparable numeric value
