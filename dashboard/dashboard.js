@@ -114,13 +114,7 @@ async function fetchUserProfile() {
   statPoints.textContent = `${points} EP`;
   settingsUsernameInput.value = profile.username;
 
-  if (points >= 1000) {
-    statRank.textContent = "Grand Time Lord";
-  } else if (points >= 500) {
-    statRank.textContent = "Chronos Engineer";
-  } else {
-    statRank.textContent = "Novice Traveler";
-  }
+  statRank.textContent = getRank(points).name;
 
   updateRankBar(points);
 
@@ -141,6 +135,27 @@ async function fetchUserProfile() {
 // 2. DASHBOARD DATA FLOW
 // ==========================================
 
+// Rank ladder (cumulative total points)
+const RANKS = [
+    { name: "Novice Traveler", min: 0 },
+    { name: "Chronos Engineer", min: 500 },
+    { name: "Temporal Artisan", min: 1200 },
+    { name: "Paradox Hunter", min: 2500 },
+    { name: "Timeline Guardian", min: 5000 },
+    { name: "Epoch Master", min: 10000 },
+    { name: "Grand Time Lord", min: 20000 },
+];
+
+function getRank(points) {
+    let idx = 0;
+    for (let i = 0; i < RANKS.length; i++) {
+        if (points >= RANKS[i].min) idx = i;
+    }
+    const current = RANKS[idx];
+    const next = RANKS[idx + 1] || null;
+    return { name: current.name, min: current.min, nextMin: next ? next.min : null };
+}
+
 // Segmented progress toward the next rank
 function updateRankBar(points) {
     const bar = document.getElementById('rank-bar');
@@ -152,26 +167,21 @@ function updateRankBar(points) {
 
     const SEGMENTS = segs.length;
 
-    let currentMin = 0, nextMin = 500;
-    if (points >= 1000) {
-        nextMin = null;
-    } else if (points >= 500) {
-        currentMin = 500; nextMin = 1000;
-    }
+    const rank = getRank(points);
 
-    if (nextMin === null) {
+    if (rank.nextMin === null) {
         segs.forEach(s => s.classList.add('on'));
         next.textContent = 'Highest rank reached';
         return;
     }
 
-    const progress = Math.min(1, Math.max(0, (points - currentMin) / (nextMin - currentMin)));
+    const progress = Math.min(1, Math.max(0, (points - rank.min) / (rank.nextMin - rank.min)));
     const filled = Math.round(progress * SEGMENTS);
     segs.forEach((s, i) => {
         s.classList.toggle('on', i < filled);
         s.classList.toggle('half', i === filled && progress < 1 && filled < SEGMENTS);
     });
-    next.textContent = `${nextMin - points} EP to next rank`;
+    next.textContent = `${rank.nextMin - points} EP to next rank`;
 }
 
 async function fetchDashboardData() {
