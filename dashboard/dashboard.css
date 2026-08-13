@@ -833,7 +833,7 @@ body {
 .log-archive-header h1 {
   font-family: var(--font-display);
   font-size: 2.5rem;
-  color: white;
+  color: var(--text-primary);
   margin: 10px 0;
   letter-spacing: -1px;
 }
@@ -1171,5 +1171,49 @@ body {
   .mission-link {
     margin-left: auto;
   }
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   Deepen epoch-colored text and swap dark surfaces so everything stays
+   readable on light backgrounds.
+   ========================================================================== */
+[data-theme="light"] .log-archive-card {
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .status-pending {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(180, 83, 9, 0.35);
+}
+
+[data-theme="light"] .epoch-month,
+[data-theme="light"] .challenge-card .card-badge,
+[data-theme="light"] .epoch-stat-head {
+  color: hsl(var(--epoch-hue, 25) 70% 32%);
+}
+
+[data-theme="light"] .challenge-card .card-points {
+  color: hsl(var(--epoch-hue, 25) 75% 35%);
+}
+
+[data-theme="light"] .challenge-card:hover .enter-link,
+[data-theme="light"] .mission-row:hover .mission-link {
+  color: hsl(var(--epoch-hue, 25) 75% 38%);
+}
+
+[data-theme="light"] .epoch-stat-fill {
+  background: linear-gradient(90deg, hsl(var(--epoch-hue, 25) 70% 42%), hsl(var(--epoch-hue, 25) 75% 50%));
+  box-shadow: 0 0 10px hsl(var(--epoch-hue, 25) 70% 42% / 0.35);
+}
+
+[data-theme="light"] .epoch-section + .epoch-section {
+  border-top-color: hsla(var(--epoch-hue, 25) 60% 45% / 0.22);
+}
+
+[data-theme="light"] .card-archived {
+  opacity: 0.7;
 }
 
