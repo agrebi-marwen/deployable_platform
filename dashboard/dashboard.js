@@ -196,7 +196,7 @@ async function fetchChallenges() {
     }
 
     if (!challenges || challenges.length === 0) {
-        challengesList.innerHTML = `<div class="loading-state">No timeline anomalies detected at this moment. Secure zone.</div>`;
+        challengesList.innerHTML = `<div class="loading-state">No active anomalies detected at this moment. Secure zone.</div>`;
         return;
     }
 
