@@ -96,7 +96,7 @@
           vec2 offset = vec2(float(x), float(y));
           vec2 si = id + vec2(float(x), float(y));
           float seed = Hash21(si);
-          float size = fract(seed * 345.32);
+          float size = 0.35 + 0.65 * fract(seed * 345.32);
           float glossLocal = tri(uStarSpeed / (PERIOD * seed + 1.0));
           float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;
 
@@ -265,14 +265,14 @@
     const config = {
       focal: [0.5, 0.5],
       rotation: [1.0, 0.0],
-      starSpeed: 0.2,
-      density: 0.2,
+      starSpeed: 0.5,
+      density: 0.24,
       hueShift: 0.0,
-      speed: 0.2,
-      glowIntensity: 0.12,
+      speed: 0.7,
+      glowIntensity: 0.22,
       saturation: 0.0,
       mouseRepulsion: false,
-      twinkleIntensity: 0.0,
+      twinkleIntensity: 0.2,
       rotationSpeed: 0.0,
       repulsionStrength: 6.0,
       autoCenterRepulsion: 0.0,
