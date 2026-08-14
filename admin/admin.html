@@ -121,6 +121,74 @@
       </div>
     </div>
 
+    <div class="admin-grid">
+      <div class="panel-card">
+        <h2>Deploy New Workshop</h2>
+        <form id="workshop-form">
+          <div class="form-group">
+            <label for="workshop-title">Workshop Title</label>
+            <input type="text" id="workshop-title" placeholder="e.g., Intro to Web Development" required>
+          </div>
+
+          <div class="form-group">
+            <label for="workshop-category">Category</label>
+            <select id="workshop-category" required>
+              <option value="">Select a category...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="workshop-video">Google Drive Link</label>
+            <input type="text" id="workshop-video" placeholder="https://drive.google.com/file/d/..." required>
+            <p class="hint">Share the video on Drive with "Anyone with the link", then paste the share link here.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="workshop-duration">Duration (e.g., 42:15)</label>
+            <input type="text" id="workshop-duration" placeholder="42:15">
+          </div>
+
+          <div class="form-group">
+            <label for="workshop-description">Description</label>
+            <textarea id="workshop-description" placeholder="What will the traveler learn in this session?" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="workshop-date">Published Date</label>
+            <input type="date" id="workshop-date">
+          </div>
+
+          <button type="submit" class="submit-btn" id="workshop-submit-btn">Deploy Workshop</button>
+          <div id="workshop-message" class="status-msg"></div>
+        </form>
+      </div>
+
+      <div class="panel-card">
+        <h2>Manage Categories</h2>
+        <form id="workshop-category-form">
+          <div class="form-group">
+            <label for="workshop-category-name">Category Name</label>
+            <input type="text" id="workshop-category-name" placeholder="e.g., Web Development" required>
+            <p class="hint">Slug is auto-generated from the name (e.g., web-development).</p>
+          </div>
+          <button type="submit" class="submit-btn">Add Category</button>
+          <div id="workshop-category-message" class="status-msg"></div>
+        </form>
+        <div class="roadmap-admin-list" id="workshop-category-list">
+          <p class="empty-state">Loading categories...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="panel-card panel-card-full">
+        <h2>Manage Workshops</h2>
+        <div class="roadmap-admin-list" id="workshop-admin-list">
+          <p class="empty-state">Loading deployed workshops...</p>
+        </div>
+      </div>
+    </div>
+
     <a href="../dashboard/dashboard.html" class="back-dashboard">← Return to Dashboard</a>
   </div>
 </body>

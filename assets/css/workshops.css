@@ -1,0 +1,240 @@
+/* ==========================================================================
+   WORKSHOPS — recorded video archive
+   Design tokens come from ../assets/css/global.css (loaded last).
+   ========================================================================== */
+
+/* ---- Page header ---- */
+.workshops-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 32px;
+}
+
+/* ---- Filter pills ---- */
+.workshop-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.workshop-filter-pills .pill {
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mid);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 4px 16px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.workshop-filter-pills .pill:hover {
+  color: #fff;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--line);
+}
+.workshop-filter-pills .pill.active {
+  color: hsl(var(--epoch-hue, 25) 85% 60%);
+  border-color: hsl(var(--epoch-hue, 25) 75% 48%);
+}
+
+/* ---- Card grid ---- */
+.workshop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 26px;
+}
+
+.workshop-card {
+  position: relative;
+  background: var(--bg-card);
+  border: var(--border-thick);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.4);
+  box-shadow: var(--shadow-hard);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.workshop-card:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 var(--line); }
+
+.workshop-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.workshop-card-top .path-badge {
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+  border-color: hsl(var(--epoch-hue, 25) 75% 48%);
+}
+
+.workshop-duration {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.workshop-card h3 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.workshop-desc {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.workshop-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.workshop-date {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.workshop-play {
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  transition: color 0.15s ease;
+}
+.workshop-card:hover .workshop-play { color: hsl(var(--epoch-hue, 25) 85% 60%); }
+
+/* ---- Player modal ---- */
+.workshop-player-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.workshop-player-modal {
+  width: min(860px, 100%);
+  background: var(--bg-panel);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.workshop-player-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.workshop-player-head .path-badge {
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+  border-color: hsl(var(--epoch-hue, 25) 75% 48%);
+}
+
+.workshop-close {
+  font-family: var(--font-meta);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text-strong);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.workshop-close:hover { color: var(--neon-orange); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--line); }
+
+.workshop-player-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+}
+.workshop-player-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.workshop-player-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.workshop-player-meta {
+  font-family: var(--font-meta);
+  font-size: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.workshop-player-desc {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+/* ---- Light theme ---- */
+[data-theme="light"] .workshop-card,
+[data-theme="light"] .workshop-player-modal {
+  box-shadow: var(--shadow-hard-sm);
+}
+
+[data-theme="light"] .workshop-card h3,
+[data-theme="light"] .workshop-player-title {
+  color: var(--text-strong);
+}
+
+[data-theme="light"] .workshop-card-top .path-badge,
+[data-theme="light"] .workshop-player-head .path-badge {
+  color: hsl(var(--epoch-hue, 25) 70% 32%);
+}
+
+[data-theme="light"] .workshop-card:hover .workshop-play { color: hsl(var(--epoch-hue, 25) 75% 38%); }
+
+/* ---- Mobile ---- */
+@media (max-width: 600px) {
+  .workshop-grid { grid-template-columns: 1fr; gap: 12px; }
+  .workshop-filter-pills { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+}

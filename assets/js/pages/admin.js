@@ -93,6 +93,8 @@ window.checkAdminPassword = function() {
 
         fetchPendingSubmissions();
         loadRoadmaps();
+        loadWorkshopCategories();
+        loadWorkshops();
     } else {
         authError.textContent = "CRITICAL: Access Denied. Invalid terminal code.";
         passInput.value = "";
@@ -666,5 +668,394 @@ function toggleStepEdit(card, roadmap, row, step) {
     form.querySelector('[data-action="cancel-step-edit"]').addEventListener('click', () => form.remove());
 
     row.appendChild(form);
+}
+
+// ==========================================
+// WORKSHOP CATEGORIES (manage)
+// ==========================================
+const workshopCategoryForm = document.getElementById('workshop-category-form');
+const workshopCategoryMessage = document.getElementById('workshop-category-message');
+const workshopCategoryList = document.getElementById('workshop-category-list');
+const workshopCategorySelect = document.getElementById('workshop-category');
+
+// Normalize a Google Drive share link (or bare file id) to its preview embed URL.
+// Returns null when no usable Drive id can be extracted.
+function toDriveEmbed(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return null;
+
+    let id = null;
+    const fileMatch = raw.match(/drive\.google\.com\/file\/d\/([^\/?#]+)/);
+    const idParamMatch = raw.match(/[?&]id=([^&]+)/);
+
+    if (fileMatch) {
+        id = fileMatch[1];
+    } else if (idParamMatch) {
+        id = idParamMatch[1];
+    } else if (/^[A-Za-z0-9_-]{10,}$/.test(raw)) {
+        id = raw;
+    }
+
+    if (!id) return null;
+    return `https://drive.google.com/file/d/${id}/preview`;
+}
+
+workshopCategoryForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!isRoleAuthorized || !isPasswordAuthorized) {
+        alert("Security breach detected. Terminal locked.");
+        window.location.reload();
+        return;
+    }
+
+    const name = document.getElementById('workshop-category-name').value.trim();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+    workshopCategoryMessage.textContent = "Deploying category...";
+    workshopCategoryMessage.style.color = "var(--text-strong)";
+
+    const { error } = await supabaseClient
+        .from('workshop_categories')
+        .insert([{ name, slug }]);
+
+    if (error) {
+        workshopCategoryMessage.style.color = "#fe4e00";
+        workshopCategoryMessage.textContent = "Failed: " + error.message;
+    } else {
+        workshopCategoryMessage.style.color = "#83b5d1";
+        workshopCategoryMessage.textContent = `Success! Category "${name}" deployed.`;
+        workshopCategoryForm.reset();
+        loadWorkshopCategories();
+        loadWorkshops();
+    }
+});
+
+async function loadWorkshopCategories() {
+    if (!isRoleAuthorized || !isPasswordAuthorized) return;
+
+    const { data: categories, error } = await supabaseClient
+        .from('workshop_categories')
+        .select('id, name, slug, created_at')
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        workshopCategoryList.innerHTML = `<p class="empty-state">Failed to load categories: ${escapeHtml(error.message)}</p>`;
+        return;
+    }
+
+    // Keep the deploy form's category dropdown in sync
+    workshopCategorySelect.innerHTML = `<option value="">Select a category...</option>`;
+    (categories || []).forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        workshopCategorySelect.appendChild(opt);
+    });
+
+    if (!categories || categories.length === 0) {
+        workshopCategoryList.innerHTML = `<p class="empty-state">No categories yet. Add the first one above.</p>`;
+        return;
+    }
+
+    workshopCategoryList.innerHTML = "";
+    categories.forEach(cat => {
+        workshopCategoryList.appendChild(renderWorkshopCategoryCard(cat));
+    });
+}
+
+function renderWorkshopCategoryCard(category) {
+    const card = document.createElement('div');
+    card.classList.add('roadmap-admin-card');
+    card.dataset.categoryId = category.id;
+
+    card.innerHTML = `
+        <div class="roadmap-admin-head">
+            <div>
+                <h3>${escapeHtml(category.name)}</h3>
+                <div class="roadmap-admin-meta">/${escapeHtml(category.slug)}</div>
+            </div>
+            <div class="roadmap-admin-actions">
+                <button class="roadmap-admin-btn" data-action="edit">Edit</button>
+                <button class="roadmap-admin-btn danger" data-action="delete">Delete</button>
+            </div>
+        </div>
+    `;
+
+    card.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+        if (!confirm(`Delete category "${category.name}"? Its workshops will be deleted too.`)) return;
+        const { error } = await supabaseClient.from('workshop_categories').delete().eq('id', category.id);
+        if (error) {
+            alert("Delete failed: " + error.message);
+        } else {
+            loadWorkshopCategories();
+            loadWorkshops();
+        }
+    });
+
+    card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+        toggleCategoryEdit(card, category);
+    });
+
+    return card;
+}
+
+function toggleCategoryEdit(card, category) {
+    const existing = card.querySelector('[data-role="edit"]');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.dataset.role = 'edit';
+    form.classList.add('roadmap-edit-form');
+
+    form.innerHTML = `
+        <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" value="${escapeHtml(category.name)}" required>
+        </div>
+        <div class="roadmap-admin-actions">
+            <button type="submit" class="roadmap-admin-btn">Save Category</button>
+            <button type="button" class="roadmap-admin-btn" data-action="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = form.querySelector('input').value.trim();
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+        const { error } = await supabaseClient
+            .from('workshop_categories')
+            .update({ name, slug })
+            .eq('id', category.id);
+
+        if (error) {
+            alert("Update failed: " + error.message);
+        } else {
+            loadWorkshopCategories();
+            loadWorkshops();
+        }
+    });
+
+    form.querySelector('[data-action="cancel-edit"]').addEventListener('click', () => form.remove());
+
+    card.querySelector('.roadmap-admin-head').after(form);
+}
+
+// ==========================================
+// WORKSHOPS (deploy + manage)
+// ==========================================
+const workshopForm = document.getElementById('workshop-form');
+const workshopMessage = document.getElementById('workshop-message');
+const workshopAdminList = document.getElementById('workshop-admin-list');
+
+workshopForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!isRoleAuthorized || !isPasswordAuthorized) {
+        alert("Security breach detected. Terminal locked.");
+        window.location.reload();
+        return;
+    }
+
+    const title = document.getElementById('workshop-title').value.trim();
+    const category_id = document.getElementById('workshop-category').value;
+    const video_url = document.getElementById('workshop-video').value.trim();
+    const duration = document.getElementById('workshop-duration').value.trim();
+    const description = document.getElementById('workshop-description').value.trim();
+    const dateRaw = document.getElementById('workshop-date').value;
+
+    if (!category_id) {
+        workshopMessage.style.color = "#fe4e00";
+        workshopMessage.textContent = "Failed: select a category first.";
+        return;
+    }
+
+    if (!toDriveEmbed(video_url)) {
+        workshopMessage.style.color = "#fe4e00";
+        workshopMessage.textContent = "Failed: provide a valid Google Drive share link.";
+        return;
+    }
+
+    workshopMessage.textContent = "Deploying workshop...";
+    workshopMessage.style.color = "var(--text-strong)";
+
+    const payload = { title, category_id, video_url, duration: duration || null, description };
+    if (dateRaw) {
+        payload.published_at = new Date(dateRaw + 'T00:00:00').toISOString();
+    }
+
+    const { error } = await supabaseClient
+        .from('workshops')
+        .insert([payload]);
+
+    if (error) {
+        workshopMessage.style.color = "#fe4e00";
+        workshopMessage.textContent = "Failed: " + error.message;
+    } else {
+        workshopMessage.style.color = "#83b5d1";
+        workshopMessage.textContent = `Success! Workshop "${title}" deployed.`;
+        workshopForm.reset();
+        loadWorkshops();
+    }
+});
+
+async function loadWorkshops() {
+    if (!isRoleAuthorized || !isPasswordAuthorized) return;
+
+    const { data: workshops, error } = await supabaseClient
+        .from('workshops')
+        .select('id, title, description, video_url, duration, published_at, category_id, workshop_categories (id, name, slug)')
+        .order('published_at', { ascending: false });
+
+    if (error) {
+        workshopAdminList.innerHTML = `<p class="empty-state">Failed to load workshops: ${escapeHtml(error.message)}</p>`;
+        return;
+    }
+
+    if (!workshops || workshops.length === 0) {
+        workshopAdminList.innerHTML = `<p class="empty-state">No workshops deployed yet.</p>`;
+        return;
+    }
+
+    workshopAdminList.innerHTML = "";
+    workshops.forEach(workshop => {
+        workshopAdminList.appendChild(renderWorkshopCard(workshop));
+    });
+}
+
+function renderWorkshopCard(workshop) {
+    const card = document.createElement('div');
+    card.classList.add('roadmap-admin-card');
+    card.dataset.workshopId = workshop.id;
+
+    const catName = workshop.workshop_categories?.name || 'Uncategorized';
+    const date = workshop.published_at ? new Date(workshop.published_at).toLocaleDateString() : '';
+    const metaParts = [catName, workshop.duration, date].filter(Boolean).join(' • ');
+
+    card.innerHTML = `
+        <div class="roadmap-admin-head">
+            <div>
+                <h3>${escapeHtml(workshop.title)}</h3>
+                <div class="roadmap-admin-meta">${escapeHtml(metaParts)}</div>
+            </div>
+            <div class="roadmap-admin-actions">
+                <button class="roadmap-admin-btn" data-action="edit">Edit</button>
+                <button class="roadmap-admin-btn danger" data-action="delete">Delete</button>
+            </div>
+        </div>
+    `;
+
+    card.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+        if (!confirm(`Delete workshop "${workshop.title}"?`)) return;
+        const { error } = await supabaseClient.from('workshops').delete().eq('id', workshop.id);
+        if (error) {
+            alert("Delete failed: " + error.message);
+        } else {
+            loadWorkshops();
+        }
+    });
+
+    card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+        toggleWorkshopEdit(card, workshop);
+    });
+
+    return card;
+}
+
+function toggleWorkshopEdit(card, workshop) {
+    const existing = card.querySelector('[data-role="edit"]');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.dataset.role = 'edit';
+    form.classList.add('roadmap-edit-form');
+
+    const dateValue = workshop.published_at ? new Date(workshop.published_at).toISOString().slice(0, 10) : '';
+
+    // Build a fresh category dropdown, preselecting the workshop's category
+    const catOptions = Array.from(workshopCategorySelect.options)
+        .map(opt => `<option value="${escapeHtml(opt.value)}" ${opt.value === workshop.category_id ? 'selected' : ''}>${escapeHtml(opt.textContent)}</option>`)
+        .join('');
+
+    form.innerHTML = `
+        <div class="form-group">
+            <label>Workshop Title</label>
+            <input type="text" value="${escapeHtml(workshop.title)}" required>
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select>${catOptions || '<option value="">Select a category...</option>'}</select>
+        </div>
+        <div class="form-group">
+            <label>Google Drive Link</label>
+            <input type="text" value="${escapeHtml(workshop.video_url)}" required>
+        </div>
+        <div class="form-group">
+            <label>Duration (e.g., 42:15)</label>
+            <input type="text" value="${escapeHtml(workshop.duration || '')}">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea required>${escapeHtml(workshop.description || '')}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Published Date</label>
+            <input type="date" value="${escapeHtml(dateValue)}">
+        </div>
+        <div class="roadmap-admin-actions">
+            <button type="submit" class="roadmap-admin-btn">Save Workshop</button>
+            <button type="button" class="roadmap-admin-btn" data-action="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const inputs = form.querySelectorAll('input, select, textarea');
+        const title = inputs[0].value.trim();
+        const category_id = inputs[1].value;
+        const video_url = inputs[2].value.trim();
+        const duration = inputs[3].value.trim();
+        const description = inputs[4].value.trim();
+        const dateRaw = inputs[5].value;
+
+        if (!category_id) {
+            alert("Select a category.");
+            return;
+        }
+
+        if (!toDriveEmbed(video_url)) {
+            alert("Provide a valid Google Drive share link.");
+            return;
+        }
+
+        const payload = { title, category_id, video_url, duration: duration || null, description };
+        if (dateRaw) {
+            payload.published_at = new Date(dateRaw + 'T00:00:00').toISOString();
+        } else {
+            payload.published_at = null;
+        }
+
+        const { error } = await supabaseClient
+            .from('workshops')
+            .update(payload)
+            .eq('id', workshop.id);
+
+        if (error) {
+            alert("Update failed: " + error.message);
+        } else {
+            loadWorkshops();
+        }
+    });
+
+    form.querySelector('[data-action="cancel-edit"]').addEventListener('click', () => form.remove());
+
+    card.querySelector('.roadmap-admin-head').after(form);
 }
 

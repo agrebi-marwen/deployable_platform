@@ -69,6 +69,13 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 - **Per-account progress**: step completion stored in `roadmap_progress` (scoped to `auth.uid()`), updated live when toggling a step.
 - **Schema** (`db/roadmaps.sql`): `roadmaps`, `roadmap_steps` (ordered, `resources` jsonb), and `roadmap_progress` tables with RLS — run in the Supabase SQL Editor (includes seed data for Competitive Programming, AI/ML, Data Science, Cybersecurity).
 
+### 2.9 Workshops — Video Archive (`dashboard/workshops.html`)
+- **Login-gated archive**: recorded workshop videos organized by admin-defined categories, with filter pills (All + each category).
+- **Category theming**: each category gets its own epoch hue (`--epoch-hue` from its slug), applied to badges, borders, and hover accents.
+- **Player modal**: clicking a workshop card opens a responsive 16:9 modal with Google Drive's built-in player (the stored Drive share link is normalized to `https://drive.google.com/file/d/<ID>/preview` on the client).
+- **Admin management** (`admin/admin.html`): deploy/edit/delete workshops (title, category, Drive link, duration, description, published date) and manage categories (auto-slugged, edit/delete).
+- **Schema** (`db/workshops.sql`): `workshop_categories` (slug unique) and `workshops` (category FK → CASCADE) with RLS — reads for `authenticated`, writes restricted to admins (`profiles.role = 'admin'`).
+
 ---
 
 ## 3. Security Measures
@@ -115,9 +122,11 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | `admin/admin.html` / `assets/js/pages/admin.js` | Admin challenge deployment & review + roadmap/step management |
 | `dashboard/learn.html` / `assets/js/pages/learn.js` | Learning path index with progress |
 | `dashboard/roadmap.html` / `assets/js/pages/roadmap.js` | Path detail: steps, resources, per-account completion |
+| `dashboard/workshops.html` / `assets/js/pages/workshops.js` | Workshop video archive with category filters + player modal |
 | `db/roadmaps.sql` | Supabase schema + RLS + seed data for the Learn feature |
+| `db/workshops.sql` | Supabase schema + RLS for the Workshops feature |
 | `api/config.js` | Secure config serverless function |
 | `api/rateLimit.js` | Auth rate-limiting serverless function |
 | `assets/js/` | Shared helpers: config, cache, theme, galaxy, lighting, creative |
-| `assets/css/` | Shared `global.css` + per-page `account.css`, `admin.css`, `dashboard.css`, `learn.css` |
+| `assets/css/` | Shared `global.css` + per-page `account.css`, `admin.css`, `dashboard.css`, `learn.css`, `workshops.css` |
 | `DESIGN.md` | Design system specification |

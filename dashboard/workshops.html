@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learn — Temporal Archive of Paths</title>
+  <title>Workshops — Temporal Video Archive</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
-  <link rel="stylesheet" href="../assets/css/learn.css">
+  <link rel="stylesheet" href="../assets/css/workshops.css">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous" defer></script>
   <script src="../assets/js/config.js" defer></script>
@@ -16,7 +16,7 @@
   <script src="../assets/js/galaxy-bg.js" defer></script>
   <script src="../assets/js/cursor-lighting.js" defer></script>
   <script src="../assets/js/creative.js" defer></script>
-  <script src="../assets/js/pages/learn.js" defer></script>
+  <script src="../assets/js/pages/workshops.js" defer></script>
   <link rel="stylesheet" href="../assets/css/global.css">
   <script src="../assets/js/theme.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2383b5d1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23eec643'/></svg>">
@@ -26,16 +26,15 @@
   <header class="dash-navbar">
     <div class="logo">
       <span class="logo-cube">◈</span>
-      <span class="nav-title">Learn Archive</span>
+      <span class="nav-title">Workshop Archive</span>
     </div>
 
     <nav class="dash-nav-links">
       <a href="dashboard.html">Dashboard</a>
       <a href="challenges.html">Challenges</a>
       <a href="submissions.html">Submissions</a>
-      <a href="learn.html" aria-current="page">Learn</a>
-      <a href="workshops.html">Workshops</a>
-      <a href="dashboard.html">Leaderboard</a>
+      <a href="learn.html">Learn</a>
+      <a href="workshops.html" aria-current="page">Workshops</a>
     </nav>
 
     <div class="user-profile-nav">
@@ -47,16 +46,35 @@
 
   <div class="dashboard-container">
 
-    <section class="learn-header">
-      <span class="section-badge">Temporal Academy</span>
-      <h2 class="section-title">Choose a Path</h2>
-      <p class="section-subtitle">Follow a structured roadmap, mark steps complete, and track your mastery across each timeline.</p>
+    <section class="workshops-header">
+      <span class="section-badge">Temporal Seminar Vault</span>
+      <h2 class="section-title">Workshops</h2>
+      <p class="section-subtitle">Recorded sessions from the chapter, organized by discipline. Select a transmission to begin playback.</p>
     </section>
 
-    <div id="learn-grid" class="learn-grid">
-      <div class="loading-state">Scanning the academy archives...</div>
+    <div id="workshop-filters" class="workshop-filter-pills" hidden>
+      <button class="pill active" data-cat="all">All</button>
     </div>
 
+    <div id="workshop-grid" class="workshop-grid">
+      <div class="loading-state">Unlocking the seminar vault...</div>
+    </div>
+
+  </div>
+
+  <div class="workshop-player-overlay" id="workshop-player-overlay" hidden>
+    <div class="workshop-player-modal" role="dialog" aria-modal="true" aria-label="Workshop player">
+      <div class="workshop-player-head">
+        <span class="path-badge" id="player-category">Workshop</span>
+        <button class="workshop-close" id="player-close" type="button" aria-label="Close player">&times;</button>
+      </div>
+      <div class="workshop-player-frame">
+        <iframe id="player-frame" title="Workshop video player" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <h3 class="workshop-player-title" id="player-title">Loading transmission...</h3>
+      <p class="workshop-player-meta" id="player-meta"></p>
+      <p class="workshop-player-desc" id="player-desc"></p>
+    </div>
   </div>
 
   <footer class="temporal-footer">

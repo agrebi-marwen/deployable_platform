@@ -484,3 +484,17 @@ textarea {
 }
 
 .roadmap-edit-form .form-group { margin-bottom: 10px; }
+
+/* ---- Full-width panel (workshops list) ---- */
+.panel-card-full {
+  grid-column: 1 / -1;
+}
+
+/* Generic hint text under form fields */
+.form-group .hint {
+  font-family: var(--font-meta);
+  font-size: 15px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-top: 6px;
+}
