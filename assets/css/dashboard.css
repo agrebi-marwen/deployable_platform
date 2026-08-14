@@ -1043,6 +1043,8 @@
 .app-shell .crumb .crumb-sep { color: var(--neon-orange); padding: 0 4px; }
 .app-shell .crumb .crumb-cur { color: var(--text-strong); }
 
+.app-shell .topbar .theme-toggle { margin-left: auto; }
+
 .app-shell .topbar-search {
   margin-left: auto;
   display: flex;
