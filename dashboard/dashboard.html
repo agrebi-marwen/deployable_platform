@@ -62,10 +62,6 @@
 
       <header class="topbar">
         <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Dashboard</span></span>
-        <div class="topbar-search">
-          <input type="text" placeholder="Search timeline..." aria-label="Search timeline">
-          <span class="kbd">Ctrl /</span>
-        </div>
         <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
         <div class="user-chip">
           <span class="user-avatar" id="user-avatar">◈</span>
@@ -121,47 +117,6 @@
             <div class="kpi-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
               <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================== PORTAL REGISTRY ===================== -->
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Portal Registry</h2>
-              <div class="panel-sub">Live inventory across all zones</div>
-            </div>
-            <span class="feed-status"><span class="dot"></span> synced</span>
-          </div>
-
-          <div class="reg-stats">
-            <div class="reg-stat">
-              <div class="rs-num" id="reg-workshops">–</div>
-              <div class="rs-label">Workshops</div>
-            </div>
-            <div class="reg-stat">
-              <div class="rs-num" id="reg-roadmaps">–</div>
-              <div class="rs-label">Roadmaps</div>
-            </div>
-            <div class="reg-stat">
-              <div class="rs-num" id="reg-steps">–</div>
-              <div class="rs-label">Steps</div>
-            </div>
-          </div>
-
-          <div class="reg-grid">
-            <div class="reg-col">
-              <div class="rc-title">Workshops by category</div>
-              <div id="reg-by-category" class="mini-list">
-                <div class="empty-hint">Loading categories...</div>
-              </div>
-            </div>
-            <div class="reg-col">
-              <div class="rc-title">Steps per roadmap</div>
-              <div id="reg-by-roadmap" class="mini-list">
-                <div class="empty-hint">Loading roadmaps...</div>
-              </div>
             </div>
           </div>
         </section>
@@ -238,6 +193,47 @@
             </div>
             <div id="epoch-stats" class="mini-list">
               <div class="empty-hint">Compiling epoch reports...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== PORTAL REGISTRY ===================== -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Portal Registry</h2>
+              <div class="panel-sub">Live inventory across all zones</div>
+            </div>
+            <span class="feed-status"><span class="dot"></span> synced</span>
+          </div>
+
+          <div class="reg-stats">
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-workshops">–</div>
+              <div class="rs-label">Workshops</div>
+            </div>
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-roadmaps">–</div>
+              <div class="rs-label">Roadmaps</div>
+            </div>
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-steps">–</div>
+              <div class="rs-label">Steps</div>
+            </div>
+          </div>
+
+          <div class="reg-grid">
+            <div class="reg-col">
+              <div class="rc-title">Workshops by category</div>
+              <div id="reg-by-category" class="mini-list">
+                <div class="empty-hint">Loading categories...</div>
+              </div>
+            </div>
+            <div class="reg-col">
+              <div class="rc-title">Steps per roadmap</div>
+              <div id="reg-by-roadmap" class="mini-list">
+                <div class="empty-hint">Loading roadmaps...</div>
+              </div>
             </div>
           </div>
         </section>
