@@ -55,6 +55,8 @@ html { scroll-behavior: smooth; }
 
 [id] { scroll-margin-top: 92px; }
 
+[hidden] { display: none !important; }
+
 body {
   background-color: var(--bg-abyss);
   color: var(--text-strong);

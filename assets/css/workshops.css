@@ -18,6 +18,9 @@
   gap: 10px;
   margin-bottom: 32px;
 }
+.workshop-filter-pills[hidden] {
+  display: none;
+}
 
 .workshop-filter-pills .pill {
   font-family: var(--font-meta);
@@ -135,6 +138,9 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+.workshop-player-overlay[hidden] {
+  display: none;
 }
 
 .workshop-player-modal {
