@@ -37,12 +37,21 @@
   <div class="admin-wrapper" id="admin-panel-content" style="display: none;">
     <div class="admin-header">
       <h1>Sector Control</h1>
-      <p>Manage the temporal timeline. Deploy challenges on the left; approve traveler solutions on the right.</p>
+      <p>Three operational zones: deploy and review timeline anomalies, build the traveler academy, and manage the seminar video vault.</p>
     </div>
 
-    <div class="admin-grid">
-      <div class="panel-card">
-        <h2>Deploy New Anomaly</h2>
+    <section class="zone" data-zone="anomalies">
+      <div class="zone-header">
+        <span class="zone-badge">Zone 01</span>
+        <h2>Timeline Anomalies</h2>
+        <p>Deploy monthly coding challenges and clear the pending traveler submission queue.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="panel-card">
+          <div class="panel-heading">
+            <h2>Deploy New Anomaly</h2>
+            <span class="panel-tag">Form</span>
+          </div>
         <form id="challenge-form">
           <div class="form-group">
             <label for="title">Anomaly Title</label>
@@ -73,16 +82,29 @@
       </div>
 
       <div class="panel-card">
-        <h2>Pending Submissions</h2>
+        <div class="panel-heading">
+          <h2>Pending Submissions</h2>
+          <span class="panel-tag">Queue</span>
+        </div>
         <div class="submissions-container" id="submissions-list">
           <p class="empty-state">Scanning the streams for incoming transmissions...</p>
         </div>
       </div>
-    </div>
+      </div>
+    </section>
 
-    <div class="admin-grid">
-      <div class="panel-card">
-        <h2>Deploy New Learning Path</h2>
+    <section class="zone" data-zone="academy">
+      <div class="zone-header">
+        <span class="zone-badge">Zone 02</span>
+        <h2>Traveler Academy</h2>
+        <p>Publish learning paths and maintain their ordered steps and resources.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="panel-card">
+          <div class="panel-heading">
+            <h2>Deploy New Learning Path</h2>
+            <span class="panel-tag">Form</span>
+          </div>
         <form id="roadmap-form">
           <div class="form-group">
             <label for="roadmap-title">Path Title</label>
@@ -114,16 +136,29 @@
       </div>
 
       <div class="panel-card">
-        <h2>Manage Paths &amp; Steps</h2>
+        <div class="panel-heading">
+          <h2>Manage Paths &amp; Steps</h2>
+          <span class="panel-tag">Manage</span>
+        </div>
         <div class="roadmap-admin-list" id="roadmap-admin-list">
           <p class="empty-state">Loading deployed paths...</p>
         </div>
       </div>
-    </div>
+      </div>
+    </section>
 
-    <div class="admin-grid">
-      <div class="panel-card">
-        <h2>Deploy New Workshop</h2>
+    <section class="zone" data-zone="vault">
+      <div class="zone-header">
+        <span class="zone-badge">Zone 03</span>
+        <h2>Seminar Vault</h2>
+        <p>Organize recorded workshops into categories and deploy new transmissions.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="panel-card">
+          <div class="panel-heading">
+            <h2>Deploy New Workshop</h2>
+            <span class="panel-tag">Form</span>
+          </div>
         <form id="workshop-form">
           <div class="form-group">
             <label for="workshop-title">Workshop Title</label>
@@ -164,7 +199,10 @@
       </div>
 
       <div class="panel-card">
-        <h2>Manage Categories</h2>
+        <div class="panel-heading">
+          <h2>Manage Categories</h2>
+          <span class="panel-tag">Manage</span>
+        </div>
         <form id="workshop-category-form">
           <div class="form-group">
             <label for="workshop-category-name">Category Name</label>
@@ -178,16 +216,20 @@
           <p class="empty-state">Loading categories...</p>
         </div>
       </div>
-    </div>
+      </div>
 
-    <div class="admin-grid">
+      <div class="admin-grid">
       <div class="panel-card panel-card-full">
-        <h2>Manage Workshops</h2>
+        <div class="panel-heading">
+          <h2>Manage Workshops</h2>
+          <span class="panel-tag">Manage</span>
+        </div>
         <div class="roadmap-admin-list" id="workshop-admin-list">
           <p class="empty-state">Loading deployed workshops...</p>
         </div>
       </div>
-    </div>
+      </div>
+    </section>
 
     <a href="../dashboard/dashboard.html" class="back-dashboard">← Return to Dashboard</a>
   </div>
