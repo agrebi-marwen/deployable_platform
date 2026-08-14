@@ -1045,35 +1045,6 @@
 
 .app-shell .topbar .theme-toggle { margin-left: auto; }
 
-.app-shell .topbar-search {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-panel);
-  border: var(--border-thin);
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
-  padding: 7px 12px;
-  width: 240px;
-}
-.app-shell .topbar-search input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text-strong);
-  font-family: var(--font-meta);
-  font-size: 17px;
-  width: 100%;
-}
-.app-shell .topbar-search .kbd {
-  font-family: var(--font-meta);
-  font-size: 14px;
-  color: var(--text-dim);
-  border: var(--border-thin);
-  padding: 0 5px;
-  white-space: nowrap;
-}
-
 .app-shell .user-chip {
   display: flex;
   align-items: center;
@@ -1474,7 +1445,6 @@
   .app-shell .nav-group { flex-direction: row; flex-wrap: wrap; gap: 6px; }
   .app-shell .nav-group-label { display: none; }
   .app-shell .sidebar-footer { margin-top: 0; border-top: none; padding-top: 0; flex-direction: row; }
-  .app-shell .topbar-search { display: none; }
   .app-shell .lower-grid { grid-template-columns: 1fr; }
 }
 

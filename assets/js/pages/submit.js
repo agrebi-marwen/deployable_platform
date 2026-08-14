@@ -1,20 +1,7 @@
-// 1. Configure & Initialize Supabase - Loaded from centralized config.js
-let supabaseClient = null;
+// submit.js - Submit a solution to a challenge
+// Bootstrap: config.js + common.js must load before this file.
 
-// Initialize Supabase client after config loads
-async function initSupabaseClient() {
-  const config = await waitForConfig();
-  if (!config) {
-    console.error('Failed to initialize Supabase client');
-    return;
-  }
-  
-  supabaseClient = supabase.createClient(config.url, config.anonKey);
-  initSubmitPage();
-}
-
-// Initialize client
-initSupabaseClient();
+initApp(initSubmitPage);
 
 // DOM Elements
 const challengeTitle = document.getElementById('challenge-title');
@@ -26,150 +13,107 @@ const submissionUrl = document.getElementById('submission-url');
 const submissionMessage = document.getElementById('submission-message');
 const submitBtn = document.getElementById('submit-btn');
 
-let currentUser = null;
+let currentUserId = null;
 let challengeId = null;
 
 async function initSubmitPage() {
-    // Check if session exists
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session || !session.user) {
-        window.location.href = "../account/login.html";
-        return;
-    }
-    
-    currentUser = session.user;
+  const session = await requireSession();
+  if (!session) return;
 
-    // Grab the challenge ID from URL query parameters (e.g. submit.html?id=uuid)
-    const urlParams = new URLSearchParams(window.location.search);
-    challengeId = urlParams.get('id');
+  currentUserId = session.user.id;
 
-    if (!challengeId) {
-        challengeTitle.textContent = "Invalid Anomaly Code";
-        challengeInstructions.textContent = "Please return to the dashboard and select an anomaly from the radar list.";
-        submitBtn.disabled = true;
-        return;
-    }
+  // Grab the challenge ID from URL query parameters (e.g. submit.html?id=uuid)
+  challengeId = new URLSearchParams(window.location.search).get('id');
 
-    await loadChallengeDetails();
+  if (!challengeId) {
+    challengeTitle.textContent = "Invalid Anomaly Code";
+    challengeInstructions.textContent = "Please return to the dashboard and select an anomaly from the radar list.";
+    submitBtn.disabled = true;
+    return;
+  }
+
+  await loadChallengeDetails();
 }
 
 async function loadChallengeDetails() {
-    const { data: challenge, error } = await supabaseClient
-        .from('challenges')
-        .select('*')
-        .eq('id', challengeId)
-        .single();
+  const { data: challenge, error } = await supabaseClient
+    .from('challenges')
+    .select('*')
+    .eq('id', challengeId)
+    .single();
 
-    if (error || !challenge) {
-        challengeTitle.textContent = "Scanning Failure";
-        challengeInstructions.textContent = "Could not locate this specific paradox anomaly inside the timeline databases.";
-        console.error("Fetch challenge error:", error);
-        return;
-    }
+  if (error || !challenge) {
+    challengeTitle.textContent = "Scanning Failure";
+    challengeInstructions.textContent = "Could not locate this specific paradox anomaly inside the timeline databases.";
+    console.error("Fetch challenge error:", error);
+    return;
+  }
 
-    // Populate the HTML
-    challengeTitle.textContent = challenge.title;
-    challengeMonth.textContent = challenge.month_year || "Active Paradox";
-    challengePoints.textContent = `Reward: ${challenge.points_worth} EP`;
-    challengeInstructions.textContent = challenge.instructions;
+  // Populate the HTML
+  challengeTitle.textContent = challenge.title;
+  challengeMonth.textContent = challenge.month_year || "Active Paradox";
+  challengePoints.textContent = `Reward: ${challenge.points_worth} EP`;
+  challengeInstructions.textContent = challenge.instructions;
 
-    // Tint the challenge header with this month's epoch hue
-    const detailsCard = document.querySelector('.challenge-details-card');
-    if (detailsCard && window.applyEpochColor && window.epochHue) {
-        window.applyEpochColor(detailsCard, window.epochHue(challenge.month_year));
-    }
+  // Tint the challenge header with this month's epoch hue
+  const detailsCard = document.querySelector('.challenge-details-card');
+  if (detailsCard && window.applyEpochColor && window.epochHue) {
+    window.applyEpochColor(detailsCard, window.epochHue(challenge.month_year));
+  }
 }
 
 // Handle Form Submission
 submissionForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submissionMessage.textContent = "Syncing solution into portal...";
-    submissionMessage.style.color = "var(--text-strong)";
+  e.preventDefault();
+  submitBtn.disabled = true;
+  submissionMessage.textContent = "Syncing solution into portal...";
+  submissionMessage.style.color = "var(--text-strong)";
 
-    const url = submissionUrl.value.trim();
+  const url = submissionUrl.value.trim();
 
-    // 1. Regex validation for GitHub and GitLab
-    // Matches: http(s)://(www.)github.com/username/repository or gitlab.com/username/repository
-    const gitUrlRegex = /^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
+  // Regex validation for GitHub/GitLab repository links
+  const gitUrlRegex = /^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
-    if (!gitUrlRegex.test(url)) {
-        submissionMessage.textContent = "Invalid URL. Please provide a valid GitHub or GitLab repository link.";
-        submissionMessage.style.color = "#fe4e00";
-        submitBtn.disabled = false;
-        return; // Halt execution and don't insert into database
+  if (!gitUrlRegex.test(url)) {
+    submissionMessage.textContent = "Invalid URL. Please provide a valid GitHub or GitLab repository link.";
+    submissionMessage.style.color = "#fe4e00";
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from('submissions')
+    .insert([
+      {
+        user_id: currentUserId,
+        challenge_id: challengeId,
+        submission_url: url,
+        status: 'PENDING',
+        submitted_at: new Date().toISOString()
+      }
+    ]);
+
+  if (error) {
+    console.error("Supabase insert crash details:", error);
+    submissionMessage.textContent = "Failed to secure solution: " + error.message;
+    submissionMessage.style.color = "#fe4e00";
+    submitBtn.disabled = false;
+  } else {
+    submissionMessage.textContent = "Patch deployed successfully! Standing by for supervisor clearance.";
+    submissionMessage.style.color = "#83b5d1";
+    submissionUrl.value = "";
+    submitBtn.textContent = "Patch Synchronized";
+
+    // Sparkle burst from the submit button
+    if (window.burstParticles) {
+      const rect = submitBtn.getBoundingClientRect();
+      const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
+      window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
     }
 
-    // 2. Insert submission record into the 'submissions' table
-    const { error } = await supabaseClient
-        .from('submissions')
-        .insert([
-            {
-                user_id: currentUser.id,
-                challenge_id: challengeId,
-                submission_url: url,
-                status: 'PENDING',
-                submitted_at: new Date().toISOString()
-            }
-        ]);
-
-    if (error) {
-        console.error("Supabase insert crash details:", error);
-        submissionMessage.textContent = "Failed to secure solution: " + error.message;
-        submissionMessage.style.color = "#fe4e00";
-        submitBtn.disabled = false;
-    } else {
-        submissionMessage.textContent = "Patch deployed successfully! Standing by for supervisor clearance.";
-        submissionMessage.style.color = "#83b5d1";
-        submissionUrl.value = "";
-        submitBtn.textContent = "Patch Synchronized";
-
-        // Sparkle burst from the submit button
-        if (window.burstParticles) {
-            const rect = submitBtn.getBoundingClientRect();
-            const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
-            window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
-        }
-        
-        setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Initialize Patch";
-        }, 3000);
-    }
+    setTimeout(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Initialize Patch";
+    }, 3000);
+  }
 });
-
-
-// Prevent right-click context menu
-document.addEventListener('contextmenu', (event) => {
-    event.preventDefault();
-});
-
-
-// Block common developer tool keyboard shortcuts
-document.addEventListener('keydown', (event) => {
-    // 1. Block F12
-    if (event.key === 'F12') {
-        event.preventDefault();
-    }
-    
-    // 2. Block Ctrl+Shift+I (Windows/Linux) or Cmd+Opt+I (Mac)
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'I') {
-        event.preventDefault();
-    }
-
-    // 3. Block Ctrl+Shift+J / Cmd+Opt+J (Opens Console directly)
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'J') {
-        event.preventDefault();
-    }
-
-    // 4. Block Ctrl+U / Cmd+Opt+U (View Page Source)
-    if ((event.ctrlKey || event.metaKey) && event.key === 'u') {
-        event.preventDefault();
-    }
-});
-
-// Instantly pauses execution if DevTools is open
-setInterval(() => {
-    debugger;
-}, 100);

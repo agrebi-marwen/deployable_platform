@@ -38,26 +38,3 @@ class APICache {
 
 // Global cache instance
 window.apiCache = new APICache();
-
-// Wrapper to cache Supabase queries
-window.cachedSupabaseQuery = async function(query, cacheKey, ttl = 5 * 60 * 1000) {
-  const key = `supabase_${cacheKey}`;
-  
-  // Check if cached
-  const cached = window.apiCache.get(key);
-  if (cached) {
-    return cached;
-  }
-
-  // Execute query
-  try {
-    const { data, error } = await query();
-    if (error) throw error;
-    
-    // Cache result
-    window.apiCache.set(key, { data, error: null });
-    return { data, error: null };
-  } catch (error) {
-    return { data: null, error };
-  }
-};
