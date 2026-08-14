@@ -28,9 +28,22 @@ const navUsername = document.getElementById('nav-username');
 const statRank = document.getElementById('stat-rank');
 const statPoints = document.getElementById('stat-points');
 const statSolved = document.getElementById('stat-solved');
+const statMissions = document.getElementById('stat-missions');
 const missionProgress = document.getElementById('mission-progress');
 const epochStats = document.getElementById('epoch-stats');
 const logoutBtn = document.getElementById('logout-btn');
+
+// Registry + summary elements
+const regWorkshops = document.getElementById('reg-workshops');
+const regRoadmaps = document.getElementById('reg-roadmaps');
+const regSteps = document.getElementById('reg-steps');
+const regByCategory = document.getElementById('reg-by-category');
+const regByRoadmap = document.getElementById('reg-by-roadmap');
+const sumTravelers = document.getElementById('sum-travelers');
+const sumWorkshops = document.getElementById('sum-workshops');
+const sumRoadmaps = document.getElementById('sum-roadmaps');
+const sumMissions = document.getElementById('sum-missions');
+const sumRank = document.getElementById('sum-rank');
 
 // Modal Elements
 const leaderboardModal = document.getElementById('leaderboard-modal');
@@ -65,6 +78,7 @@ async function initDashboard() {
 
     await fetchUserProfile();
     await fetchDashboardData();
+    await fetchRegistry();
 }
 async function fetchUserProfile() {
   let { data: profile, error } = await supabaseClient
@@ -110,11 +124,17 @@ async function fetchUserProfile() {
   // Now update UI from `profile`
   const points = profile.total_points ?? 0;
 
-  navUsername.textContent = `Traveler: ${profile.username}`;
+  navUsername.textContent = `${profile.username}`;
   statPoints.textContent = `${points} EP`;
   settingsUsernameInput.value = profile.username;
 
   statRank.textContent = getRank(points).name;
+  if (sumRank) sumRank.textContent = getRank(points).name;
+
+  const avatar = document.getElementById('user-avatar');
+  if (avatar) {
+    avatar.textContent = (profile.username || '◈').slice(0, 2).toUpperCase();
+  }
 
   updateRankBar(points);
 
@@ -220,6 +240,84 @@ async function fetchDashboardData() {
 
     renderMissionProgress(error ? [] : challenges || [], latestByChallenge);
     renderEpochStats(error ? [] : challenges || [], latestByChallenge);
+
+    if (statMissions) {
+        const active = (challenges || []).length;
+        statMissions.textContent = active;
+        if (sumMissions) sumMissions.textContent = active;
+    }
+}
+
+// ==========================================
+// 2b. REGISTRY & SUMMARY (PORTAL REGISTRY PANEL)
+// ==========================================
+async function fetchRegistry() {
+    // Counts come from existing tables only — no new tables required.
+    const [catsRes, wksRes, rmRes, stepsRes, profRes] = await Promise.all([
+        supabaseClient.from('workshop_categories').select('id, name').order('name'),
+        supabaseClient.from('workshops').select('id, category_id'),
+        supabaseClient.from('roadmaps').select('id, title'),
+        supabaseClient.from('roadmap_steps').select('id, roadmap_id'),
+        supabaseClient.from('profiles').select('id', { count: 'exact', head: true }),
+    ]);
+
+    const cats = catsRes.data || [];
+    const wks = wksRes.data || [];
+    const rms = rmRes.data || [];
+    const steps = stepsRes.data || [];
+
+    const workshopCount = wks.length;
+    const roadmapCount = rms.length;
+    const stepCount = steps.length;
+
+    if (regWorkshops) regWorkshops.textContent = workshopCount;
+    if (regRoadmaps) regRoadmaps.textContent = roadmapCount;
+    if (regSteps) regSteps.textContent = stepCount;
+    if (sumWorkshops) sumWorkshops.textContent = workshopCount;
+    if (sumRoadmaps) sumRoadmaps.textContent = roadmapCount;
+    if (sumTravelers) sumTravelers.textContent = profRes.count ?? '–';
+
+    // Workshops by category (segmented bars, 10 segs scaled to max)
+    if (regByCategory) {
+        const byCat = cats.map(c => ({
+            name: c.name,
+            count: wks.filter(w => w.category_id === c.id).length,
+        })).filter(x => x.count > 0);
+
+        if (byCat.length === 0) {
+            regByCategory.innerHTML = '<div class="empty-hint">No workshops registered yet.</div>';
+        } else {
+            const max = Math.max(...byCat.map(x => x.count));
+            regByCategory.innerHTML = byCat.map(x => `
+                <div class="reg-row">
+                    <span class="rr-name">${escapeHtml(x.name)}</span>
+                    <div class="rr-bar">${buildSegments(Math.round(x.count / max * 100))}</div>
+                    <span class="rr-count">${x.count}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Steps per roadmap (segmented bars, 10 segs scaled to max)
+    if (regByRoadmap) {
+        const byRm = rms.map(r => ({
+            name: r.title,
+            count: steps.filter(s => s.roadmap_id === r.id).length,
+        })).filter(x => x.count > 0);
+
+        if (byRm.length === 0) {
+            regByRoadmap.innerHTML = '<div class="empty-hint">No roadmaps registered yet.</div>';
+        } else {
+            const max = Math.max(...byRm.map(x => x.count));
+            regByRoadmap.innerHTML = byRm.map(x => `
+                <div class="reg-row">
+                    <span class="rr-name">${escapeHtml(x.name)}</span>
+                    <div class="rr-bar">${buildSegments(Math.round(x.count / max * 100))}</div>
+                    <span class="rr-count">${x.count}</span>
+                </div>
+            `).join('');
+        }
+    }
 }
 
 // Map each challenge to its most recent submission status
@@ -255,7 +353,7 @@ function statusClass(status) {
 
 function renderMissionProgress(challenges, latestByChallenge) {
     if (!challenges || challenges.length === 0) {
-        missionProgress.innerHTML = `<div class="loading-state">No active anomalies detected at this moment. Secure zone.</div>`;
+        missionProgress.innerHTML = `<div class="empty-hint">No active anomalies detected at this moment. Secure zone.</div>`;
         return;
     }
 
@@ -264,15 +362,15 @@ function renderMissionProgress(challenges, latestByChallenge) {
         const entry = latestByChallenge[challenge.id];
         const status = entry?.status ?? null;
         const row = document.createElement('div');
-        row.classList.add('mission-row');
-        row.style.setProperty('--epoch-hue', window.epochHue ? window.epochHue(challenge.month_year) : 25);
+        row.classList.add('mini-row');
 
         row.innerHTML = `
-            <div class="mission-meta">
-                <span class="mission-title">${escapeHtml(challenge.title)}</span>
-                <span class="mission-date">${status ? 'Last deployment ' + escapeHtml(formatDate(entry.ts)) : 'Awaiting first deployment'}</span>
+            <span class="mr-icon">◈</span>
+            <div class="mr-body">
+                <span class="mr-title">${escapeHtml(challenge.title)}</span>
+                <span class="mr-meta">${status ? 'Last deployment ' + escapeHtml(formatDate(entry.ts)) : 'Awaiting first deployment'}</span>
             </div>
-            <span class="table-status-badge ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
+            <span class="mini-badge ${statusClass(status) === 'status-accepted' ? 'ok' : statusClass(status) === 'status-pending' ? '' : statusClass(status) === 'status-rejected' ? 'warn' : ''}">${escapeHtml(statusLabel(status))}</span>
             <a class="mission-link" href="submit.html?id=${encodeURIComponent(challenge.id)}">Open &rarr;</a>
         `;
         fragment.appendChild(row);
@@ -298,7 +396,7 @@ function renderEpochStats(challenges, latestByChallenge) {
     const sorted = Object.keys(epochs).sort((a, b) => parseMonthYear(b) - parseMonthYear(a));
 
     if (sorted.length === 0) {
-        epochStats.innerHTML = `<div class="loading-state">No active anomalies detected at this moment.</div>`;
+        epochStats.innerHTML = `<div class="empty-hint">No active anomalies detected at this moment.</div>`;
         return;
     }
 
@@ -307,17 +405,15 @@ function renderEpochStats(challenges, latestByChallenge) {
         const epoch = epochs[month];
         const pct = epoch.total ? Math.round((epoch.approved / epoch.total) * 100) : 0;
         const stat = document.createElement('div');
-        stat.classList.add('epoch-stat');
-        stat.style.setProperty('--epoch-hue', epoch.hue);
+        stat.classList.add('mini-row');
 
         stat.innerHTML = `
-            <div class="epoch-stat-head">
-                <span>${escapeHtml(month)}</span>
-                <span class="epoch-stat-count">${epoch.approved}/${epoch.total} approved</span>
+            <span class="mr-icon">▶</span>
+            <div class="mr-body">
+                <span class="mr-title">${escapeHtml(month)}</span>
+                <span class="mr-meta">${epoch.approved}/${epoch.total} approved</span>
             </div>
-            <div class="epoch-stat-bar">
-                ${buildSegments(pct)}
-            </div>
+            <span class="mini-badge">${pct}%</span>
         `;
         fragment.appendChild(stat);
     });

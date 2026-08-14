@@ -23,69 +23,227 @@
 </head>
 <body>
 
-  <header class="dash-navbar">
-    <div class="logo">
-      <span class="logo-cube">◈</span>
-      <span class="nav-title">Dashboard</span>
-    </div>
+  <div class="app-shell">
 
-    <nav class="dash-nav-links">
-      <a href="challenges.html">Challenges</a>
-      <a href="submissions.html">Submissions</a>
-      <a href="learn.html">Learn</a>
-      <a href="workshops.html">Workshops</a>
-      <a href="#" id="open-leaderboard">Leaderboard</a>
-      <a href="#" id="open-settings">Settings</a>
-    </nav>
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-cube">◈</span>
+        <span>
+          The Time Portal
+          <span class="logo-badge">IEEE CS INSAT SBC</span>
+        </span>
+      </div>
 
-    <div class="user-profile-nav">
-      <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
-      <span id="nav-username">Loading Traveler...</span>
-      <button id="logout-btn" class="btn-logout">De-authorize</button>
-    </div>
-  </header>
+      <nav class="nav-group">
+        <span class="nav-group-label">Operations</span>
+        <a href="dashboard.html" class="nav-link active"><span class="nav-icon">▶</span> Overview</a>
+        <a href="challenges.html" class="nav-link"><span class="nav-icon">◆</span> Challenges</a>
+        <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
+        <a href="learn.html" class="nav-link"><span class="nav-icon">◆</span> Learn</a>
+        <a href="workshops.html" class="nav-link"><span class="nav-icon">◆</span> Workshops</a>
+      </nav>
 
-  <div class="dashboard-container">
+      <nav class="nav-group">
+        <span class="nav-group-label">Account</span>
+        <a href="#" class="nav-link" id="open-leaderboard"><span class="nav-icon">▤</span> Leaderboard</a>
+        <a href="#" class="nav-link" id="open-settings"><span class="nav-icon">◈</span> Settings</a>
+        <button type="button" class="nav-link" id="logout-btn" style="background:none;border-color:transparent;cursor:pointer;width:100%;text-align:left;"><span class="nav-icon">»</span> Log Out</button>
+      </nav>
 
-    <section class="stats-row">
-      <div class="stat-card">
-        <p class="stat-label">Temporal Rank</p>
-        <h3 id="stat-rank">Novice Traveler</h3>
-        <div class="rank-bar" id="rank-bar">
-          <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      <div class="sidebar-footer">
+        <div class="status-pill"><span class="status-dot"></span> Temporal Core: Operational</div>
+        <div class="status-pill">V. 2.0.0</div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <div class="main">
+
+      <header class="topbar">
+        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Dashboard</span></span>
+        <div class="topbar-search">
+          <input type="text" placeholder="Search timeline..." aria-label="Search timeline">
+          <span class="kbd">Ctrl /</span>
         </div>
-        <p class="rank-bar-caption" id="rank-bar-next">Reaching next rank</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-label">Energy Points</p>
-        <h3 id="stat-points">0 EP</h3>
-      </div>
-      <div class="stat-card">
-        <p class="stat-label">Anomalies Solved</p>
-        <h3 id="stat-solved">0</h3>
-      </div>
-    </section>
+        <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
+        <div class="user-chip">
+          <span class="user-avatar" id="user-avatar">◈</span>
+          <span class="user-name" id="nav-username">Loading Traveler...</span>
+        </div>
+      </header>
 
-    <section class="panel-section">
-      <div class="panel-header">
-        <h2>Mission Progress</h2>
-        <span class="panel-note">Active anomalies with your latest deployment status</span>
-      </div>
-      <div id="mission-progress" class="mission-list">
-        <div class="loading-state">Scanning active anomalies...</div>
-      </div>
-    </section>
+      <main class="content">
 
-    <section class="panel-section">
-      <div class="panel-header">
-        <h2>Per-Epoch Stats</h2>
-        <span class="panel-note">Approved patches per deployment epoch</span>
-      </div>
-      <div id="epoch-stats" class="epoch-stats">
-        <div class="loading-state">Compiling epoch reports...</div>
-      </div>
-    </section>
+        <div class="page-head">
+          <div>
+            <h1>Command Center</h1>
+            <p>Overview of the temporal registry, missions, and academy activity.</p>
+          </div>
+        </div>
 
+        <!-- ===================== KPI ROW ===================== -->
+        <section class="kpi-grid" aria-label="Key metrics">
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-label">Temporal Rank <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-rank">Novice Traveler</div>
+            <div class="kpi-sub" id="rank-bar-next">Reaching next rank</div>
+            <div class="kpi-bar" id="rank-bar">
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-label">Energy Points <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-points">0 EP</div>
+            <div class="kpi-sub">Total accumulated</div>
+            <div class="kpi-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-yellow">
+            <div class="kpi-label">Anomalies Solved <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-solved">0</div>
+            <div class="kpi-sub">Approved patches</div>
+            <div class="kpi-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-red">
+            <div class="kpi-label">Active Missions <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-missions">0</div>
+            <div class="kpi-sub">Open anomalies</div>
+            <div class="kpi-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== PORTAL REGISTRY ===================== -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Portal Registry</h2>
+              <div class="panel-sub">Live inventory across all zones</div>
+            </div>
+            <span class="feed-status"><span class="dot"></span> synced</span>
+          </div>
+
+          <div class="reg-stats">
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-workshops">–</div>
+              <div class="rs-label">Workshops</div>
+            </div>
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-roadmaps">–</div>
+              <div class="rs-label">Roadmaps</div>
+            </div>
+            <div class="reg-stat">
+              <div class="rs-num" id="reg-steps">–</div>
+              <div class="rs-label">Steps</div>
+            </div>
+          </div>
+
+          <div class="reg-grid">
+            <div class="reg-col">
+              <div class="rc-title">Workshops by category</div>
+              <div id="reg-by-category" class="mini-list">
+                <div class="empty-hint">Loading categories...</div>
+              </div>
+            </div>
+            <div class="reg-col">
+              <div class="rc-title">Steps per roadmap</div>
+              <div id="reg-by-roadmap" class="mini-list">
+                <div class="empty-hint">Loading roadmaps...</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== SUMMARY BAR ===================== -->
+        <section class="summary-bar" aria-label="Registry summary">
+          <div class="summary-item" style="--si-hue: #eec643;">
+            <span class="si-label">Travelers</span>
+            <span class="si-value" id="sum-travelers">–</span>
+            <div class="si-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg on"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+          <div class="summary-item" style="--si-hue: #83b5d1;">
+            <span class="si-label">Workshops</span>
+            <span class="si-value" id="sum-workshops">–</span>
+            <div class="si-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg on"></span><span class="seg on"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+          <div class="summary-item" style="--si-hue: #345995;">
+            <span class="si-label">Roadmaps</span>
+            <span class="si-value" id="sum-roadmaps">–</span>
+            <div class="si-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+          <div class="summary-item" style="--si-hue: #fe4e00;">
+            <span class="si-label">Active Anomalies</span>
+            <span class="si-value" id="sum-missions">–</span>
+            <div class="si-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+          <div class="summary-item" style="--si-hue: #83b5d1;">
+            <span class="si-label">Your Rank</span>
+            <span class="si-value" id="sum-rank">–</span>
+            <div class="si-bar">
+              <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
+              <span class="seg on"></span><span class="seg on"></span><span class="seg"></span>
+              <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== LOWER GRID ===================== -->
+        <section class="lower-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Mission Progress</h2>
+                <div class="panel-sub">Active anomalies with your latest deployment status</div>
+              </div>
+            </div>
+            <div id="mission-progress" class="mini-list">
+              <div class="empty-hint">Scanning active anomalies...</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Per-Epoch Stats</h2>
+                <div class="panel-sub">Approved patches per deployment epoch</div>
+              </div>
+            </div>
+            <div id="epoch-stats" class="mini-list">
+              <div class="empty-hint">Compiling epoch reports...</div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
   </div>
 
 

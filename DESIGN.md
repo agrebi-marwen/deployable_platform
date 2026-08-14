@@ -222,4 +222,107 @@ Beveled cards with a square initials avatar block (Press Start 2P initials in Fl
 
 ## 9. Reference Implementation
 
-See `overworld-sample/index5.html` — the approved self-contained static sample: full landing page (nav, hero + HUD, team, leaderboard, anomalies, footer) in this system, with the live galaxy background.
+See `overworld-sample/index5.html` - the approved self-contained static sample: full landing page (nav, hero + HUD, team, leaderboard, anomalies, footer) in this system, with the live galaxy background.
+
+Dashboard + admin reference: `dashboardX.html` (self-contained Command Center sample) and `admin/admin.html` (live console). See sections 10 and 11.
+
+---
+
+## 10. Admin Console (`.zone` functional layout)
+
+The admin panel is organized into **functional zones**, not tabs. Each zone groups its management panels under a labeled header with a color-coded badge. All zones use the same `panel-card` bevel framing as the rest of the system.
+
+### Zone anatomy
+```html
+<section class="zone" data-zone="anomalies">
+  <div class="zone-header">
+    <span class="zone-badge">Zone 01</span>
+    <h2>Timeline Anomalies</h2>
+    <p>Deploy and manage missions on the timeline.</p>
+  </div>
+  <!-- .admin-grid of .panel-card rows -->
+</section>
+```
+
+### Zone color coding (`--zone-hue`)
+Each zone tints its badge, heading mark, panel titles, and panel tags via a hue token. The three zones map onto the existing palette:
+| Zone | `data-zone` | `--zone-hue` | Source color |
+| :--- | :--- | :--- | :--- |
+| Timeline Anomalies | `anomalies` | `18` | Flame Orange `#fe4e00` |
+| Traveler Academy | `academy` | `220` | Dusk Blue `#345995` |
+| Seminar Vault | `vault` | `205` | Sky Reflection `#83b5d1` |
+
+Tinted text uses `hsl(var(--zone-hue, 18) 85% 60%)` for headings and `90% 62%` for badges/tags; borders use `70% 48%`. This keeps the hue on-palette while staying readable on dark surfaces.
+
+### Zone CSS pattern
+```css
+.zone { margin-bottom: 46px; padding-bottom: 30px; border-bottom: 2px dashed rgba(131,181,209,0.25); }
+.zone:last-of-type { border-bottom: none; margin-bottom: 0; }
+.zone-badge { color: hsl(var(--zone-hue, 18) 90% 62%); border-color: hsl(var(--zone-hue, 18) 70% 48%); box-shadow: var(--shadow-hard-sm); }
+.zone-header h2::before { content: "▶ "; color: hsl(var(--zone-hue, 18) 85% 60%); }
+```
+
+### Panel headers
+Cards that need a label + action in the same row use `.panel-heading` (flex row, bottom keyline) with an optional `.panel-tag` chip on the right, tinted by the zone hue. Standard cards keep the plain `h2` underline header. All other form/table/security styles remain on the 5-color system.
+
+---
+
+## 11. Command Center Dashboard (CoreUI-inspired, reconciled)
+
+`dashboardX.html` translates the CoreUI Dark SaaS admin layout onto the Time Portal system. **CoreUI is an inspiration, not a source of truth** - every token is re-mapped to the 5-color palette; there is no `#5856D6` / `#398BF7` / `#F9B115` / `#E55353` / `#323A49` anywhere.
+
+### Layout architecture
+```
++-----------+------------------------------------------------+
+|  SIDEBAR  |  TOPBAR (breadcrumb · search · theme · user chip)|
+|  250px    +------------------------------------------------+
+|  grouped  |  page-head                                      |
+|  nav      |  KPI ROW (4 color-block cards)                 |
+|  status   |  PANEL (Portal Registry)                       |
+|  footer   |  SUMMARY BAR (5-metric strip)                 |
+|           |  LOWER GRID (2 lists)                          |
++-----------+------------------------------------------------+
+```
+
+* **App shell:** `display: grid; grid-template-columns: 250px 1fr; min-height: 100vh`. Sidebar is a bordered rail, not a floating glass panel.
+* **Topbar:** sticky, `rgba(5,5,5,0.92)` + blur, bottom keyline. Contains breadcrumb (VT323, Flame Orange separators), search box with `Ctrl /` kbd hint, 40x40 theme toggle, and a bordered user chip with EP pill.
+* **Content:** max-width 1280px, centered, 26px padding, 26px column gap.
+
+### KPI row (4 cards)
+Solid color-block cards (CoreUI concept) re-mapped to the palette:
+* `kpi-purple` -> Dusk Blue `#345995`
+* `kpi-blue` -> Sky Reflection `#83b5d1`
+* `kpi-yellow` -> Tuscan Sun `#eec643`
+* `kpi-red` -> Flame Orange `#fe4e00`
+
+Each card: VT323 uppercase label + `⋯` options, Press Start 2P value, VT323 sub + delta (▲/▼), and a **segmented pixel bar** (ink segments) instead of CoreUI's smooth sparkline.
+
+### Portal Registry panel
+A no-chart inventory snapshot (COUNT / GROUP BY over existing tables). Three stat cells (Workshops / Roadmaps / Steps), then a two-column breakdown ("Workshops by category", "Steps per roadmap") rendered as segmented bars with per-row counts. Row fill reuses `--neon-cyan` (primary), `--neon-yellow` (secondary), `--neon-pink` (tertiary).
+
+### Summary bar
+Five-column stat strip (CoreUI summary) with `--si-hue` per column and a 10-segment fill bar per metric. Dividers use `--border-thin` between columns.
+
+### Lower grid
+Two `.panel` lists side by side (lists collapse to 1 column under 900px).
+
+### Dark + light theme
+`[data-theme="light"]` overrides surfaces to paper tones while **keeping the five palette colors as card fills and accent text**. Persisted in `localStorage`.
+
+### Responsive rules
+* `<=1100px`: KPI grid 2-col, summary bar 2-col, registry columns stack.
+* `<=900px`: shell -> 1 column, sidebar becomes a horizontal wrap row (border-bottom), search hidden, lower grid 1-col.
+* `<=600px`: KPI grid and summary bar -> 1 col, content/topbar padding tightens.
+
+Everything else - bevels, hard shadows, type hierarchy, segmented HUD, no flashing - follows sections 1-7 unchanged.
+
+---
+
+## 12. Design Tokens Summary
+
+* **Palette:** exactly five colors - Sky Reflection `#83b5d1`, Dusk Blue `#345995`, Flame Orange `#fe4e00`, Tuscan Sun `#eec643`, Onyx `#050505`. Never add new hexes for new features.
+* **Shadows:** `--shadow-hard: 5px 5px 0 #000`, `--shadow-hard-sm: 3px 3px 0 #000`.
+* **Borders:** `--border-thick: 3px solid #000`, `--border-thin: 2px solid #000`.
+* **Fonts:** Press Start 2P (display), VT323 (meta), Space Grotesk (body).
+* **Motion:** hovers 0.15s ease, shadow shifts, button press; `prefers-reduced-motion: reduce` -> static.
+* **Zone hues:** only in the admin console, via `--zone-hue` derived from the 5 colors.

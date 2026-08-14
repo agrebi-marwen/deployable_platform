@@ -24,53 +24,97 @@
 </head>
 <body>
 
-  <header class="dash-navbar">
-    <div class="logo">
-      <a href="dashboard.html" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 10px;">
+  <div class="app-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+      <div class="logo">
         <span class="logo-cube">◈</span>
-        <span class="nav-title">Back to Command Center</span>
-      </a>
-    </div>
-    <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
-  </header>
-
-  <div class="submit-layout-container">
-    
-    <main class="challenge-details-card">
-      <div class="section-badge" id="challenge-month">Month Anomaly</div>
-      <h1 id="challenge-title">Loading Challenge...</h1>
-      <div class="challenge-reward" id="challenge-points">Reward: -- EP</div>
-      
-      <div class="challenge-instructions-box">
-        <h3>Mission Briefing</h3>
-        <p id="challenge-instructions">Retrieving data blocks from the temporal database...</p>
-      </div>
-    </main>
-
-    <aside class="submission-panel">
-      
-      <div class="submission-card">
-        <h3>Transmutation Portal</h3>
-        <p class="sub-text">Deploy your solution link to patch this anomaly.</p>
-        
-        <form id="submission-form">
-          <label for="submission-url">Repository URL</label>
-          <input 
-            type="url" 
-            id="submission-url" 
-            placeholder="https://github.com/username/repository" 
-            pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
-            title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
-            required>
-          <button type="submit" id="submit-btn">Initialize Patch</button>
-        </form>
-        <div id="submission-message"></div>
+        <span>
+          The Time Portal
+          <span class="logo-badge">IEEE CS INSAT SBC</span>
+        </span>
       </div>
 
+      <nav class="nav-group">
+        <span class="nav-group-label">Operations</span>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">▶</span> Overview</a>
+        <a href="challenges.html" class="nav-link active"><span class="nav-icon">◆</span> Challenges</a>
+        <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
+        <a href="learn.html" class="nav-link"><span class="nav-icon">◆</span> Learn</a>
+        <a href="workshops.html" class="nav-link"><span class="nav-icon">◆</span> Workshops</a>
+      </nav>
+
+      <nav class="nav-group">
+        <span class="nav-group-label">Account</span>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">▤</span> Leaderboard</a>
+        <button type="button" class="nav-link" id="logout-btn" style="background:none;border-color:transparent;cursor:pointer;width:100%;text-align:left;"><span class="nav-icon">»</span> Log Out</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill"><span class="status-dot"></span> Temporal Core: Operational</div>
+        <div class="status-pill">V. 2.0.0</div>
+      </div>
     </aside>
 
-  </div>
+    <!-- ===================== MAIN ===================== -->
+    <div class="main">
 
+      <header class="topbar">
+        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Challenge Mission</span></span>
+        <div class="topbar-search">
+          <input type="text" placeholder="Search timeline..." aria-label="Search timeline">
+          <span class="kbd">Ctrl /</span>
+        </div>
+        <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
+        <div class="user-chip">
+          <span class="user-avatar" id="user-avatar">◈</span>
+          <span class="user-name" id="nav-username">Loading Traveler...</span>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="submit-layout-container">
+    
+          <main class="challenge-details-card">
+            <div class="section-badge" id="challenge-month">Month Anomaly</div>
+            <h1 id="challenge-title">Loading Challenge...</h1>
+            <div class="challenge-reward" id="challenge-points">Reward: -- EP</div>
+    
+            <div class="challenge-instructions-box">
+              <h3>Mission Briefing</h3>
+              <p id="challenge-instructions">Retrieving data blocks from the temporal database...</p>
+            </div>
+          </main>
+
+          <aside class="submission-panel">
+    
+            <div class="submission-card">
+              <h3>Transmutation Portal</h3>
+              <p class="sub-text">Deploy your solution link to patch this anomaly.</p>
+    
+              <form id="submission-form">
+                <label for="submission-url">Repository URL</label>
+                <input 
+                  type="url" 
+                  id="submission-url" 
+                  placeholder="https://github.com/username/repository" 
+                  pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
+                  title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
+                  required>
+                <button type="submit" id="submit-btn">Initialize Patch</button>
+              </form>
+              <div id="submission-message"></div>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
 
   <footer class="temporal-footer">
     <div class="footer-grid">

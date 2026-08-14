@@ -23,47 +23,75 @@
 </head>
 <body>
 
-  <header class="dash-navbar">
-    <div class="logo">
-      <a href="learn.html" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 10px;">
+  <div class="app-shell">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+      <div class="logo">
         <span class="logo-cube">◈</span>
-        <span class="nav-title">← Back to Paths</span>
-      </a>
+        <span>
+          The Time Portal
+          <span class="logo-badge">IEEE CS INSAT SBC</span>
+        </span>
+      </div>
+
+      <nav class="nav-group">
+        <span class="nav-group-label">Operations</span>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">▶</span> Overview</a>
+        <a href="challenges.html" class="nav-link"><span class="nav-icon">◆</span> Challenges</a>
+        <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
+        <a href="learn.html" class="nav-link active"><span class="nav-icon">◆</span> Learn</a>
+        <a href="workshops.html" class="nav-link"><span class="nav-icon">◆</span> Workshops</a>
+      </nav>
+
+      <nav class="nav-group">
+        <span class="nav-group-label">Account</span>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">▤</span> Leaderboard</a>
+        <button type="button" class="nav-link" id="logout-btn" style="background:none;border-color:transparent;cursor:pointer;width:100%;text-align:left;"><span class="nav-icon">»</span> Log Out</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill"><span class="status-dot"></span> Temporal Core: Operational</div>
+        <div class="status-pill">V. 2.0.0</div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <div class="main">
+
+      <header class="topbar">
+        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Learning Path</span></span>
+        <div class="topbar-search">
+          <input type="text" placeholder="Search timeline..." aria-label="Search timeline">
+          <span class="kbd">Ctrl /</span>
+        </div>
+        <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
+        <div class="user-chip">
+          <span class="user-avatar" id="user-avatar">◈</span>
+          <span class="user-name" id="nav-username">Loading Traveler...</span>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <section class="roadmap-page-header" id="roadmap-header" style="--epoch-hue: 25;">
+          <span class="path-badge" id="roadmap-difficulty">Path</span>
+          <h1 class="roadmap-title" id="roadmap-title">Loading Path...</h1>
+          <p class="roadmap-subtitle" id="roadmap-description">Retrieving the roadmap from the temporal database...</p>
+        </section>
+
+        <div class="roadmap-overview" id="roadmap-overview" style="--epoch-hue: 25;">
+          <span class="roadmap-overview-label">Path Progress</span>
+          <div class="learn-progress-bar" id="roadmap-progress-bar"></div>
+          <div class="roadmap-overview-caption" id="roadmap-progress-caption">0/0 complete</div>
+        </div>
+
+        <div id="roadmap-steps" class="roadmap-steps">
+          <div class="loading-state">Decoding the roadmap steps...</div>
+        </div>
+
+      </main>
     </div>
-
-    <nav class="dash-nav-links">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="challenges.html">Challenges</a>
-      <a href="submissions.html">Submissions</a>
-      <a href="learn.html">Learn</a>
-      <a href="workshops.html">Workshops</a>
-    </nav>
-
-    <div class="user-profile-nav">
-      <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
-      <span id="nav-username">Loading Traveler...</span>
-      <button id="logout-btn" class="btn-logout">De-authorize</button>
-    </div>
-  </header>
-
-  <div class="dashboard-container">
-
-    <section class="roadmap-page-header" id="roadmap-header" style="--epoch-hue: 25;">
-      <span class="path-badge" id="roadmap-difficulty">Path</span>
-      <h1 class="roadmap-title" id="roadmap-title">Loading Path...</h1>
-      <p class="roadmap-subtitle" id="roadmap-description">Retrieving the roadmap from the temporal database...</p>
-    </section>
-
-    <div class="roadmap-overview" id="roadmap-overview" style="--epoch-hue: 25;">
-      <span class="roadmap-overview-label">Path Progress</span>
-      <div class="learn-progress-bar" id="roadmap-progress-bar"></div>
-      <div class="roadmap-overview-caption" id="roadmap-progress-caption">0/0 complete</div>
-    </div>
-
-    <div id="roadmap-steps" class="roadmap-steps">
-      <div class="loading-state">Decoding the roadmap steps...</div>
-    </div>
-
   </div>
 
   <footer class="temporal-footer">
