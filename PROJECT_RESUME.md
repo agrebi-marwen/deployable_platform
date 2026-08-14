@@ -61,6 +61,13 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 - **Two-step authorization**: (1) Supabase database role check (`role = 'admin'`), (2) admin password loaded from the serverless config endpoint (kept secret from the client).
 - **Deploy new challenge**: title, EP reward, instructions, active toggle — automatically tagged to the current month/year.
 - **Review pending submissions**: approve or reject, with animated card removal and live refresh.
+- **Roadmap operations**: deploy/edit/delete learning paths (title, slug, description, difficulty) and manage their steps (add, edit, delete, reorder via up/down, resources as `Title | URL` lines).
+
+### 2.8 Learn — Roadmaps (`dashboard/learn.html`, `dashboard/roadmap.html`)
+- **Path index**: all deployed learning paths as cards with difficulty tag, description, step count, and a segmented per-user progress bar.
+- **Path detail**: ordered step list with descriptions and curated resource links; each step is a pixel checkbox.
+- **Per-account progress**: step completion stored in `roadmap_progress` (scoped to `auth.uid()`), updated live when toggling a step.
+- **Schema** (`db/roadmaps.sql`): `roadmaps`, `roadmap_steps` (ordered, `resources` jsonb), and `roadmap_progress` tables with RLS — run in the Supabase SQL Editor (includes seed data for Competitive Programming, AI/ML, Data Science, Cybersecurity).
 
 ---
 
@@ -105,9 +112,12 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | `dashboard/challenges.html` / `assets/js/pages/challenges.js` | Challenge archive |
 | `dashboard/submit.html` / `assets/js/pages/submit.js` | Solution submission |
 | `dashboard/submissions.html` / `assets/js/pages/submissions.js` | Submission history |
-| `admin/admin.html` / `assets/js/pages/admin.js` | Admin challenge deployment & review |
+| `admin/admin.html` / `assets/js/pages/admin.js` | Admin challenge deployment & review + roadmap/step management |
+| `dashboard/learn.html` / `assets/js/pages/learn.js` | Learning path index with progress |
+| `dashboard/roadmap.html` / `assets/js/pages/roadmap.js` | Path detail: steps, resources, per-account completion |
+| `db/roadmaps.sql` | Supabase schema + RLS + seed data for the Learn feature |
 | `api/config.js` | Secure config serverless function |
 | `api/rateLimit.js` | Auth rate-limiting serverless function |
 | `assets/js/` | Shared helpers: config, cache, theme, galaxy, lighting, creative |
-| `assets/css/` | Shared `global.css` + per-page `account.css`, `admin.css`, `dashboard.css` |
+| `assets/css/` | Shared `global.css` + per-page `account.css`, `admin.css`, `dashboard.css`, `learn.css` |
 | `DESIGN.md` | Design system specification |
