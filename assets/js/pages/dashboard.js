@@ -436,7 +436,16 @@ async function fetchLeaderboard() {
   // Add Load More button if there are 50 results
   if (rankings.length === 50) {
     const loadMoreRow = document.createElement('tr');
-    loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button class="load-more-btn" onclick="loadMoreLeaderboard()">Load More Travelers</button></td>`;
+    const loadMoreTd = document.createElement('td');
+    loadMoreTd.colSpan = 3;
+    loadMoreTd.style.textAlign = 'center';
+    loadMoreTd.style.padding = '15px';
+    const loadMoreBtn = document.createElement('button');
+    loadMoreBtn.className = 'load-more-btn';
+    loadMoreBtn.textContent = 'Load More Travelers';
+    loadMoreBtn.addEventListener('click', loadMoreLeaderboard);
+    loadMoreTd.appendChild(loadMoreBtn);
+    loadMoreRow.appendChild(loadMoreTd);
     tbody.appendChild(loadMoreRow);
   }
 }
@@ -471,7 +480,16 @@ async function loadMoreLeaderboard() {
     // Add Load More button again if full batch returned
     if (rankings.length === 50) {
       const loadMoreRow = document.createElement('tr');
-      loadMoreRow.innerHTML = `<td colspan="3" style="text-align: center; padding: 15px;"><button class="load-more-btn" onclick="loadMoreLeaderboard()">Load More Travelers</button></td>`;
+      const loadMoreTd = document.createElement('td');
+      loadMoreTd.colSpan = 3;
+      loadMoreTd.style.textAlign = 'center';
+      loadMoreTd.style.padding = '15px';
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.className = 'load-more-btn';
+      loadMoreBtn.textContent = 'Load More Travelers';
+      loadMoreBtn.addEventListener('click', loadMoreLeaderboard);
+      loadMoreTd.appendChild(loadMoreBtn);
+      loadMoreRow.appendChild(loadMoreTd);
       tbody.appendChild(loadMoreRow);
     }
   }

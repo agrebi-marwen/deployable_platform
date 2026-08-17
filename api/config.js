@@ -34,7 +34,6 @@ export default function handler(req, res) {
   // Return config from environment variables (never exposed to client source)
   res.status(200).json({
     url: process.env.SUPABASE_URL,
-    anonKey: process.env.SUPABASE_ANON_KEY,
-    adminPassword: process.env.ADMIN_PASSWORD || null
+    anonKey: process.env.SUPABASE_ANON_KEY
   });
 }

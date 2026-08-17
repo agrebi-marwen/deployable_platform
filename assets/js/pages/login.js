@@ -26,33 +26,30 @@ form.addEventListener('submit', async (e) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
-  // Check rate limit
+  // Sign in through the serverless endpoint: rate limiting is enforced server-side.
   try {
-    const rateLimitResponse = await fetch('../api/rateLimit', {
+    const response = await fetch('../api/authLogin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, password })
     });
 
-    if (!rateLimitResponse.ok) {
-      const rateLimitData = await rateLimitResponse.json();
+    const result = await response.json();
+
+    if (!response.ok || !result.session) {
       messageEl.style.color = "#fe4e00";
-      messageEl.textContent = "Error: " + rateLimitData.error;
+      messageEl.textContent = "Error: " + (result.error || "Login failed");
       return;
     }
-  } catch (err) {
-    // Rate limiting service unavailable, proceed anyway
-  }
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
+    // Adopt the session returned by the server.
+    const { error: sessionError } = await supabaseClient.auth.setSession(result.session);
+    if (sessionError) {
+      messageEl.style.color = "#fe4e00";
+      messageEl.textContent = "Error: " + sessionError.message;
+      return;
+    }
 
-  if (error) {
-    messageEl.style.color = "#fe4e00";
-    messageEl.textContent = "Error: " + error.message;
-  } else {
     messageEl.style.color = "#83b5d1";
     messageEl.textContent = "Success! Redirecting...";
 
@@ -60,5 +57,8 @@ form.addEventListener('submit', async (e) => {
     setTimeout(() => {
       window.location.href = "../dashboard/dashboard.html";
     }, 1000);
+  } catch (err) {
+    messageEl.style.color = "#fe4e00";
+    messageEl.textContent = "Error: authentication service unavailable.";
   }
 });

@@ -4,8 +4,8 @@
 
 initApp(initAdminPage);
 
-// SECURITY SETTINGS - Admin password loaded from environment via config API
-let ADMIN_SECRET_KEY = null;
+// SECURITY SETTINGS - The terminal password is verified server-side
+// (api/adminCheck.js) and is never exposed to the client.
 let isRoleAuthorized = false;
 let isPasswordAuthorized = false;
 
@@ -13,18 +13,19 @@ const overlay = document.getElementById('security-overlay');
 const adminPanel = document.getElementById('admin-panel-content');
 const authError = document.getElementById('auth-error');
 const passInput = document.getElementById('admin-pass-input');
+const authBtn = document.getElementById('admin-auth-btn');
 
-// Add event listener only if element exists
+// Add event listeners only if the elements exist
 if (passInput) {
   passInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.checkAdminPassword();
   });
 }
+if (authBtn) {
+  authBtn.addEventListener('click', () => window.checkAdminPassword());
+}
 
 async function initAdminPage(client, config) {
-  // Load admin password from secure config endpoint
-  ADMIN_SECRET_KEY = config.adminPassword;
-
   // Verify admin role after client is ready
   await verifyAdminRole();
 }
@@ -56,27 +57,57 @@ async function verifyAdminRole() {
   passInput.focus();
 }
 
-// PASSWORD VERIFICATION
-window.checkAdminPassword = function() {
+// PASSWORD VERIFICATION - server-side via api/adminCheck.js
+window.checkAdminPassword = async function() {
   if (!isRoleAuthorized) return;
 
   const inputVal = passInput.value;
 
-  if (inputVal === ADMIN_SECRET_KEY) {
-    isPasswordAuthorized = true;
-    authError.textContent = "";
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session || !session.access_token) {
+    authError.textContent = "CRITICAL: Session expired. Please login again.";
+    window.location.href = "../account/login.html";
+    return;
+  }
 
-    overlay.style.display = "none";
-    adminPanel.style.display = "block";
+  authError.textContent = "Verifying terminal code...";
+  passInput.disabled = true;
 
-    fetchPendingSubmissions();
-    loadRoadmaps();
-    loadWorkshopCategories();
-    loadWorkshops();
-  } else {
-    authError.textContent = "CRITICAL: Access Denied. Invalid terminal code.";
+  try {
+    const response = await fetch('../api/adminCheck', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({ password: inputVal })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.authorized) {
+      isPasswordAuthorized = true;
+      authError.textContent = "";
+      passInput.value = "";
+
+      overlay.style.display = "none";
+      adminPanel.style.display = "block";
+
+      fetchPendingSubmissions();
+      loadRoadmaps();
+      loadWorkshopCategories();
+      loadWorkshops();
+    } else {
+      authError.textContent = (result && result.error) || "CRITICAL: Access Denied. Invalid terminal code.";
+      passInput.value = "";
+      passInput.focus();
+    }
+  } catch (err) {
+    authError.textContent = "CRITICAL: Verification service unavailable.";
     passInput.value = "";
     passInput.focus();
+  } finally {
+    passInput.disabled = false;
   }
 };
 

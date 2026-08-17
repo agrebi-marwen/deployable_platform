@@ -59,24 +59,6 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Check rate limit
-  try {
-    const rateLimitResponse = await fetch('../api/rateLimit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-
-    if (!rateLimitResponse.ok) {
-      const rateLimitData = await rateLimitResponse.json();
-      messageEl.style.color = "#fe4e00";
-      messageEl.textContent = "Error: " + rateLimitData.error;
-      return;
-    }
-  } catch (err) {
-    // Rate limiting service unavailable, proceed anyway
-  }
-
   // Check if the username is already taken
   const { data: existingProfile, error: checkError } = await supabaseClient
     .from('profiles')
@@ -94,33 +76,41 @@ form.addEventListener('submit', async (e) => {
     console.error("Database connection check failed:", checkError);
   }
 
-  // If the username is free, proceed with the signUp logic
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        username: username
-      }
-    }
-  });
+  // Create the account through the serverless endpoint:
+  // rate limiting is enforced server-side (fail-closed).
+  try {
+    const response = await fetch('../api/authSignup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, username })
+    });
 
-  if (error) {
-    messageEl.style.color = "#fe4e00";
-    if (error.message.includes("already registered")) {
-      messageEl.textContent = "Error: Email is already registered!";
-    } else {
-      messageEl.textContent = "Error: " + error.message;
+    const result = await response.json();
+
+    if (!response.ok || result.error) {
+      messageEl.style.color = "#fe4e00";
+      if ((result.error || '').toLowerCase().includes("already registered")) {
+        messageEl.textContent = "Error: Email is already registered!";
+      } else {
+        messageEl.textContent = "Error: " + (result.error || "Signup failed");
+      }
+      return;
     }
-    console.error(error);
-  } else {
+
     messageEl.style.color = "#83b5d1";
-    messageEl.textContent = "Success! Account created. Redirecting to login...";
+    if (result.session) {
+      messageEl.textContent = "Success! Account created. Redirecting to login...";
+    } else {
+      messageEl.textContent = "Success! Account created. Check your email to confirm before logging in.";
+    }
     form.reset();
 
     // Redirect to login.html
     setTimeout(() => {
       window.location.href = "login.html";
     }, 1500);
+  } catch (err) {
+    messageEl.style.color = "#fe4e00";
+    messageEl.textContent = "Error: registration service unavailable.";
   }
 });

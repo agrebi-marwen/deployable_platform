@@ -6,6 +6,12 @@ initApp(
     fetchLastThreeChallenges();
     loadPublicLeaderboard();
 
+    // Fallback: drop team images that fail to load (keeps the CSP free of
+    // inline handlers while preserving the previous onerror="this.remove()").
+    document.querySelectorAll('.team-avatar img').forEach(img => {
+      img.addEventListener('error', () => img.remove());
+    });
+
     // Track login state changes after the client is ready
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       const authBtn = document.getElementById('auth-btn');

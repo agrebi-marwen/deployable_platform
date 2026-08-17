@@ -55,6 +55,8 @@ create index if not exists roadmap_progress_user_idx
 -- ----------------------------------------------------------------------------
 -- 4. ROW LEVEL SECURITY
 --    Roadmaps + steps are readable by any authenticated user.
+--    Writes (insert/update/delete) are restricted to admins
+--    (profiles.role = 'admin'), matching db/workshops.sql.
 --    Progress is only visible/writable by the owner.
 -- ----------------------------------------------------------------------------
 alter table public.roadmaps         enable row level security;
@@ -70,6 +72,52 @@ drop policy if exists "roadmap_steps_read_authenticated" on public.roadmap_steps
 create policy "roadmap_steps_read_authenticated"
   on public.roadmap_steps for select
   to authenticated using (true);
+
+drop policy if exists "roadmaps_admin_insert" on public.roadmaps;
+create policy "roadmaps_admin_insert"
+  on public.roadmaps for insert
+  to authenticated with check (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+drop policy if exists "roadmaps_admin_update" on public.roadmaps;
+create policy "roadmaps_admin_update"
+  on public.roadmaps for update
+  to authenticated using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  ) with check (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+drop policy if exists "roadmaps_admin_delete" on public.roadmaps;
+create policy "roadmaps_admin_delete"
+  on public.roadmaps for delete
+  to authenticated using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+drop policy if exists "roadmap_steps_admin_insert" on public.roadmap_steps;
+create policy "roadmap_steps_admin_insert"
+  on public.roadmap_steps for insert
+  to authenticated with check (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+drop policy if exists "roadmap_steps_admin_update" on public.roadmap_steps;
+create policy "roadmap_steps_admin_update"
+  on public.roadmap_steps for update
+  to authenticated using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  ) with check (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+drop policy if exists "roadmap_steps_admin_delete" on public.roadmap_steps;
+create policy "roadmap_steps_admin_delete"
+  on public.roadmap_steps for delete
+  to authenticated using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
 
 drop policy if exists "progress_select_own" on public.roadmap_progress;
 create policy "progress_select_own"
