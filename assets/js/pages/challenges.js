@@ -7,8 +7,15 @@ initApp(initChallengesPage);
 const navUsername = document.getElementById('nav-username');
 const logoutBtn = document.getElementById('logout-btn');
 const archiveContainer = document.getElementById('challenges-archive');
+const tabsContainer = document.getElementById('category-tabs');
 
 const targetChallengeId = new URLSearchParams(window.location.search).get('target');
+
+const MISC_KEY = '__misc__';
+
+let allChallenges = [];
+let activeCategory = 'all';
+let categoryGroups = [];
 
 async function initChallengesPage() {
   bindLogout(logoutBtn);
@@ -33,7 +40,7 @@ async function fetchAllChallenges() {
   } else {
     const result = await supabaseClient
       .from('challenges')
-      .select('id, title, instructions, month_year, points_worth, is_active')
+      .select(`id, title, instructions, month_year, points_worth, is_active, category_id, challenge_categories (id, slug, name)`)
       .order('created_at', { ascending: false });
     challenges = result.data;
     error = result.error;
@@ -52,37 +59,92 @@ async function fetchAllChallenges() {
     return;
   }
 
-  // Group by deployment month (month_year), newest epoch first
-  const groups = {};
-  challenges.forEach(challenge => {
-    const month = (challenge.month_year || 'Unknown Epoch').trim();
-    (groups[month] = groups[month] || []).push(challenge);
+  allChallenges = challenges;
+  categoryGroups = buildCategoryGroups();
+  renderCategoryTabs();
+  renderArchive();
+}
+
+// Group challenges by their category; unassigned challenges land in "Misc".
+function buildCategoryGroups() {
+  const map = {};
+  const order = [];
+
+  allChallenges.forEach(challenge => {
+    const cat = challenge.challenge_categories;
+    const key = cat ? cat.slug : MISC_KEY;
+
+    let group = map[key];
+    if (!group) {
+      group = {
+        key,
+        name: cat ? cat.name : 'Misc',
+        hue: cat && cat.slug && window.epochHue ? window.epochHue(cat.slug) : 25,
+        challenges: []
+      };
+      map[key] = group;
+      order.push(group);
+    }
+    group.challenges.push(challenge);
   });
 
-  const sortedMonths = Object.keys(groups).sort((a, b) => parseMonthYear(b) - parseMonthYear(a));
+  // Alphabetical by name, with "Misc" pinned to the very end.
+  order.sort((a, b) => {
+    if (a.key === MISC_KEY) return 1;
+    if (b.key === MISC_KEY) return -1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return order;
+}
+
+function renderCategoryTabs() {
+  tabsContainer.innerHTML = `<button type="button" class="category-tab active" data-category="all">All</button>`;
+
+  categoryGroups.forEach(group => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'category-tab';
+    btn.dataset.category = group.key;
+    btn.textContent = group.name;
+    tabsContainer.appendChild(btn);
+  });
+
+  tabsContainer.hidden = false;
+}
+
+function hueForCategory(key) {
+  if (key === 'all') return null;
+  const group = categoryGroups.find(g => g.key === key);
+  return group ? group.hue : null;
+}
+
+function renderArchive() {
+  const visible = activeCategory === 'all'
+    ? categoryGroups
+    : categoryGroups.filter(g => g.key === activeCategory);
+
+  archiveContainer.innerHTML = "";
 
   // PERF: Batch DOM updates with DocumentFragment (single reflow instead of multiple)
   const fragment = document.createDocumentFragment();
 
-  sortedMonths.forEach(month => {
-    const monthChallenges = groups[month];
-    const hue = window.epochHue ? window.epochHue(month) : 25;
-
+  visible.forEach(group => {
     const section = document.createElement('section');
-    section.classList.add('epoch-section');
-    section.style.setProperty('--epoch-hue', hue);
+    section.classList.add('category-section');
+    section.style.setProperty('--epoch-hue', group.hue);
 
     const header = document.createElement('div');
-    header.classList.add('epoch-header');
+    header.classList.add('category-header');
     header.innerHTML = `
-            <span class="epoch-month">${escapeHtml(month)}</span>
-            <span class="epoch-count">${monthChallenges.length} anomaly${monthChallenges.length === 1 ? '' : 'ies'}</span>
+            <span class="category-name">${escapeHtml(group.name)}</span>
+            <span class="category-count">${group.challenges.length} anomaly${group.challenges.length === 1 ? '' : 'ies'}</span>
         `;
 
     const grid = document.createElement('div');
     grid.classList.add('challenges-grid');
 
-    monthChallenges.forEach(challenge => {
+    group.challenges.forEach(challenge => {
       const archived = !challenge.is_active;
       const card = document.createElement('div');
       card.classList.add('challenge-card');
@@ -112,8 +174,6 @@ async function fetchAllChallenges() {
     fragment.appendChild(section);
   });
 
-  // Single DOM write
-  archiveContainer.innerHTML = "";
   archiveContainer.appendChild(fragment);
 
   // Highlight a challenge targeted from the homepage "View Paradox" link (?target=<id>)
@@ -126,3 +186,21 @@ async function fetchAllChallenges() {
     }
   }
 }
+
+tabsContainer.addEventListener('click', (e) => {
+  const tab = e.target.closest('.category-tab');
+  if (!tab) return;
+
+  activeCategory = tab.dataset.category;
+  tabsContainer.querySelectorAll('.category-tab').forEach(t => t.classList.toggle('active', t === tab));
+
+  // Theme the active tab with its category's hue.
+  const hue = hueForCategory(activeCategory);
+  if (hue != null) {
+    tabsContainer.style.setProperty('--epoch-hue', hue);
+  } else {
+    tabsContainer.style.removeProperty('--epoch-hue');
+  }
+
+  renderArchive();
+});
