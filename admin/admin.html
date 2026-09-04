@@ -66,6 +66,23 @@
           </div>
 
           <div class="form-group">
+            <label for="challenge-category">Category</label>
+            <select id="challenge-category" required>
+              <option value="">Select a category...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="challenge-difficulty">Difficulty</label>
+            <select id="challenge-difficulty" required>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+              <option value="Expert">Expert</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="instructions">Instructions & Mission Details</label>
             <textarea id="instructions" placeholder="Describe the steps and code required for the traveler..." required></textarea>
           </div>
@@ -85,11 +102,44 @@
 
       <div class="panel-card">
         <div class="panel-heading">
+          <h2>Manage Categories</h2>
+          <span class="panel-tag">Manage</span>
+        </div>
+        <form id="challenge-category-form">
+          <div class="form-group">
+            <label for="challenge-category-name">Category Name</label>
+            <input type="text" id="challenge-category-name" placeholder="e.g., CP, MLOps" required>
+            <p class="hint">Slug is auto-generated from the name (e.g., competitive-programming).</p>
+          </div>
+          <button type="submit" class="submit-btn">Add Category</button>
+          <div id="challenge-category-message" class="status-msg"></div>
+        </form>
+        <div class="roadmap-admin-list" id="challenge-category-list">
+          <p class="empty-state">Loading categories...</p>
+        </div>
+      </div>
+      </div>
+
+      <div class="admin-grid">
+      <div class="panel-card panel-card-full">
+        <div class="panel-heading">
           <h2>Pending Submissions</h2>
           <span class="panel-tag">Queue</span>
         </div>
         <div class="submissions-container" id="submissions-list">
           <p class="empty-state">Scanning the streams for incoming transmissions...</p>
+        </div>
+      </div>
+      </div>
+
+      <div class="admin-grid">
+      <div class="panel-card panel-card-full">
+        <div class="panel-heading">
+          <h2>Manage Anomalies</h2>
+          <span class="panel-tag">Manage</span>
+        </div>
+        <div class="roadmap-admin-list" id="challenge-admin-list">
+          <p class="empty-state">Loading deployed anomalies...</p>
         </div>
       </div>
       </div>

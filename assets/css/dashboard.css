@@ -422,6 +422,119 @@
 .card-archived:hover { transform: none; box-shadow: var(--shadow-hard); }
 .card-archived .enter-link { color: var(--text-dim); }
 
+/* -------------------------------------------------------------------------
+   Category filter tabs
+   ------------------------------------------------------------------------- */
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.category-tab {
+  font-family: var(--font-meta);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mid);
+  background: var(--bg-panel);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.category-tab:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--line); }
+.category-tab.active {
+  color: hsl(var(--epoch-hue, 25) 90% 62%);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.5);
+}
+
+/* -------------------------------------------------------------------------
+   Category sections (outer split) — reuses .epoch-section/.epoch-header
+   naming from the archive so a category renders exactly like the old
+   epoch grouping did. .category-section/.category-header/.category-name/
+   .category-count are aliases with identical rules for clarity in markup.
+   ------------------------------------------------------------------------- */
+.category-section { margin-bottom: 48px; }
+
+.category-section + .category-section {
+  padding-top: 48px;
+  border-top: 2px dashed hsla(var(--epoch-hue, 25) 60% 55% / 0.2);
+}
+
+.category-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.category-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  text-transform: uppercase;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+}
+
+.category-count {
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  background: var(--bg-panel);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 2px 12px;
+}
+
+/* -------------------------------------------------------------------------
+   Difficulty sub-groups (inner split, nested inside a category section)
+   ------------------------------------------------------------------------- */
+.difficulty-group { margin-bottom: 32px; }
+.difficulty-group:last-child { margin-bottom: 0; }
+
+.difficulty-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.difficulty-label {
+  font-family: var(--font-meta);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 10px;
+  border: var(--border-thin);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.difficulty-label.diff-beginner { color: var(--neon-cyan); background: hsla(190, 70%, 50%, 0.1); }
+.difficulty-label.diff-intermediate { color: var(--neon-yellow); background: hsla(48, 80%, 55%, 0.1); }
+.difficulty-label.diff-advanced { color: #fe4e00; background: hsla(16, 95%, 55%, 0.1); }
+.difficulty-label.diff-expert { color: var(--neon-pink, #ff3d9a); background: hsla(325, 85%, 55%, 0.1); }
+
+.difficulty-count { font-size: 13px; color: var(--text-dim); }
+
+.card-difficulty {
+  font-family: var(--font-meta);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 1px 8px;
+  border: var(--border-thin);
+}
+.card-difficulty.diff-beginner { color: var(--neon-cyan); }
+.card-difficulty.diff-intermediate { color: var(--neon-yellow); }
+.card-difficulty.diff-advanced { color: #fe4e00; }
+.card-difficulty.diff-expert { color: var(--neon-pink, #ff3d9a); }
+
 /* =========================================================================
    MODALS
    ========================================================================= */

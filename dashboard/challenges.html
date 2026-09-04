@@ -73,10 +73,14 @@
       <main class="content">
 
         <section class="challenges-page-header">
-          <span class="section-badge">Epoch Archive</span>
+          <span class="section-badge">Sector Archive</span>
           <h2 class="section-title">All Challenges</h2>
-          <p class="section-subtitle">Every anomaly ever deployed, grouped by its deployment epoch. Active anomalies await your patch.</p>
+          <p class="section-subtitle">Every anomaly ever deployed, grouped by category and difficulty. Active anomalies await your patch.</p>
         </section>
+
+        <div class="category-tabs" id="category-tabs">
+          <button type="button" class="category-tab active" data-category="all">All</button>
+        </div>
 
         <div id="challenges-archive">
           <div class="loading-state">Scanning the temporal archive...</div>
