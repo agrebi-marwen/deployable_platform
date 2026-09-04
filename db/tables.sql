@@ -18,8 +18,16 @@ CREATE TABLE public.challenges (
   month_year text NOT NULL,
   points_worth integer NOT NULL DEFAULT 100,
   is_active boolean NOT NULL DEFAULT false,
+  category_id uuid,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   CONSTRAINT challenges_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.challenge_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT challenge_categories_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.submissions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

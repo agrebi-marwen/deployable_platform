@@ -94,6 +94,7 @@ window.checkAdminPassword = async function() {
       adminPanel.style.display = "block";
 
       fetchPendingSubmissions();
+      loadChallengeCategories();
       loadRoadmaps();
       loadWorkshopCategories();
       loadWorkshops();
@@ -134,13 +135,19 @@ challengeForm.addEventListener('submit', async (e) => {
   const points_worth = parseInt(document.getElementById('points_worth').value, 10);
   const instructions = document.getElementById('instructions').value.trim();
   const is_active = document.getElementById('is_active').checked;
+  const category_id = document.getElementById('challenge-category').value;
 
   const currentDate = new Date();
   const month_year = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' }).toUpperCase();
 
+  const payload = { title, instructions, month_year, points_worth, is_active };
+  if (category_id) {
+    payload.category_id = category_id;
+  }
+
   const { error } = await supabaseClient
     .from('challenges')
-    .insert([{ title, instructions, month_year, points_worth, is_active }]);
+    .insert([payload]);
 
   if (error) {
     creationMessage.style.color = "#fe4e00";
@@ -674,6 +681,156 @@ function toggleStepEdit(card, roadmap, row, step) {
   form.querySelector('[data-action="cancel-step-edit"]').addEventListener('click', () => form.remove());
 
   row.appendChild(form);
+}
+
+// ==========================================
+// CHALLENGE CATEGORIES (manage)
+// ==========================================
+const challengeCategoryForm = document.getElementById('challenge-category-form');
+const challengeCategoryMessage = document.getElementById('challenge-category-message');
+const challengeCategoryList = document.getElementById('challenge-category-list');
+const challengeCategorySelect = document.getElementById('challenge-category');
+
+challengeCategoryForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  if (!isRoleAuthorized || !isPasswordAuthorized) {
+    alert("Security breach detected. Terminal locked.");
+    window.location.reload();
+    return;
+  }
+
+  const name = document.getElementById('challenge-category-name').value.trim();
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  challengeCategoryMessage.textContent = "Deploying category...";
+  challengeCategoryMessage.style.color = "var(--text-strong)";
+
+  const { error } = await supabaseClient
+    .from('challenge_categories')
+    .insert([{ name, slug }]);
+
+  if (error) {
+    challengeCategoryMessage.style.color = "#fe4e00";
+    challengeCategoryMessage.textContent = "Failed: " + error.message;
+  } else {
+    challengeCategoryMessage.style.color = "#83b5d1";
+    challengeCategoryMessage.textContent = `Success! Category "${name}" deployed.`;
+    challengeCategoryForm.reset();
+    loadChallengeCategories();
+  }
+});
+
+async function loadChallengeCategories() {
+  if (!isRoleAuthorized || !isPasswordAuthorized) return;
+
+  const { data: categories, error } = await supabaseClient
+    .from('challenge_categories')
+    .select('id, name, slug, created_at')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    challengeCategoryList.innerHTML = `<p class="empty-state">Failed to load categories: ${escapeHtml(error.message)}</p>`;
+    return;
+  }
+
+  // Keep the deploy form's category dropdown in sync
+  challengeCategorySelect.innerHTML = `<option value="">Select a category...</option>`;
+  (categories || []).forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.id;
+    opt.textContent = cat.name;
+    challengeCategorySelect.appendChild(opt);
+  });
+
+  if (!categories || categories.length === 0) {
+    challengeCategoryList.innerHTML = `<p class="empty-state">No categories yet. Add the first one above.</p>`;
+    return;
+  }
+
+  challengeCategoryList.innerHTML = "";
+  categories.forEach(cat => {
+    challengeCategoryList.appendChild(renderChallengeCategoryCard(cat));
+  });
+}
+
+function renderChallengeCategoryCard(category) {
+  const card = document.createElement('div');
+  card.classList.add('roadmap-admin-card');
+  card.dataset.categoryId = category.id;
+
+  card.innerHTML = `
+        <div class="roadmap-admin-head">
+            <div>
+                <h3>${escapeHtml(category.name)}</h3>
+                <div class="roadmap-admin-meta">/${escapeHtml(category.slug)}</div>
+            </div>
+            <div class="roadmap-admin-actions">
+                <button class="roadmap-admin-btn" data-action="edit">Edit</button>
+                <button class="roadmap-admin-btn danger" data-action="delete">Delete</button>
+            </div>
+        </div>
+    `;
+
+  card.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+    if (!confirm(`Delete category "${category.name}"? Its challenges will be deleted too.`)) return;
+    const { error } = await supabaseClient.from('challenge_categories').delete().eq('id', category.id);
+    if (error) {
+      alert("Delete failed: " + error.message);
+    } else {
+      loadChallengeCategories();
+    }
+  });
+
+  card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+    toggleChallengeCategoryEdit(card, category);
+  });
+
+  return card;
+}
+
+function toggleChallengeCategoryEdit(card, category) {
+  const existing = card.querySelector('[data-role="edit"]');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const form = document.createElement('form');
+  form.dataset.role = 'edit';
+  form.classList.add('roadmap-edit-form');
+
+  form.innerHTML = `
+        <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" value="${escapeHtml(category.name)}" required>
+        </div>
+        <div class="roadmap-admin-actions">
+            <button type="submit" class="roadmap-admin-btn">Save Category</button>
+            <button type="button" class="roadmap-admin-btn" data-action="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = form.querySelector('input').value.trim();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+    const { error } = await supabaseClient
+      .from('challenge_categories')
+      .update({ name, slug })
+      .eq('id', category.id);
+
+    if (error) {
+      alert("Update failed: " + error.message);
+    } else {
+      loadChallengeCategories();
+    }
+  });
+
+  form.querySelector('[data-action="cancel-edit"]').addEventListener('click', () => form.remove());
+
+  card.querySelector('.roadmap-admin-head').after(form);
 }
 
 // ==========================================
