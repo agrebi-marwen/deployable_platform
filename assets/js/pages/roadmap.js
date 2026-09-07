@@ -33,8 +33,8 @@ async function initRoadmapPage() {
   roadmapId = urlParams.get('id');
 
   if (!roadmapId) {
-    titleEl.textContent = "Invalid Path Code";
-    descEl.textContent = "Please return to the Learn archive and select a path.";
+    titleEl.textContent = "Path Not Found";
+    descEl.textContent = "Please return to the Learn page and select a path.";
     stepsContainer.innerHTML = `<div class="loading-state">No path selected.</div>`;
     return;
   }
@@ -49,8 +49,8 @@ async function loadRoadmap() {
   ]);
 
   if (roadmapError || !roadmap) {
-    titleEl.textContent = "Scanning Failure";
-    descEl.textContent = "Could not locate this path inside the academy databases.";
+    titleEl.textContent = "Loading Failed";
+    descEl.textContent = "Could not load this path. It may have been removed.";
     stepsContainer.innerHTML = `<div class="loading-state">Path not found.</div>`;
     return;
   }
@@ -79,7 +79,7 @@ async function loadRoadmap() {
 
 function renderSteps(steps, completedSet) {
   if (!steps || steps.length === 0) {
-    stepsContainer.innerHTML = `<div class="loading-state">This path has no steps deployed yet.</div>`;
+    stepsContainer.innerHTML = `<div class="loading-state">This path has no steps yet.</div>`;
     updateProgress(0, 0, completedSet);
     return;
   }

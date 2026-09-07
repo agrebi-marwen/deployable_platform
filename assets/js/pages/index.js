@@ -25,14 +25,14 @@ initApp(
             .eq('id', session.user.id)
             .single();
 
-          const username = profile ? profile.username : "Traveler";
+          const username = profile ? profile.username : "User";
           const points = profile ? profile.total_points : 0;
 
           if (authBtn) {
             authBtn.outerHTML = `
                     <div id="user-nav-container" style="display: flex; align-items: center; gap: 15px;">
                         <a href="dashboard/dashboard.html" style="font-family: 'VT323', monospace; font-size: 19px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-strong); text-decoration: none; border-bottom: 2px dashed var(--neon-cyan); padding-bottom: 2px;">
-                            🕒 ${escapeHtml(username)} (${escapeHtml(points)} EP)
+                            🕒 ${escapeHtml(username)} (${escapeHtml(points)} pts)
                         </a>
                         <button id="logout-btn" style="font-family: 'VT323', monospace; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-panel); border: 2px solid var(--line); box-shadow: var(--shadow-hard-sm); color: var(--neon-red); padding: 4px 14px; cursor: pointer;">Log Out</button>
                     </div>
@@ -41,7 +41,7 @@ initApp(
           }
 
           if (heroCtaBtn) {
-            heroCtaBtn.textContent = "Enter Command Center";
+            heroCtaBtn.textContent = "Open Dashboard";
             heroCtaBtn.setAttribute('href', 'dashboard/dashboard.html');
           }
         } catch (e) {
@@ -69,7 +69,7 @@ async function fetchLastThreeChallenges() {
     if (error) throw error;
 
     if (!challenges || challenges.length === 0) {
-      container.innerHTML = `<p class="empty-state">The temporal timeline is stable. No active anomalies detected.</p>`;
+      container.innerHTML = `<p class="empty-state">No active challenges right now. Check back soon!</p>`;
       return;
     }
 
@@ -79,7 +79,7 @@ async function fetchLastThreeChallenges() {
             <div class="challenge-card-homepage" style="--epoch-hue: ${hue};">
                 <div>
                     <span class="challenge-card-homepage-epoch">
-                        ${escapeHtml(ch.month_year || "Active Epoch")}
+                        ${escapeHtml(ch.month_year || "Active Month")}
                     </span>
                     <h3 class="challenge-card-homepage-title">
                         ${escapeHtml(ch.title)}
@@ -90,10 +90,10 @@ async function fetchLastThreeChallenges() {
                 </div>
                 <div class="challenge-card-homepage-meta">
                     <span class="challenge-card-homepage-points">
-                        +${escapeHtml(ch.points_worth)} EP
+                        +${escapeHtml(ch.points_worth)} pts
                     </span>
                     <a href="dashboard/challenges.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
-                        View Paradox
+                        View Challenge
                     </a>
                 </div>
             </div>
@@ -101,7 +101,7 @@ async function fetchLastThreeChallenges() {
     }).join('');
   } catch (err) {
     console.error("❌ Challenges Error:", err);
-    container.innerHTML = `<p style="color: #fe4e00; font-size: 0.9rem;">Error accessing temporal stream: ${escapeHtml(err.message)}</p>`;
+    container.innerHTML = `<p style="color: #fe4e00; font-size: 0.9rem;">Error loading challenges: ${escapeHtml(err.message)}</p>`;
   }
 }
 
@@ -120,7 +120,7 @@ async function loadPublicLeaderboard() {
     if (error) throw error;
 
     if (!rankings || rankings.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No timeline adjustments logged yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No members ranked yet.</td></tr>`;
       return;
     }
 
@@ -133,8 +133,8 @@ async function loadPublicLeaderboard() {
       return `
                 <tr>
                     <td class="col-rank"><strong>${rankBadge}</strong></td>
-                    <td class="col-name">${escapeHtml(profile.username || "Anonymous Traveler")}</td>
-                    <td class="col-points">${escapeHtml(profile.total_points ?? 0)} EP</td>
+                    <td class="col-name">${escapeHtml(profile.username || "Anonymous Member")}</td>
+                    <td class="col-points">${escapeHtml(profile.total_points ?? 0)} pts</td>
                 </tr>
             `;
     }).join('');

@@ -28,7 +28,7 @@ async function initChallengesPage() {
 }
 
 async function fetchAllChallenges() {
-  archiveContainer.innerHTML = `<div class="loading-state">Scanning the temporal archive...</div>`;
+  archiveContainer.innerHTML = `<div class="loading-state">Loading challenges...</div>`;
 
   // PERF: Check cache first (5-minute TTL)
   const cacheKey = 'all_challenges';
@@ -50,12 +50,12 @@ async function fetchAllChallenges() {
   }
 
   if (error) {
-    archiveContainer.innerHTML = `<div class="loading-state">Temporal scanner offline: ${escapeHtml(error.message)}</div>`;
+    archiveContainer.innerHTML = `<div class="loading-state">Failed to load challenges: ${escapeHtml(error.message)}</div>`;
     return;
   }
 
   if (!challenges || challenges.length === 0) {
-    archiveContainer.innerHTML = `<div class="loading-state">The archive is empty. No anomalies deployed yet.</div>`;
+    archiveContainer.innerHTML = `<div class="loading-state">The archive is empty. No challenges yet.</div>`;
     return;
   }
 
@@ -138,7 +138,7 @@ function renderArchive() {
     header.classList.add('category-header');
     header.innerHTML = `
             <span class="category-name">${escapeHtml(group.name)}</span>
-            <span class="category-count">${group.challenges.length} anomaly${group.challenges.length === 1 ? '' : 'ies'}</span>
+            <span class="category-count">${group.challenges.length} challenge${group.challenges.length === 1 ? '' : 's'}</span>
         `;
 
     const grid = document.createElement('div');
@@ -159,12 +159,12 @@ function renderArchive() {
 
       card.innerHTML = `
                 <div class="card-top">
-                    <span class="card-badge">${escapeHtml(challenge.month_year || 'Epoch')}</span>
-                    <span class="card-points">+${escapeHtml(challenge.points_worth ?? 100)} EP</span>
+                    <span class="card-badge">${escapeHtml(challenge.month_year || 'Month')}</span>
+                    <span class="card-points">+${escapeHtml(challenge.points_worth ?? 100)} pts</span>
                 </div>
                 <h3>${escapeHtml(challenge.title)}</h3>
                 <p class="challenge-desc">${escapeHtml((challenge.instructions || '').replace(/\s+/g, ' ').trim().slice(0, 140))}</p>
-                <span class="enter-link">${archived ? 'Archived Epoch' : 'Initiate Synchronization →'}</span>
+                <span class="enter-link">${archived ? 'Archived Month' : 'Submit Solution →'}</span>
             `;
       grid.appendChild(card);
     });

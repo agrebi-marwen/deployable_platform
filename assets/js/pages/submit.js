@@ -26,8 +26,8 @@ async function initSubmitPage() {
   challengeId = new URLSearchParams(window.location.search).get('id');
 
   if (!challengeId) {
-    challengeTitle.textContent = "Invalid Anomaly Code";
-    challengeInstructions.textContent = "Please return to the dashboard and select an anomaly from the radar list.";
+    challengeTitle.textContent = "Challenge Not Found";
+    challengeInstructions.textContent = "Please return to the dashboard and select a challenge.";
     submitBtn.disabled = true;
     return;
   }
@@ -43,16 +43,16 @@ async function loadChallengeDetails() {
     .single();
 
   if (error || !challenge) {
-    challengeTitle.textContent = "Scanning Failure";
-    challengeInstructions.textContent = "Could not locate this specific paradox anomaly inside the timeline databases.";
+    challengeTitle.textContent = "Loading Failed";
+    challengeInstructions.textContent = "Could not load this challenge. It may have been removed.";
     console.error("Fetch challenge error:", error);
     return;
   }
 
   // Populate the HTML
   challengeTitle.textContent = challenge.title;
-  challengeMonth.textContent = challenge.month_year || "Active Paradox";
-  challengePoints.textContent = `Reward: ${challenge.points_worth} EP`;
+  challengeMonth.textContent = challenge.month_year || "Active Challenge";
+  challengePoints.textContent = `Reward: ${challenge.points_worth} pts`;
   challengeInstructions.textContent = challenge.instructions;
 
   // Tint the challenge header with this month's epoch hue
@@ -66,7 +66,7 @@ async function loadChallengeDetails() {
 submissionForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   submitBtn.disabled = true;
-  submissionMessage.textContent = "Syncing solution into portal...";
+  submissionMessage.textContent = "Submitting solution...";
   submissionMessage.style.color = "var(--text-strong)";
 
   const url = submissionUrl.value.trim();
@@ -95,14 +95,14 @@ submissionForm.addEventListener('submit', async (e) => {
 
   if (error) {
     console.error("Supabase insert crash details:", error);
-    submissionMessage.textContent = "Failed to secure solution: " + error.message;
+    submissionMessage.textContent = "Failed to submit solution: " + error.message;
     submissionMessage.style.color = "#fe4e00";
     submitBtn.disabled = false;
   } else {
-    submissionMessage.textContent = "Patch deployed successfully! Standing by for supervisor clearance.";
+    submissionMessage.textContent = "Solution submitted! Waiting for admin approval.";
     submissionMessage.style.color = "#83b5d1";
     submissionUrl.value = "";
-    submitBtn.textContent = "Patch Synchronized";
+    submitBtn.textContent = "Solution Submitted";
 
     // Sparkle burst from the submit button
     if (window.burstParticles) {
@@ -113,7 +113,7 @@ submissionForm.addEventListener('submit', async (e) => {
 
     setTimeout(() => {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Initialize Patch";
+      submitBtn.textContent = "Submit Solution";
     }, 3000);
   }
 });

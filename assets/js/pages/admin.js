@@ -35,7 +35,7 @@ async function verifyAdminRole() {
   const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
   if (sessionError || !session || !session.user) {
-    alert("Unauthorized terminal. Please login.");
+    alert("Please log in first.");
     window.location.href = "../account/login.html";
     return;
   }
@@ -65,12 +65,12 @@ window.checkAdminPassword = async function() {
 
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session || !session.access_token) {
-    authError.textContent = "CRITICAL: Session expired. Please login again.";
+    authError.textContent = "Session expired. Please log in again.";
     window.location.href = "../account/login.html";
     return;
   }
 
-  authError.textContent = "Verifying terminal code...";
+  authError.textContent = "Verifying password...";
   passInput.disabled = true;
 
   try {
@@ -99,12 +99,12 @@ window.checkAdminPassword = async function() {
       loadWorkshopCategories();
       loadWorkshops();
     } else {
-      authError.textContent = (result && result.error) || "CRITICAL: Access Denied. Invalid terminal code.";
+      authError.textContent = (result && result.error) || "Access denied: invalid password.";
       passInput.value = "";
       passInput.focus();
     }
   } catch (err) {
-    authError.textContent = "CRITICAL: Verification service unavailable.";
+    authError.textContent = "Verification service is unavailable.";
     passInput.value = "";
     passInput.focus();
   } finally {
@@ -122,13 +122,13 @@ challengeForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Security breach detected. Terminal locked.");
+    alert("Session expired. Please reload and log in again.");
     window.location.reload();
     return;
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = "Deploying Anomaly...";
+  submitBtn.textContent = "Creating challenge...";
   creationMessage.textContent = "";
 
   const title = document.getElementById('title').value.trim();
@@ -154,12 +154,12 @@ challengeForm.addEventListener('submit', async (e) => {
     creationMessage.textContent = "Failed: " + error.message;
   } else {
     creationMessage.style.color = "#83b5d1";
-    creationMessage.textContent = `Success! Anomaly deployed under timeline index: ${month_year}`;
+    creationMessage.textContent = `Success! Challenge published (${month_year}).`;
     challengeForm.reset();
     document.getElementById('is_active').checked = true;
   }
   submitBtn.disabled = false;
-  submitBtn.textContent = "Deploy Anomaly";
+  submitBtn.textContent = "Create Challenge";
 });
 
 // PENDING SUBMISSIONS
@@ -198,15 +198,15 @@ function renderSubmissions(submissions, challengeLookup) {
   submissionsList.innerHTML = "";
 
   if (!submissions || submissions.length === 0) {
-    submissionsList.innerHTML = `<p class="empty-state">No pending anomalies currently require review.</p>`;
+    submissionsList.innerHTML = `<p class="empty-state">No pending submissions to review.</p>`;
     return;
   }
 
   submissions.forEach(sub => {
-    const username = sub.profiles?.username || "Unknown Traveler";
-    const challengeTitle = challengeLookup[sub.challenge_id] || "Active Paradox Target";
+    const username = sub.profiles?.username || "Unknown Member";
+    const challengeTitle = challengeLookup[sub.challenge_id] || "Active Challenge";
     const dateRaw = sub.submitted_at || sub.created_at;
-    const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Recent Stream";
+    const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Recently";
 
     const card = document.createElement('div');
     card.className = "sub-card";
@@ -215,21 +215,21 @@ function renderSubmissions(submissions, challengeLookup) {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <h3 style="color: var(--text-strong); margin: 0; font-family: 'VT323', monospace; font-size: 1.25rem;">${escapeHtml(challengeTitle)}</h3>
-                    <p style="color: #6e8296; font-size: 0.8rem; margin: 4px 0 0 0;">Traveler: <strong>${escapeHtml(username)}</strong> • ${escapeHtml(date)}</p>
+                    <p style="color: #6e8296; font-size: 0.8rem; margin: 4px 0 0 0;"><strong>${escapeHtml(username)}</strong> • ${escapeHtml(date)}</p>
                 </div>
                 <span style="font-size: 0.8rem; color: #eec643; background: rgba(238, 198, 67, 0.1); padding: 3px 8px; border: 2px solid #eec643; font-family: 'VT323', monospace; text-transform: uppercase;">PENDING</span>
             </div>
             
             <div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
-                <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Repository Payload URL:</span>
+                <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Repository URL:</span>
                 <a href="${escapeHtml(safeUrl(sub.submission_url))}" target="_blank" rel="noopener noreferrer" style="color: #83b5d1; font-size: 0.9rem; word-break: break-all; text-decoration: none;">
                     ${escapeHtml(sub.submission_url)} ↗
                 </a>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <button class="action-btn btn-approve" data-id="${escapeHtml(sub.id)}" data-action="APPROVED">Approve Patch</button>
-                <button class="action-btn btn-reject" data-id="${escapeHtml(sub.id)}" data-action="REJECTED">Reject Patch</button>
+                <button class="action-btn btn-approve" data-id="${escapeHtml(sub.id)}" data-action="APPROVED">Approve</button>
+                <button class="action-btn btn-reject" data-id="${escapeHtml(sub.id)}" data-action="REJECTED">Reject</button>
             </div>
         `;
     submissionsList.appendChild(card);
@@ -239,7 +239,7 @@ function renderSubmissions(submissions, challengeLookup) {
 // RESOLVE PENDING
 window.resolveSubmission = async (id, status) => {
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Terminal unauthorized.");
+    alert("Session expired. Please reload.");
     return;
   }
 
@@ -262,7 +262,7 @@ submissionsList.addEventListener('click', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Terminal unauthorized.");
+    alert("Session expired. Please reload.");
     return;
   }
 
@@ -273,7 +273,7 @@ submissionsList.addEventListener('click', async (e) => {
 
   const siblingButtons = submissionCard ? submissionCard.querySelectorAll('button') : [];
   siblingButtons.forEach(btn => btn.disabled = true);
-  targetButton.textContent = "Syncing Grid...";
+  targetButton.textContent = "Updating...";
 
   console.log(`Executing Database Call: Row ${submissionId} changing to state ${newStatus}`);
 
@@ -285,7 +285,7 @@ submissionsList.addEventListener('click', async (e) => {
   if (error) {
     alert("Failure adjusting status: " + error.message);
     siblingButtons.forEach(btn => btn.disabled = false);
-    targetButton.textContent = newStatus === 'APPROVED' ? 'Approve Patch' : 'Reject Patch';
+    targetButton.textContent = newStatus === 'APPROVED' ? 'Approve' : 'Reject';
   } else {
     console.log("Database updated successfully!");
 
@@ -316,7 +316,7 @@ roadmapForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Security breach detected. Terminal locked.");
+    alert("Session expired. Please reload and log in again.");
     window.location.reload();
     return;
   }
@@ -326,7 +326,7 @@ roadmapForm.addEventListener('submit', async (e) => {
   const description = document.getElementById('roadmap-description').value.trim();
   const difficulty = document.getElementById('roadmap-difficulty').value;
 
-  roadmapMessage.textContent = "Deploying learning path...";
+  roadmapMessage.textContent = "Creating learning path...";
   roadmapMessage.style.color = "var(--text-strong)";
 
   const { error } = await supabaseClient
@@ -338,7 +338,7 @@ roadmapForm.addEventListener('submit', async (e) => {
     roadmapMessage.textContent = "Failed: " + error.message;
   } else {
     roadmapMessage.style.color = "#83b5d1";
-    roadmapMessage.textContent = `Success! Path "${title}" deployed.`;
+    roadmapMessage.textContent = `Success! Path "${title}" created.`;
     roadmapForm.reset();
     loadRoadmaps();
   }
@@ -358,7 +358,7 @@ async function loadRoadmaps() {
   }
 
   if (!roadmaps || roadmaps.length === 0) {
-    roadmapAdminList.innerHTML = `<p class="empty-state">No learning paths deployed yet.</p>`;
+    roadmapAdminList.innerHTML = `<p class="empty-state">No learning paths yet.</p>`;
     return;
   }
 
@@ -510,7 +510,7 @@ async function loadRoadmapSteps(card, roadmap) {
         </div>
         <div class="form-group">
             <label>Description</label>
-            <textarea placeholder="What should the traveler learn here?" required></textarea>
+            <textarea placeholder="What should members learn here?" required></textarea>
         </div>
         <div class="form-group">
             <label>Resources (one per line: Title | URL)</label>
@@ -695,7 +695,7 @@ challengeCategoryForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Security breach detected. Terminal locked.");
+    alert("Session expired. Please reload and log in again.");
     window.location.reload();
     return;
   }
@@ -703,7 +703,7 @@ challengeCategoryForm.addEventListener('submit', async (e) => {
   const name = document.getElementById('challenge-category-name').value.trim();
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-  challengeCategoryMessage.textContent = "Deploying category...";
+  challengeCategoryMessage.textContent = "Creating category...";
   challengeCategoryMessage.style.color = "var(--text-strong)";
 
   const { error } = await supabaseClient
@@ -715,7 +715,7 @@ challengeCategoryForm.addEventListener('submit', async (e) => {
     challengeCategoryMessage.textContent = "Failed: " + error.message;
   } else {
     challengeCategoryMessage.style.color = "#83b5d1";
-    challengeCategoryMessage.textContent = `Success! Category "${name}" deployed.`;
+    challengeCategoryMessage.textContent = `Success! Category "${name}" created.`;
     challengeCategoryForm.reset();
     loadChallengeCategories();
   }
@@ -845,7 +845,7 @@ workshopCategoryForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Security breach detected. Terminal locked.");
+    alert("Session expired. Please reload and log in again.");
     window.location.reload();
     return;
   }
@@ -853,7 +853,7 @@ workshopCategoryForm.addEventListener('submit', async (e) => {
   const name = document.getElementById('workshop-category-name').value.trim();
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-  workshopCategoryMessage.textContent = "Deploying category...";
+  workshopCategoryMessage.textContent = "Creating category...";
   workshopCategoryMessage.style.color = "var(--text-strong)";
 
   const { error } = await supabaseClient
@@ -865,7 +865,7 @@ workshopCategoryForm.addEventListener('submit', async (e) => {
     workshopCategoryMessage.textContent = "Failed: " + error.message;
   } else {
     workshopCategoryMessage.style.color = "#83b5d1";
-    workshopCategoryMessage.textContent = `Success! Category "${name}" deployed.`;
+    workshopCategoryMessage.textContent = `Success! Category "${name}" created.`;
     workshopCategoryForm.reset();
     loadWorkshopCategories();
     loadWorkshops();
@@ -997,7 +997,7 @@ workshopForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!isRoleAuthorized || !isPasswordAuthorized) {
-    alert("Security breach detected. Terminal locked.");
+    alert("Session expired. Please reload and log in again.");
     window.location.reload();
     return;
   }
@@ -1021,7 +1021,7 @@ workshopForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  workshopMessage.textContent = "Deploying workshop...";
+  workshopMessage.textContent = "Creating workshop...";
   workshopMessage.style.color = "var(--text-strong)";
 
   const payload = { title, category_id, video_url, duration: duration || null, description };
@@ -1038,7 +1038,7 @@ workshopForm.addEventListener('submit', async (e) => {
     workshopMessage.textContent = "Failed: " + error.message;
   } else {
     workshopMessage.style.color = "#83b5d1";
-    workshopMessage.textContent = `Success! Workshop "${title}" deployed.`;
+    workshopMessage.textContent = `Success! Workshop "${title}" created.`;
     workshopForm.reset();
     loadWorkshops();
   }
@@ -1058,7 +1058,7 @@ async function loadWorkshops() {
   }
 
   if (!workshops || workshops.length === 0) {
-    workshopAdminList.innerHTML = `<p class="empty-state">No workshops deployed yet.</p>`;
+    workshopAdminList.innerHTML = `<p class="empty-state">No workshops yet.</p>`;
     return;
   }
 

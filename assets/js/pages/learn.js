@@ -19,7 +19,7 @@ async function initLearnPage() {
 }
 
 async function fetchRoadmaps(userId) {
-  gridContainer.innerHTML = `<div class="loading-state">Unlocking the academy vault...</div>`;
+  gridContainer.innerHTML = `<div class="loading-state">Loading paths...</div>`;
 
   // PERF: check cache first (5-minute TTL)
   const cacheKey = 'roadmaps';
@@ -42,12 +42,12 @@ async function fetchRoadmaps(userId) {
   }
 
   if (error) {
-    gridContainer.innerHTML = `<div class="loading-state">Academy scanner offline: ${escapeHtml(error.message)}</div>`;
+    gridContainer.innerHTML = `<div class="loading-state">Failed to load paths: ${escapeHtml(error.message)}</div>`;
     return;
   }
 
   if (!roadmaps || roadmaps.length === 0) {
-    gridContainer.innerHTML = `<div class="loading-state">The academy archive is empty. No paths deployed yet.</div>`;
+    gridContainer.innerHTML = `<div class="loading-state">No learning paths available yet.</div>`;
     return;
   }
 
@@ -93,7 +93,7 @@ async function fetchRoadmaps(userId) {
                 <span>${done}/${total} complete</span>
                 <strong>${pct}%</strong>
             </div>
-            <span class="path-enter">Enter the Path →</span>
+            <span class="path-enter">Open Path →</span>
         `;
 
     fragment.appendChild(card);

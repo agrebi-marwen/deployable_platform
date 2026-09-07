@@ -43,7 +43,7 @@ window.loadUsername = async function (userId, el) {
     .select('username')
     .eq('id', userId)
     .maybeSingle();
-  el.textContent = profile?.username ? `Traveler: ${profile.username}` : 'Traveler';
+  el.textContent = profile?.username || 'User';
 };
 
 // Escape untrusted values before interpolating into innerHTML (prevents XSS)

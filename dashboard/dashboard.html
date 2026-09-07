@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Temporal Command Center</title>
+  <title>Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
       </div>
 
       <nav class="nav-group">
-        <span class="nav-group-label">Operations</span>
+        <span class="nav-group-label">Menu</span>
         <a href="dashboard.html" class="nav-link active"><span class="nav-icon">▶</span> Overview</a>
         <a href="challenges.html" class="nav-link"><span class="nav-icon">◆</span> Challenges</a>
         <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
@@ -54,7 +54,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="status-pill"><span class="status-dot"></span> Temporal Core: Operational</div>
+        <div class="status-pill"><span class="status-dot"></span> System online</div>
         <div class="status-pill">V. 2.0.0</div>
       </div>
     </aside>
@@ -67,7 +67,7 @@
         <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
         <div class="user-chip">
           <span class="user-avatar" id="user-avatar">◈</span>
-          <span class="user-name" id="nav-username">Loading Traveler...</span>
+          <span class="user-name" id="nav-username">Loading user...</span>
         </div>
       </header>
 
@@ -75,16 +75,16 @@
 
         <div class="page-head">
           <div>
-            <h1>Command Center</h1>
-            <p>Overview of the temporal registry, missions, and academy activity.</p>
+            <h1>Dashboard</h1>
+            <p>Overview of your challenges, learning paths, and activity.</p>
           </div>
         </div>
 
         <!-- ===================== KPI ROW ===================== -->
         <section class="kpi-grid" aria-label="Key metrics">
           <div class="kpi-card kpi-purple">
-            <div class="kpi-label">Temporal Rank <span class="kpi-options">⋯</span></div>
-            <div class="kpi-value" id="stat-rank">Novice Traveler</div>
+            <div class="kpi-label">Rank <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-rank">Novice</div>
             <div class="kpi-sub" id="rank-bar-next">Reaching next rank</div>
             <div class="kpi-bar" id="rank-bar">
               <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
@@ -93,8 +93,8 @@
           </div>
 
           <div class="kpi-card kpi-blue">
-            <div class="kpi-label">Energy Points <span class="kpi-options">⋯</span></div>
-            <div class="kpi-value" id="stat-points">0 EP</div>
+            <div class="kpi-label">Points <span class="kpi-options">⋯</span></div>
+            <div class="kpi-value" id="stat-points">0</div>
             <div class="kpi-sub">Total accumulated</div>
             <div class="kpi-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
@@ -103,9 +103,9 @@
           </div>
 
           <div class="kpi-card kpi-yellow">
-            <div class="kpi-label">Anomalies Solved <span class="kpi-options">⋯</span></div>
+            <div class="kpi-label">Challenges Solved <span class="kpi-options">⋯</span></div>
             <div class="kpi-value" id="stat-solved">0</div>
-            <div class="kpi-sub">Approved patches</div>
+            <div class="kpi-sub">Approved solutions</div>
             <div class="kpi-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span>
               <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
@@ -113,9 +113,9 @@
           </div>
 
           <div class="kpi-card kpi-red">
-            <div class="kpi-label">Active Missions <span class="kpi-options">⋯</span></div>
+            <div class="kpi-label">Active Challenges <span class="kpi-options">⋯</span></div>
             <div class="kpi-value" id="stat-missions">0</div>
-            <div class="kpi-sub">Open anomalies</div>
+            <div class="kpi-sub">Open challenges</div>
             <div class="kpi-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
               <span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span>
@@ -124,9 +124,9 @@
         </section>
 
         <!-- ===================== SUMMARY BAR ===================== -->
-        <section class="summary-bar" aria-label="Registry summary">
+        <section class="summary-bar" aria-label="Platform summary">
           <div class="summary-item" style="--si-hue: #eec643;">
-            <span class="si-label">Travelers</span>
+            <span class="si-label">Members</span>
             <span class="si-value" id="sum-travelers">–</span>
             <div class="si-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg on"></span>
@@ -153,7 +153,7 @@
             </div>
           </div>
           <div class="summary-item" style="--si-hue: #fe4e00;">
-            <span class="si-label">Active Anomalies</span>
+            <span class="si-label">Active Challenges</span>
             <span class="si-value" id="sum-missions">–</span>
             <div class="si-bar">
               <span class="seg on"></span><span class="seg on"></span><span class="seg"></span>
@@ -177,24 +177,24 @@
           <div class="panel">
             <div class="panel-head">
               <div>
-                <h2>Mission Progress</h2>
-                <div class="panel-sub">Active anomalies with your latest deployment status</div>
+                <h2>Challenge Progress</h2>
+                <div class="panel-sub">Active challenges with your latest submission status</div>
               </div>
             </div>
             <div id="mission-progress" class="mini-list">
-              <div class="empty-hint">Scanning active anomalies...</div>
+              <div class="empty-hint">Loading active challenges...</div>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-head">
               <div>
-                <h2>Per-Epoch Stats</h2>
-                <div class="panel-sub">Approved patches per deployment epoch</div>
+                <h2>Stats by Month</h2>
+                <div class="panel-sub">Approved solutions by month</div>
               </div>
             </div>
             <div id="epoch-stats" class="mini-list">
-              <div class="empty-hint">Compiling epoch reports...</div>
+              <div class="empty-hint">Loading monthly stats...</div>
             </div>
           </div>
         </section>
@@ -203,8 +203,8 @@
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2>Portal Registry</h2>
-              <div class="panel-sub">Live inventory across all zones</div>
+              <h2>Catalog</h2>
+              <div class="panel-sub">Live overview of available content</div>
             </div>
             <span class="feed-status"><span class="dot"></span> synced</span>
           </div>
@@ -248,22 +248,22 @@
   <div class="modal-overlay" id="leaderboard-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🏆 Registry of Elite Time Travelers</h2>
+        <h2>🏆 Leaderboard</h2>
         <button class="close-modal" id="close-leaderboard">&times;</button>
       </div>
-      <p class="modal-subtitle">Real-time standings of travelers stabilizing the timeline.</p>
+      <p class="modal-subtitle">Top members ranked by points.</p>
       <div class="modal-table-container">
         <table>
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Traveler Name</th>
-              <th>Energy Points (EP)</th>
+              <th>Member Name</th>
+              <th>Points</th>
             </tr>
           </thead>
           <tbody id="leaderboard-tbody">
             <tr>
-              <td colspan="3" class="modal-loading">Querying active timelines...</td>
+              <td colspan="3" class="modal-loading">Loading leaderboard...</td>
             </tr>
           </tbody>
         </table>
@@ -275,10 +275,10 @@
   <div class="modal-overlay" id="settings-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>⚙️ Temporal Identity Settings</h2>
+        <h2>⚙️ Account Settings</h2>
         <button class="close-modal" id="close-settings">&times;</button>
       </div>
-      <p class="modal-subtitle">Configure your public credentials and security protocols.</p>
+      <p class="modal-subtitle">Update your public username and password.</p>
 
 
       <form id="settings-form" class="settings-form-layout">
@@ -288,11 +288,11 @@
         </div>
 
         <div class="form-group">
-          <label for="settings-password">Update Security Key (Password)</label>
+          <label for="settings-password">New Password</label>
           <input type="password" id="settings-password" placeholder="Leave blank to keep current">
         </div>
 
-        <button type="submit" class="btn-save-settings">Update Identity</button>
+        <button type="submit" class="btn-save-settings">Save Changes</button>
         <div id="settings-message"></div>
       </form>
     </div>
@@ -305,13 +305,13 @@
           <span class="logo-cube">◈</span>
           The Time Portal
         </div>
-        <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
+        <p class="footer-tagline">Built by the IEEE CS INSAT Student Branch Chapter.</p>
       </div>
 
       <div class="footer-links-group">
         <h4>Navigation</h4>
         <ul class="footer-links">
-          <li><a href="/index.html">Home Portal</a></li>
+          <li><a href="/index.html">Home</a></li>
           <li><a href="/dashboard/dashboard.html">Dashboard</a></li>
           <li><a href="/dashboard/challenges.html">Challenges</a></li>
         </ul>
@@ -329,7 +329,7 @@
 
     <div class="footer-bottom">
       <p>&copy; 2026 IEEE Computer Society INSAT Student Branch Chapter. All rights reserved.</p>
-      <p class="system-status"><span class="status-indicator"></span> Temporal Core: Operational</p>
+      <p class="system-status"><span class="status-indicator"></span> System online</p>
     </div>
   </footer>
 

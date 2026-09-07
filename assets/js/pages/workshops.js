@@ -29,7 +29,7 @@ async function initWorkshopsPage() {
 }
 
 async function fetchWorkshops() {
-  gridContainer.innerHTML = `<div class="loading-state">Unlocking the seminar vault...</div>`;
+  gridContainer.innerHTML = `<div class="loading-state">Loading workshops...</div>`;
 
   // PERF: check cache first (5-minute TTL)
   const cacheKey = 'workshops';
@@ -61,12 +61,12 @@ async function fetchWorkshops() {
   }
 
   if (error) {
-    gridContainer.innerHTML = `<div class="loading-state">Vault scanner offline: ${escapeHtml(error.message)}</div>`;
+    gridContainer.innerHTML = `<div class="loading-state">Failed to load workshops: ${escapeHtml(error.message)}</div>`;
     return;
   }
 
   if (!data || data.length === 0) {
-    gridContainer.innerHTML = `<div class="loading-state">The seminar vault is empty. No workshops deployed yet.</div>`;
+    gridContainer.innerHTML = `<div class="loading-state">No workshops available yet.</div>`;
     filtersEl.hidden = true;
     return;
   }
@@ -103,7 +103,7 @@ function renderGrid() {
     : allWorkshops.filter(w => w.category_id === activeFilter);
 
   if (visible.length === 0) {
-    gridContainer.innerHTML = `<div class="loading-state">No transmissions in this category yet.</div>`;
+    gridContainer.innerHTML = `<div class="loading-state">No videos in this category yet.</div>`;
     return;
   }
 
@@ -128,7 +128,7 @@ function renderGrid() {
             <p class="workshop-desc">${escapeHtml(workshop.description || '')}</p>
             <div class="workshop-card-foot">
                 <span class="workshop-date">${escapeHtml(date)}</span>
-                <span class="workshop-play">Play Transmission ▸</span>
+                <span class="workshop-play">Play Video ▸</span>
             </div>
         `;
 
@@ -146,7 +146,7 @@ function renderGrid() {
 function openPlayer(workshop) {
   const embedUrl = toDriveEmbed(workshop.video_url);
   if (!embedUrl) {
-    alert("This transmission has no valid Google Drive link.");
+    alert("This video has no valid Google Drive link.");
     return;
   }
 

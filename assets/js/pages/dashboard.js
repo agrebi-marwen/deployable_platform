@@ -70,14 +70,14 @@ async function fetchUserProfile() {
       .from('profiles')
       .insert({
         id: currentUser.id,
-        username: 'Traveler',
+        username: 'User',
         total_points: 0,
       });
 
     if (insertError) {
       console.error('Profile insert failed:', insertError);
-      navUsername.textContent = 'Traveler';
-      statPoints.textContent = '0 EP';
+navUsername.textContent = 'User';
+      statPoints.textContent = '0 pts';
       statSolved.textContent = '0';
       return;
     }
@@ -92,8 +92,8 @@ async function fetchUserProfile() {
     profile = newProfile;
   } else if (error) {
     console.error('Profile load failed:', error);
-    navUsername.textContent = 'Traveler';
-    statPoints.textContent = '0 EP';
+    navUsername.textContent = 'User';
+    statPoints.textContent = '0 pts';
     statSolved.textContent = '0';
     return;
   }
@@ -102,7 +102,7 @@ async function fetchUserProfile() {
   const points = profile.total_points ?? 0;
 
   navUsername.textContent = profile.username;
-  statPoints.textContent = `${points} EP`;
+  statPoints.textContent = `${points} pts`;
   settingsUsernameInput.value = profile.username;
 
   const rank = getRank(points);
@@ -136,13 +136,13 @@ async function fetchUserProfile() {
 
 // Rank ladder (cumulative total points)
 const RANKS = [
-  { name: "Novice Traveler", min: 0 },
-  { name: "Chronos Engineer", min: 500 },
-  { name: "Temporal Artisan", min: 1200 },
-  { name: "Paradox Hunter", min: 2500 },
-  { name: "Timeline Guardian", min: 5000 },
-  { name: "Epoch Master", min: 10000 },
-  { name: "Grand Time Lord", min: 20000 },
+  { name: "Novice", min: 0 },
+  { name: "Apprentice", min: 500 },
+  { name: "Junior", min: 1200 },
+  { name: "Intermediate", min: 2500 },
+  { name: "Senior", min: 5000 },
+  { name: "Expert", min: 10000 },
+  { name: "Master", min: 20000 },
 ];
 
 function getRank(points) {
@@ -179,7 +179,7 @@ function updateRankBar(points) {
     s.classList.toggle('on', i < filled);
     s.classList.toggle('half', i === filled && progress < 1 && filled < SEGMENTS);
   });
-  next.textContent = `${rank.nextMin - points} EP to next rank`;
+  next.textContent = `${rank.nextMin - points} pts to next rank`;
 }
 
 async function fetchDashboardData() {
@@ -263,7 +263,7 @@ async function fetchRegistry() {
     })).filter(x => x.count > 0);
 
     regByCategory.innerHTML = byCat.length === 0
-      ? '<div class="empty-hint">No workshops registered yet.</div>'
+      ? '<div class="empty-hint">No workshops yet.</div>'
       : renderRegistryRows(byCat);
   }
 
@@ -275,7 +275,7 @@ async function fetchRegistry() {
     })).filter(x => x.count > 0);
 
     regByRoadmap.innerHTML = byRm.length === 0
-      ? '<div class="empty-hint">No roadmaps registered yet.</div>'
+      ? '<div class="empty-hint">No learning paths yet.</div>'
       : renderRegistryRows(byRm);
   }
 }
@@ -315,7 +315,7 @@ function statusLabel(status) {
 
 function renderMissionProgress(challenges, latestByChallenge) {
   if (!challenges || challenges.length === 0) {
-    missionProgress.innerHTML = `<div class="empty-hint">No active anomalies detected at this moment. Secure zone.</div>`;
+    missionProgress.innerHTML = `<div class="empty-hint">No active challenges right now.</div>`;
     return;
   }
 
@@ -330,7 +330,7 @@ function renderMissionProgress(challenges, latestByChallenge) {
             <span class="mr-icon">◈</span>
             <div class="mr-body">
                 <span class="mr-title">${escapeHtml(challenge.title)}</span>
-                <span class="mr-meta">${status ? 'Last deployment ' + escapeHtml(formatDate(latestByChallenge[challenge.id].ts)) : 'Awaiting first deployment'}</span>
+                <span class="mr-meta">${status ? 'Last submitted ' + escapeHtml(formatDate(latestByChallenge[challenge.id].ts)) : 'Awaiting first submission'}</span>
             </div>
             <span class="mini-badge ${badgeClass}">${escapeHtml(statusLabel(status))}</span>
             <a class="mission-link" href="submit.html?id=${encodeURIComponent(challenge.id)}">Open &rarr;</a>
@@ -354,7 +354,7 @@ function statusClass(status) {
 function renderEpochStats(challenges, latestByChallenge) {
   const epochs = {};
   challenges.forEach(challenge => {
-    const month = (challenge.month_year || 'Unknown Epoch').trim();
+    const month = (challenge.month_year || 'Unknown Month').trim();
     if (!epochs[month]) {
       epochs[month] = { total: 0, approved: 0, hue: window.epochHue ? window.epochHue(month) : 25 };
     }
@@ -367,7 +367,7 @@ function renderEpochStats(challenges, latestByChallenge) {
   const sorted = Object.keys(epochs).sort((a, b) => parseMonthYear(b) - parseMonthYear(a));
 
   if (sorted.length === 0) {
-    epochStats.innerHTML = `<div class="empty-hint">No active anomalies detected at this moment.</div>`;
+    epochStats.innerHTML = `<div class="empty-hint">No active challenges right now.</div>`;
     return;
   }
 
@@ -398,7 +398,7 @@ function renderEpochStats(challenges, latestByChallenge) {
 // ==========================================
 async function fetchLeaderboard() {
   const tbody = document.getElementById('leaderboard-tbody');
-  tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Scanning timelines...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Loading leaderboard...</td></tr>`;
 
   // PERF: Pagination - load 50 at a time instead of unlimited
   const { data: rankings, error } = await supabaseClient
@@ -408,12 +408,12 @@ async function fetchLeaderboard() {
     .limit(50);
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Failed to read registry: ${escapeHtml(error.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="table-loading">Failed to load leaderboard: ${escapeHtml(error.message)}</td></tr>`;
     return;
   }
 
   if (!rankings || rankings.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No travelers registered yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No members yet.</td></tr>`;
     return;
   }
 
@@ -424,7 +424,7 @@ async function fetchLeaderboard() {
     row.innerHTML = `
             <td><strong>#${index + 1}</strong></td>
             <td>${escapeHtml(profile.username)}</td>
-            <td>${escapeHtml(profile.total_points ?? 0)} EP</td>
+            <td>${escapeHtml(profile.total_points ?? 0)} pts</td>
         `;
     fragment.appendChild(row);
   });
@@ -442,7 +442,7 @@ async function fetchLeaderboard() {
     loadMoreTd.style.padding = '15px';
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.className = 'load-more-btn';
-    loadMoreBtn.textContent = 'Load More Travelers';
+    loadMoreBtn.textContent = 'Load More Members';
     loadMoreBtn.addEventListener('click', loadMoreLeaderboard);
     loadMoreTd.appendChild(loadMoreBtn);
     loadMoreRow.appendChild(loadMoreTd);
@@ -470,7 +470,7 @@ async function loadMoreLeaderboard() {
       row.innerHTML = `
                 <td><strong>#${leaderboardOffset + index + 1}</strong></td>
                 <td>${escapeHtml(profile.username)}</td>
-                <td>${escapeHtml(profile.total_points ?? 0)} EP</td>
+                <td>${escapeHtml(profile.total_points ?? 0)} pts</td>
             `;
       fragment.appendChild(row);
     });
@@ -486,7 +486,7 @@ async function loadMoreLeaderboard() {
       loadMoreTd.style.padding = '15px';
       const loadMoreBtn = document.createElement('button');
       loadMoreBtn.className = 'load-more-btn';
-      loadMoreBtn.textContent = 'Load More Travelers';
+      loadMoreBtn.textContent = 'Load More Members';
       loadMoreBtn.addEventListener('click', loadMoreLeaderboard);
       loadMoreTd.appendChild(loadMoreBtn);
       loadMoreRow.appendChild(loadMoreTd);
@@ -497,7 +497,7 @@ async function loadMoreLeaderboard() {
 
 settingsForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  settingsMessage.textContent = "Updating protocol...";
+  settingsMessage.textContent = "Saving changes...";
   settingsMessage.style.color = "var(--text-strong)";
 
   const newUsername = settingsUsernameInput.value.trim();
@@ -526,7 +526,7 @@ settingsForm.addEventListener('submit', async (e) => {
     }
   }
 
-  settingsMessage.textContent = "Identity stabilized successfully!";
+  settingsMessage.textContent = "Changes saved successfully!";
   settingsMessage.style.color = "#83b5d1";
   fetchUserProfile();
   setTimeout(() => {

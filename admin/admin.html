@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal - Sector Control</title>
+  <title>Admin Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -29,39 +29,39 @@
   <div id="security-overlay" class="overlay" style="display: none;">
     <div class="security-card">
       <h2>Authorization Required</h2>
-      <p>Enter the temporal administrative clearance code to access Sector Control.</p>
+      <p>Enter the admin access code to continue.</p>
       <input type="password" id="admin-pass-input" placeholder="••••••••••••" autofocus>
-      <button id="admin-auth-btn" class="submit-btn">Authorize Terminal</button>
+      <button id="admin-auth-btn" class="submit-btn">Authorize</button>
       <div id="auth-error" class="status-msg" style="color: #fe4e00; margin-top: 15px;"></div>
     </div>
   </div>
 
   <div class="admin-wrapper" id="admin-panel-content" style="display: none;">
     <div class="admin-header">
-      <h1>Sector Control</h1>
-      <p>Three operational zones: deploy and review timeline anomalies, build the traveler academy, and manage the seminar video vault.</p>
+      <h1>Admin Panel</h1>
+      <p>Manage challenges, learning paths, and workshops.</p>
     </div>
 
     <section class="zone" data-zone="anomalies">
       <div class="zone-header">
-        <span class="zone-badge">Zone 01</span>
-        <h2>Timeline Anomalies</h2>
-        <p>Deploy monthly coding challenges and clear the pending traveler submission queue.</p>
+        <span class="zone-badge">Section 1</span>
+        <h2>Challenges</h2>
+        <p>Create monthly coding challenges and review member submissions.</p>
       </div>
       <div class="admin-grid">
         <div class="panel-card">
           <div class="panel-heading">
-            <h2>Deploy New Anomaly</h2>
+            <h2>Create New Challenge</h2>
             <span class="panel-tag">Form</span>
           </div>
         <form id="challenge-form">
           <div class="form-group">
-            <label for="title">Anomaly Title</label>
-            <input type="text" id="title" placeholder="e.g., Chrono-Trigger Buffer Overflow" required>
+            <label for="title">Challenge Title</label>
+            <input type="text" id="title" placeholder="e.g., Fix the Array Rotation Bug" required>
           </div>
 
           <div class="form-group">
-            <label for="points_worth">Points Worth (EP)</label>
+            <label for="points_worth">Points Worth (pts)</label>
             <input type="number" id="points_worth" value="100" min="10" max="1000" step="10" required>
           </div>
 
@@ -83,19 +83,19 @@
           </div>
 
           <div class="form-group">
-            <label for="instructions">Instructions & Mission Details</label>
-            <textarea id="instructions" placeholder="Describe the steps and code required for the traveler..." required></textarea>
+            <label for="instructions">Instructions & Details</label>
+            <textarea id="instructions" placeholder="Describe the steps and code required to solve the challenge..." required></textarea>
           </div>
 
           <div class="form-group checkbox-group">
             <label class="switch-label">
               <input type="checkbox" id="is_active" checked>
               <span class="custom-switch"></span>
-              Activate immediately in terminal feed
+              Publish immediately
             </label>
           </div>
 
-          <button type="submit" class="submit-btn" id="submit-btn">Deploy Anomaly</button>
+          <button type="submit" class="submit-btn" id="submit-btn">Create Challenge</button>
           <div id="creation-message" class="status-msg"></div>
         </form>
       </div>
@@ -127,7 +127,7 @@
           <span class="panel-tag">Queue</span>
         </div>
         <div class="submissions-container" id="submissions-list">
-          <p class="empty-state">Scanning the streams for incoming transmissions...</p>
+          <p class="empty-state">Loading submissions...</p>
         </div>
       </div>
       </div>
@@ -135,11 +135,11 @@
       <div class="admin-grid">
       <div class="panel-card panel-card-full">
         <div class="panel-heading">
-          <h2>Manage Anomalies</h2>
+          <h2>Manage Challenges</h2>
           <span class="panel-tag">Manage</span>
         </div>
         <div class="roadmap-admin-list" id="challenge-admin-list">
-          <p class="empty-state">Loading deployed anomalies...</p>
+          <p class="empty-state">Loading challenges...</p>
         </div>
       </div>
       </div>
@@ -147,14 +147,14 @@
 
     <section class="zone" data-zone="academy">
       <div class="zone-header">
-        <span class="zone-badge">Zone 02</span>
-        <h2>Traveler Academy</h2>
+        <span class="zone-badge">Section 2</span>
+        <h2>Learning Paths</h2>
         <p>Publish learning paths and maintain their ordered steps and resources.</p>
       </div>
       <div class="admin-grid">
         <div class="panel-card">
           <div class="panel-heading">
-            <h2>Deploy New Learning Path</h2>
+            <h2>Create New Learning Path</h2>
             <span class="panel-tag">Form</span>
           </div>
         <form id="roadmap-form">
@@ -170,7 +170,7 @@
 
           <div class="form-group">
             <label for="roadmap-description">Description</label>
-            <textarea id="roadmap-description" placeholder="What will the traveler learn on this path?" required></textarea>
+            <textarea id="roadmap-description" placeholder="What will members learn on this path?" required></textarea>
           </div>
 
           <div class="form-group">
@@ -182,7 +182,7 @@
             </select>
           </div>
 
-          <button type="submit" class="submit-btn" id="roadmap-submit-btn">Deploy Learning Path</button>
+          <button type="submit" class="submit-btn" id="roadmap-submit-btn">Create Learning Path</button>
           <div id="roadmap-message" class="status-msg"></div>
         </form>
       </div>
@@ -193,7 +193,7 @@
           <span class="panel-tag">Manage</span>
         </div>
         <div class="roadmap-admin-list" id="roadmap-admin-list">
-          <p class="empty-state">Loading deployed paths...</p>
+          <p class="empty-state">Loading paths...</p>
         </div>
       </div>
       </div>
@@ -201,14 +201,14 @@
 
     <section class="zone" data-zone="vault">
       <div class="zone-header">
-        <span class="zone-badge">Zone 03</span>
-        <h2>Seminar Vault</h2>
-        <p>Organize recorded workshops into categories and deploy new transmissions.</p>
+        <span class="zone-badge">Section 3</span>
+        <h2>Workshops</h2>
+        <p>Organize workshops into categories and publish new videos.</p>
       </div>
       <div class="admin-grid">
         <div class="panel-card">
           <div class="panel-heading">
-            <h2>Deploy New Workshop</h2>
+            <h2>Create New Workshop</h2>
             <span class="panel-tag">Form</span>
           </div>
         <form id="workshop-form">
@@ -237,7 +237,7 @@
 
           <div class="form-group">
             <label for="workshop-description">Description</label>
-            <textarea id="workshop-description" placeholder="What will the traveler learn in this session?" required></textarea>
+            <textarea id="workshop-description" placeholder="What will members learn in this session?" required></textarea>
           </div>
 
           <div class="form-group">
@@ -245,7 +245,7 @@
             <input type="date" id="workshop-date">
           </div>
 
-          <button type="submit" class="submit-btn" id="workshop-submit-btn">Deploy Workshop</button>
+          <button type="submit" class="submit-btn" id="workshop-submit-btn">Create Workshop</button>
           <div id="workshop-message" class="status-msg"></div>
         </form>
       </div>
@@ -278,7 +278,7 @@
           <span class="panel-tag">Manage</span>
         </div>
         <div class="roadmap-admin-list" id="workshop-admin-list">
-          <p class="empty-state">Loading deployed workshops...</p>
+          <p class="empty-state">Loading workshops...</p>
         </div>
       </div>
       </div>

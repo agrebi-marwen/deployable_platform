@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deploy Temporal Patch</title>
+  <title>Submit Solution</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
       </div>
 
       <nav class="nav-group">
-        <span class="nav-group-label">Operations</span>
+        <span class="nav-group-label">Menu</span>
         <a href="dashboard.html" class="nav-link"><span class="nav-icon">▶</span> Overview</a>
         <a href="challenges.html" class="nav-link active"><span class="nav-icon">◆</span> Challenges</a>
         <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
@@ -54,7 +54,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="status-pill"><span class="status-dot"></span> Temporal Core: Operational</div>
+        <div class="status-pill"><span class="status-dot"></span> System online</div>
         <div class="status-pill">V. 2.0.0</div>
       </div>
     </aside>
@@ -63,11 +63,11 @@
     <div class="main">
 
       <header class="topbar">
-        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Challenge Mission</span></span>
+        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Submit Solution</span></span>
         <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
         <div class="user-chip">
           <span class="user-avatar" id="user-avatar">◈</span>
-          <span class="user-name" id="nav-username">Loading Traveler...</span>
+          <span class="user-name" id="nav-username">Loading user...</span>
         </div>
       </header>
 
@@ -76,21 +76,21 @@
         <div class="submit-layout-container">
     
           <div class="challenge-details-card">
-            <div class="section-badge" id="challenge-month">Month Anomaly</div>
+            <div class="section-badge" id="challenge-month">Monthly Challenge</div>
             <h1 id="challenge-title">Loading Challenge...</h1>
             <div class="challenge-reward" id="challenge-points">Reward: -- EP</div>
     
             <div class="challenge-instructions-box">
-              <h3>Mission Briefing</h3>
-              <p id="challenge-instructions">Retrieving data blocks from the temporal database...</p>
+              <h3>Instructions</h3>
+              <p id="challenge-instructions">Loading challenge details...</p>
             </div>
           </div>
 
           <aside class="submission-panel">
     
             <div class="submission-card">
-              <h3>Transmutation Portal</h3>
-              <p class="sub-text">Deploy your solution link to patch this anomaly.</p>
+              <h3>Submit Your Solution</h3>
+              <p class="sub-text">Paste the link to your repository below.</p>
     
               <form id="submission-form">
                 <label for="submission-url">Repository URL</label>
@@ -101,7 +101,7 @@
                   pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
                   title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
                   required>
-                <button type="submit" id="submit-btn">Initialize Patch</button>
+                <button type="submit" id="submit-btn">Submit Solution</button>
               </form>
               <div id="submission-message"></div>
             </div>
@@ -121,13 +121,13 @@
           <span class="logo-cube">◈</span>
           The Time Portal
         </div>
-        <p class="footer-tagline">Stabilizing timeline anomalies, one epoch at a time.</p>
+        <p class="footer-tagline">Built by the IEEE CS INSAT Student Branch Chapter.</p>
       </div>
       
       <div class="footer-links-group">
         <h4>Navigation</h4>
         <ul class="footer-links">
-          <li><a href="/index.html">Home Portal</a></li>
+          <li><a href="/index.html">Home</a></li>
           <li><a href="/dashboard/challenges.html">Challenges</a></li>
           <li><a href="/dashboard/dashboard.html">Dashboard</a></li>
         </ul>
@@ -145,7 +145,7 @@
 
     <div class="footer-bottom">
       <p>&copy; 2026 IEEE Computer Society INSAT Student Branch Chapter. All rights reserved.</p>
-      <p class="system-status"><span class="status-indicator"></span> Temporal Core: Operational</p>
+      <p class="system-status"><span class="status-indicator"></span> System online</p>
     </div>
   </footer>
 

@@ -13,7 +13,7 @@ async function initSubmissionsPage() {
 }
 
 async function fetchUserSubmissions(userId) {
-  logsTableBody.innerHTML = `<tr><td colspan="4" class="table-loading">Syncing secure telemetry feed...</td></tr>`;
+  logsTableBody.innerHTML = `<tr><td colspan="4" class="table-loading">Loading your submissions...</td></tr>`;
 
   // We fetch submissions and join the matching 'challenges' records to display the title
   const { data: submissions, error } = await supabaseClient
@@ -31,11 +31,11 @@ async function fetchUserSubmissions(userId) {
     .order('submitted_at', { ascending: false });
 
   if (error) {
-    console.error("Failed to query submissions log stream:", error);
+    console.error("Failed to query submissions log:", error);
     logsTableBody.innerHTML = `
             <tr>
                 <td colspan="4" class="table-error">
-                    Telemetry Fetch Failed: ${escapeHtml(error.message)}
+                    Failed to load submissions: ${escapeHtml(error.message)}
                 </td>
             </tr>`;
     return;
@@ -45,7 +45,7 @@ async function fetchUserSubmissions(userId) {
     logsTableBody.innerHTML = `
             <tr>
                 <td colspan="4" class="table-empty">
-                    No active or pending transmission signals detected from your origin coordinates.
+                    No submissions yet.
                 </td>
             </tr>`;
     return;
@@ -55,8 +55,8 @@ async function fetchUserSubmissions(userId) {
 
   submissions.forEach(sub => {
     const timestamp = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : "Unknown";
-    const challengeTitle = sub.challenges ? sub.challenges.title : "Unrecognized Anomaly";
-    const targetUrl = sub.submission_url || "No target registered";
+    const challengeTitle = sub.challenges ? sub.challenges.title : "Unknown Challenge";
+    const targetUrl = sub.submission_url || "No URL provided";
 
     // Status aesthetic rendering
     const cleanStatus = (sub.status || "PENDING").toUpperCase();
