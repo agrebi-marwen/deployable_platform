@@ -144,6 +144,44 @@
   color: var(--text-dim);
 }
 
+/* ---- "Solve a challenge" section ---- */
+.node-challenges {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 40% 45% / 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.node-challenges .node-required-label {
+  margin-right: 0;
+  font-size: 13px;
+}
+
+.node-challenge-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.node-challenge-link {
+  font-family: var(--font-meta);
+  font-size: 15px;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  padding: 4px 12px;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.node-challenge-link:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--line);
+}
+
 /* ---- Light theme overrides ---- */
 [data-theme="light"] .roadmap-map-step { box-shadow: var(--shadow-hard-sm); }
 [data-theme="light"] .roadmap-back { color: hsl(var(--epoch-hue, 25) 70% 35%); }

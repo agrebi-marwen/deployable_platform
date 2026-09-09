@@ -39,6 +39,33 @@ function buildCompletedTags(challenges, approvedChallengeIds) {
   return tags;
 }
 
+// Build a map: normalized tag -> unique challenges carrying that tag.
+function buildChallengesByTag(challenges) {
+  const map = {};
+  (challenges || []).forEach(ch => {
+    const seen = new Set();
+    String(ch.tags || '').split(/\s+/).forEach(t => {
+      const norm = normalizeTag(t);
+      if (!norm || seen.has(norm)) return;
+      seen.add(norm);
+      if (!map[norm]) map[norm] = [];
+      map[norm].push(ch);
+    });
+  });
+  return map;
+}
+
+// Find challenges that match ANY of a node's required tags (deduped by id).
+function challengesForNode(requiredTags, challengesByTag) {
+  const out = new Map();
+  requiredTags.forEach(norm => {
+    (challengesByTag[norm] || []).forEach(ch => {
+      if (!out.has(ch.id)) out.set(ch.id, ch);
+    });
+  });
+  return Array.from(out.values());
+}
+
 async function initRoadmapMapPage() {
   bindLogout(logoutBtn);
 
@@ -132,7 +159,16 @@ async function loadUserState(nodes) {
     : Promise.resolve({ data: [], error: null });
   const { data: challenges } = await challengeQuery;
 
+  // Also fetch all active challenges so each node can offer a "solve this"
+  // section linking to challenges that carry the node's required tags.
+  const activeQuery = supabaseClient
+    .from('challenges')
+    .select('id, title, tags')
+    .eq('is_active', true);
+  const { data: activeChallenges } = await activeQuery;
+
   const completedTags = buildCompletedTags(challenges || [], approvedChallengeIds);
+  const challengesByTag = buildChallengesByTag(activeChallenges || []);
 
   // Deepest unlocked index: -1 means nothing unlocked yet
   let deepestIndex = -1;
@@ -141,10 +177,10 @@ async function loadUserState(nodes) {
     if (idx !== -1) deepestIndex = idx;
   }
 
-  renderNodes(nodes, deepestIndex, completedTags);
+  renderNodes(nodes, deepestIndex, completedTags, challengesByTag);
 }
 
-function renderNodes(nodes, deepestIndex, completedTags) {
+function renderNodes(nodes, deepestIndex, completedTags, challengesByTag) {
   if (!nodes || nodes.length === 0) {
     nodesContainer.innerHTML = `<div class="loading-state">This field has no nodes yet.</div>`;
     updateProgress(0, 0);
@@ -193,6 +229,22 @@ function renderNodes(nodes, deepestIndex, completedTags) {
         ? `<div class="node-lock-hint">Unlock the previous node to proceed.</div>`
         : '';
 
+    // "Solve a challenge" section: active challenges carrying ANY of this
+    // node's required tags. Unlocked nodes also surface them (re-brush up).
+    const nodeChallenges = challengesForNode(normalizedRequired, challengesByTag);
+    const challengeSection = normalizedRequired.length && nodeChallenges.length
+      ? `<div class="node-challenges">
+            <span class="node-required-label">${isUnlocked ? 'Practice with:' : 'Try these to earn the tags:'}</span>
+            <div class="node-challenge-links">
+              ${nodeChallenges.map(ch =>
+                `<a class="node-challenge-link" href="submit.html?id=${encodeURIComponent(ch.id)}">${escapeHtml(ch.title)} →</a>`
+              ).join('')}
+            </div>
+         </div>`
+      : (normalizedRequired.length
+          ? `<div class="node-lock-hint">No active challenges with these tags yet.</div>`
+          : '');
+
     const row = document.createElement('div');
     row.classList.add('roadmap-map-step');
     if (isUnlocked) row.classList.add('is-unlocked');
@@ -209,6 +261,7 @@ function renderNodes(nodes, deepestIndex, completedTags) {
                 <p class="roadmap-step-desc">${escapeHtml(node.description || '')}</p>
                 ${tagChips}
                 ${resourceHtml}
+                ${challengeSection}
                 ${actionHtml}
             </div>
         `;
