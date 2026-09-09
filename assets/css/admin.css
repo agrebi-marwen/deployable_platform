@@ -95,6 +95,7 @@ body {
 [data-zone="anomalies"] { --zone-hue: 18; }   /* Flame Orange */
 [data-zone="academy"]   { --zone-hue: 220; }  /* Dusk Blue */
 [data-zone="vault"]     { --zone-hue: 205; }  /* Sky Reflection */
+[data-zone="roadmaps"]  { --zone-hue: 130; }  /* Circuit Green */
 
 .admin-grid {
   display: grid;

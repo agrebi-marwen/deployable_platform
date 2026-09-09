@@ -74,17 +74,15 @@
 
           <div class="form-group">
             <label for="challenge-tags">Tags</label>
-            <input type="text" id="challenge-tags" placeholder="e.g., #CP #MLOps #Algorithms" >
-            <p class="hint">Space-separated tags prefixed with # (e.g. #CP #MLOps).</p>
+            <input type="text" id="challenge-tags" placeholder="e.g., #NumberTheory #MLOps1 #BinarySearch" >
+            <p class="hint">Space-separated tags prefixed with # (e.g. #BinarySearch #MLOps).</p>
           </div>
 
           <div class="form-group">
             <label for="challenge-difficulty">Difficulty</label>
             <select id="challenge-difficulty" required>
               <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
-              <option value="Expert">Expert</option>
             </select>
           </div>
 
@@ -287,6 +285,56 @@
           <p class="empty-state">Loading workshops...</p>
         </div>
       </div>
+      </div>
+    </section>
+
+    <section class="zone" data-zone="roadmaps">
+      <div class="zone-header">
+        <span class="zone-badge">Section 4</span>
+        <h2>Roadmaps</h2>
+        <p>Create node-based roadmaps and order their nodes. Each node lists required challenge tags the user must earn to unlock it.</p>
+      </div>
+      <div class="admin-grid">
+        <div class="panel-card">
+          <div class="panel-heading">
+            <h2>Create Roadmap</h2>
+            <span class="panel-tag">Form</span>
+          </div>
+          <form id="node-roadmap-form">
+            <div class="form-group">
+              <label for="node-roadmap-title">Field Title</label>
+              <input type="text" id="node-roadmap-title" placeholder="e.g., Competitive Programming" required>
+            </div>
+            <div class="form-group">
+              <label for="node-roadmap-slug">Slug (URL identifier)</label>
+              <input type="text" id="node-roadmap-slug" placeholder="e.g., competitive-programming" required>
+            </div>
+            <div class="form-group">
+              <label for="node-roadmap-description">Description</label>
+              <textarea id="node-roadmap-description" placeholder="What will members learn across this field?" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="node-roadmap-difficulty">Difficulty</label>
+              <select id="node-roadmap-difficulty">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <button type="submit" class="submit-btn" id="node-roadmap-submit-btn">Create Roadmap</button>
+            <div id="node-roadmap-message" class="status-msg"></div>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-heading">
+            <h2>Manage Roadmaps &amp; Nodes</h2>
+            <span class="panel-tag">Manage</span>
+          </div>
+          <div class="roadmap-admin-list" id="node-roadmap-admin-list">
+            <p class="empty-state">Loading roadmaps...</p>
+          </div>
+        </div>
       </div>
     </section>
 

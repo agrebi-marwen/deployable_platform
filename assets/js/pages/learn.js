@@ -33,6 +33,7 @@ async function fetchRoadmaps(userId) {
     const result = await supabaseClient
       .from('roadmaps')
       .select('id, slug, title, description, difficulty')
+      .eq('type', 'learn')
       .order('created_at', { ascending: true });
     roadmaps = result.data;
     error = result.error;

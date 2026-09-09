@@ -1,0 +1,156 @@
+/* ==========================================================================
+   ROADMAPS SUITE — node-based, challenge-tag gated roadmaps
+   Design tokens come from ../assets/css/global.css (loaded last).
+   Shared roadmap styling (path-card, overview, progress bar, resource pills)
+   lives in learn.css; this file adds node-specific + page-specific rules.
+   ========================================================================== */
+
+/* ---- Roadmaps index (list page header) ---- */
+.roadmaps-page-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 44px;
+}
+
+.roadmaps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 26px;
+}
+
+/* ---- Detail page header ---- */
+.roadmap-map-header {
+  margin-bottom: 32px;
+}
+
+.roadmap-map-header .path-badge {
+  font-size: 18px;
+  padding: 4px 14px;
+}
+
+.roadmap-back {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.roadmap-back:hover { color: #fff; }
+
+/* ---- Node list ---- */
+.roadmap-map-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Node row: override the learn.css .roadmap-step to add left border state */
+.roadmap-map-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.3);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 20px 22px;
+  transition: box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.roadmap-map-step.is-unlocked {
+  border-left: 4px solid hsl(var(--epoch-hue, 25) 85% 55%);
+  opacity: 0.82;
+}
+
+.roadmap-map-step.is-next { border-left: 4px solid var(--neon-yellow); }
+
+.roadmap-map-step.is-ready {
+  border-left: 4px solid var(--neon-green);
+  box-shadow: 5px 5px 0 var(--line);
+}
+
+.roadmap-map-step:hover { box-shadow: 5px 5px 0 var(--line); }
+
+/* Node status badge */
+.node-status {
+  flex-shrink: 0;
+  font-family: var(--font-meta);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: var(--border-thin);
+  padding: 1px 8px;
+  margin-left: auto;
+}
+
+.node-status.unlocked { color: hsl(var(--epoch-hue, 25) 85% 55%); border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.5); }
+.node-status.ready    { color: var(--neon-green); border-color: var(--neon-green); }
+.node-status.next     { color: var(--neon-yellow); border-color: var(--neon-yellow); }
+.node-status.locked   { color: var(--text-dim); border-color: var(--line); }
+
+/* Required tag chips */
+.node-required-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.node-required-label {
+  font-family: var(--font-meta);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-right: 4px;
+}
+
+.node-required-tag {
+  font-family: var(--font-meta);
+  font-size: 14px;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  padding: 2px 8px;
+}
+
+/* Unlock button + lock hints */
+.node-unlock-btn {
+  margin-top: 14px;
+  font-family: var(--font-meta);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  background: var(--neon-green);
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.node-unlock-btn:hover:not(:disabled)  { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.08); }
+.node-unlock-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.node-lock-hint {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ---- Light theme overrides ---- */
+[data-theme="light"] .roadmap-map-step { box-shadow: var(--shadow-hard-sm); }
+[data-theme="light"] .roadmap-back { color: hsl(var(--epoch-hue, 25) 70% 35%); }
+[data-theme="light"] .roadmap-back:hover { color: var(--text-strong); }
+
+/* ---- Mobile ---- */
+@media (max-width: 600px) {
+  .roadmaps-grid { grid-template-columns: 1fr; gap: 12px; }
+  .roadmap-map-step { flex-direction: column; }
+}

@@ -47,8 +47,32 @@ CREATE TABLE public.roadmaps (
   title text NOT NULL,
   description text,
   difficulty text DEFAULT 'Beginner'::text,
+  type text DEFAULT 'learn'::text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT roadmaps_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.roadmap_nodes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  roadmap_id uuid NOT NULL,
+  position integer NOT NULL DEFAULT 0,
+  title text NOT NULL,
+  description text,
+  required_tags jsonb NOT NULL DEFAULT '[]'::jsonb,
+  resources jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT roadmap_nodes_pkey PRIMARY KEY (id),
+  CONSTRAINT roadmap_nodes_roadmap_id_fkey FOREIGN KEY (roadmap_id) REFERENCES public.roadmaps(id)
+);
+CREATE TABLE public.roadmap_node_progress (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  roadmap_id uuid NOT NULL,
+  node_id uuid NOT NULL,
+  completed_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT roadmap_node_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT roadmap_node_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT roadmap_node_progress_roadmap_id_fkey FOREIGN KEY (roadmap_id) REFERENCES public.roadmaps(id),
+  CONSTRAINT roadmap_node_progress_node_id_fkey FOREIGN KEY (node_id) REFERENCES public.roadmap_nodes(id)
 );
 CREATE TABLE public.roadmap_steps (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

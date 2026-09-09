@@ -98,6 +98,7 @@ window.checkAdminPassword = async function() {
       loadRoadmaps();
       loadWorkshopCategories();
       loadWorkshops();
+      loadNodeRoadmaps();
     } else {
       authError.textContent = (result && result.error) || "Access denied: invalid password.";
       passInput.value = "";
@@ -1202,4 +1203,400 @@ function toggleWorkshopEdit(card, workshop) {
   form.querySelector('[data-action="cancel-edit"]').addEventListener('click', () => form.remove());
 
   card.querySelector('.roadmap-admin-head').after(form);
+}
+
+// ==========================================
+// ROADMAP NODES (node-based roadmaps, challenge-tag gated)
+// ==========================================
+const nodeRoadmapForm = document.getElementById('node-roadmap-form');
+const nodeRoadmapMessage = document.getElementById('node-roadmap-message');
+const nodeRoadmapAdminList = document.getElementById('node-roadmap-admin-list');
+
+nodeRoadmapForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  if (!isRoleAuthorized || !isPasswordAuthorized) {
+    alert("Session expired. Please reload and log in again.");
+    window.location.reload();
+    return;
+  }
+
+  const title = document.getElementById('node-roadmap-title').value.trim();
+  const slug = document.getElementById('node-roadmap-slug').value.trim().toLowerCase().replace(/\s+/g, '-');
+  const description = document.getElementById('node-roadmap-description').value.trim();
+  const difficulty = document.getElementById('node-roadmap-difficulty').value;
+
+  nodeRoadmapMessage.textContent = "Creating roadmap...";
+  nodeRoadmapMessage.style.color = "var(--text-strong)";
+
+  const { error } = await supabaseClient
+    .from('roadmaps')
+    .insert([{ title, slug, description, difficulty, type: 'nodes' }]);
+
+  if (error) {
+    nodeRoadmapMessage.style.color = "#fe4e00";
+    nodeRoadmapMessage.textContent = "Failed: " + error.message;
+  } else {
+    nodeRoadmapMessage.style.color = "#83b5d1";
+    nodeRoadmapMessage.textContent = `Success! Field "${title}" created. Now add nodes.`;
+    nodeRoadmapForm.reset();
+    loadNodeRoadmaps();
+  }
+});
+
+async function loadNodeRoadmaps() {
+  if (!isRoleAuthorized || !isPasswordAuthorized) return;
+
+  const { data: roadmaps, error } = await supabaseClient
+    .from('roadmaps')
+    .select('id, slug, title, description, difficulty')
+    .eq('type', 'nodes')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    nodeRoadmapAdminList.innerHTML = `<p class="empty-state">Failed to load roadmaps: ${escapeHtml(error.message)}</p>`;
+    return;
+  }
+
+  if (!roadmaps || roadmaps.length === 0) {
+    nodeRoadmapAdminList.innerHTML = `<p class="empty-state">No node roadmaps yet. Create the first one above.</p>`;
+    return;
+  }
+
+  nodeRoadmapAdminList.innerHTML = "";
+  roadmaps.forEach(roadmap => {
+    nodeRoadmapAdminList.appendChild(renderNodeRoadmapCard(roadmap));
+  });
+}
+
+function renderNodeRoadmapCard(roadmap) {
+  const card = document.createElement('div');
+  card.classList.add('roadmap-admin-card');
+  card.dataset.roadmapId = roadmap.id;
+
+  card.innerHTML = `
+        <div class="roadmap-admin-head">
+            <div>
+                <h3>${escapeHtml(roadmap.title)}</h3>
+                <div class="roadmap-admin-meta">/${escapeHtml(roadmap.slug)} • ${escapeHtml(roadmap.difficulty || 'Field')}</div>
+            </div>
+            <div class="roadmap-admin-actions">
+                <button class="roadmap-admin-btn" data-action="nodes">Manage Nodes</button>
+                <button class="roadmap-admin-btn" data-action="edit">Edit</button>
+                <button class="roadmap-admin-btn danger" data-action="delete">Delete</button>
+            </div>
+        </div>
+        <div class="roadmap-admin-steps" data-role="nodes" style="display: none;">
+            <p class="empty-state">Loading nodes...</p>
+        </div>
+    `;
+
+  card.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+    if (!confirm(`Delete field "${roadmap.title}" and ALL its nodes?`)) return;
+    const { error } = await supabaseClient.from('roadmaps').delete().eq('id', roadmap.id);
+    if (error) {
+      alert("Delete failed: " + error.message);
+    } else {
+      loadNodeRoadmaps();
+    }
+  });
+
+  card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+    toggleNodeRoadmapEdit(card, roadmap);
+  });
+
+  card.querySelector('[data-action="nodes"]').addEventListener('click', () => {
+    const nodesBox = card.querySelector('[data-role="nodes"]');
+    const isHidden = nodesBox.style.display === 'none';
+    nodesBox.style.display = isHidden ? 'flex' : 'none';
+    if (isHidden) loadNodes(card, roadmap);
+  });
+
+  return card;
+}
+
+function toggleNodeRoadmapEdit(card, roadmap) {
+  const existing = card.querySelector('[data-role="edit"]');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const form = document.createElement('form');
+  form.dataset.role = 'edit';
+  form.classList.add('roadmap-edit-form');
+
+  form.innerHTML = `
+        <div class="form-group">
+            <label>Field Title</label>
+            <input type="text" value="${escapeHtml(roadmap.title)}" required>
+        </div>
+        <div class="form-group">
+            <label>Slug</label>
+            <input type="text" value="${escapeHtml(roadmap.slug)}" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea required>${escapeHtml(roadmap.description || '')}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Difficulty</label>
+            <select>
+                <option value="Beginner" ${roadmap.difficulty === 'Beginner' ? 'selected' : ''}>Beginner</option>
+                <option value="Intermediate" ${roadmap.difficulty === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                <option value="Advanced" ${roadmap.difficulty === 'Advanced' ? 'selected' : ''}>Advanced</option>
+            </select>
+        </div>
+        <div class="roadmap-admin-actions">
+            <button type="submit" class="roadmap-admin-btn">Save Field</button>
+            <button type="button" class="roadmap-admin-btn" data-action="cancel-edit">Cancel</button>
+        </div>
+    `;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = form.querySelector('input').value.trim();
+    const slug = form.querySelectorAll('input')[1].value.trim().toLowerCase().replace(/\s+/g, '-');
+    const description = form.querySelector('textarea').value.trim();
+    const difficulty = form.querySelector('select').value;
+
+    const { error } = await supabaseClient
+      .from('roadmaps')
+      .update({ title, slug, description, difficulty })
+      .eq('id', roadmap.id);
+
+    if (error) {
+      alert("Update failed: " + error.message);
+    } else {
+      loadNodeRoadmaps();
+    }
+  });
+
+  form.querySelector('[data-action="cancel-edit"]').addEventListener('click', () => form.remove());
+
+  card.querySelector('.roadmap-admin-head').after(form);
+}
+
+// Parse "Title | URL" lines into the resources jsonb array
+function parseResourcesText(raw) {
+  return raw
+    ? String(raw).split('\n').map(line => {
+      const sep = line.indexOf('|');
+      if (sep === -1) return null;
+      return { title: line.slice(0, sep).trim(), url: line.slice(sep + 1).trim() };
+    }).filter(r => r && r.url)
+    : [];
+}
+
+// Normalize a space-separated tag input like "#Arrays #Binary Search" into an array of tag strings
+function parseRequiredTags(raw) {
+  return String(raw || '')
+    .split(/\s+/)
+    .map(t => t.trim().replace(/^#+/, ''))
+    .filter(Boolean);
+}
+
+async function loadNodes(card, roadmap) {
+  const nodesBox = card.querySelector('[data-role="nodes"]');
+  if (!isRoleAuthorized || !isPasswordAuthorized) return;
+
+  const { data: nodes, error } = await supabaseClient
+    .from('roadmap_nodes')
+    .select('id, title, description, required_tags, resources, position')
+    .eq('roadmap_id', roadmap.id)
+    .order('position', { ascending: true });
+
+  if (error) {
+    nodesBox.innerHTML = `<p class="empty-state">Failed to load nodes: ${escapeHtml(error.message)}</p>`;
+    return;
+  }
+
+  if (!nodes || nodes.length === 0) {
+    nodesBox.innerHTML = `<p class="empty-state">No nodes yet. Add the first one below.</p>`;
+  } else {
+    nodesBox.innerHTML = "";
+    nodes.forEach((node, index) => {
+      nodesBox.appendChild(renderNodeRow(card, roadmap, node, index, nodes.length));
+    });
+  }
+
+  // Add-node form at the bottom
+  const nodeForm = document.createElement('form');
+  nodeForm.classList.add('roadmap-step-form');
+  nodeForm.innerHTML = `
+        <div class="form-group">
+            <label>Node Title</label>
+            <input type="text" placeholder="e.g., Arrays" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea placeholder="What should members master here?" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Required Tags (space-separated, e.g. #Arrays #DataStructures)</label>
+            <input type="text" placeholder="#Arrays #DataStructures">
+            <p class="hint">User must have an APPROVED submission on a challenge carrying ALL listed tags to unlock this node.</p>
+        </div>
+        <div class="form-group">
+            <label>Resources (one per line: Title | URL)</label>
+            <textarea placeholder="Arrays guide | https://example.com/arrays"></textarea>
+        </div>
+        <button type="submit" class="roadmap-admin-btn">+ Add Node</button>
+    `;
+
+  nodeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const inputs = nodeForm.querySelectorAll('input, textarea');
+    const title = inputs[0].value.trim();
+    const description = inputs[1].value.trim();
+    const required_tags = parseRequiredTags(inputs[2].value);
+    const resources = parseResourcesText(inputs[3].value);
+
+    const position = nodes ? nodes.length : 0;
+
+    const { error } = await supabaseClient
+      .from('roadmap_nodes')
+      .insert([{ roadmap_id: roadmap.id, position, title, description, required_tags, resources }]);
+
+    if (error) {
+      alert("Failed to add node: " + error.message);
+    } else {
+      loadNodes(card, roadmap);
+    }
+  });
+
+  nodesBox.appendChild(nodeForm);
+}
+
+function renderNodeRow(card, roadmap, node, index, total) {
+  const row = document.createElement('div');
+  row.classList.add('roadmap-admin-step');
+  row.dataset.nodeId = node.id;
+
+  const tagsChip = (Array.isArray(node.required_tags) && node.required_tags.length)
+    ? `<span class="roadmap-admin-step-title">${escapeHtml(node.title)} <span style="color: var(--neon-yellow);">[${escapeHtml(node.required_tags.map(t => '#' + t).join(' '))}]</span></span>`
+    : `<span class="roadmap-admin-step-title">${escapeHtml(node.title)}</span>`;
+
+  row.innerHTML = `
+        <span class="roadmap-admin-step-pos">#${index + 1}</span>
+        ${tagsChip}
+        <div class="roadmap-admin-actions">
+            <button class="roadmap-admin-btn" data-action="up" ${index === 0 ? 'disabled' : ''}>↑</button>
+            <button class="roadmap-admin-btn" data-action="down" ${index === total - 1 ? 'disabled' : ''}>↓</button>
+            <button class="roadmap-admin-btn" data-action="edit-node">Edit</button>
+            <button class="roadmap-admin-btn danger" data-action="delete-node">Del</button>
+        </div>
+    `;
+
+  row.querySelector('[data-action="up"]').addEventListener('click', async () => {
+    await swapNodePositions(node, -1, roadmap.id, card, row);
+  });
+
+  row.querySelector('[data-action="down"]').addEventListener('click', async () => {
+    await swapNodePositions(node, 1, roadmap.id, card, row);
+  });
+
+  row.querySelector('[data-action="delete-node"]').addEventListener('click', async () => {
+    if (!confirm(`Delete node "${node.title}"?`)) return;
+    const { error } = await supabaseClient.from('roadmap_nodes').delete().eq('id', node.id);
+    if (error) {
+      alert("Delete failed: " + error.message);
+    } else {
+      loadNodes(card, roadmap);
+    }
+  });
+
+  row.querySelector('[data-action="edit-node"]').addEventListener('click', () => {
+    toggleNodeEdit(card, roadmap, row, node);
+  });
+
+  return row;
+}
+
+async function swapNodePositions(node, direction, roadmapId, card, row) {
+  const { data: nodes } = await supabaseClient
+    .from('roadmap_nodes')
+    .select('id, position')
+    .eq('roadmap_id', roadmapId)
+    .order('position', { ascending: true });
+
+  const idx = nodes.findIndex(n => n.id === node.id);
+  const target = nodes[idx + direction];
+  if (!target) return;
+
+  const { error } = await supabaseClient
+    .from('roadmap_nodes')
+    .upsert([
+      { id: node.id, position: target.position },
+      { id: target.id, position: node.position }
+    ]);
+
+  if (error) {
+    alert("Reorder failed: " + error.message);
+  } else {
+    loadNodes(card, { id: roadmapId });
+  }
+}
+
+function toggleNodeEdit(card, roadmap, row, node) {
+  const existing = row.querySelector('[data-role="edit-node"]');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const form = document.createElement('form');
+  form.dataset.role = 'edit-node';
+  form.classList.add('roadmap-edit-form');
+
+  const tagsText = (Array.isArray(node.required_tags) ? node.required_tags : []).map(t => '#' + t).join(' ');
+  const resourcesText = (Array.isArray(node.resources) ? node.resources : [])
+    .map(r => `${r.title} | ${r.url}`).join('\n');
+
+  form.innerHTML = `
+        <div class="form-group">
+            <label>Node Title</label>
+            <input type="text" value="${escapeHtml(node.title)}" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea required>${escapeHtml(node.description || '')}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Required Tags (space-separated)</label>
+            <input type="text" value="${escapeHtml(tagsText)}">
+        </div>
+        <div class="form-group">
+            <label>Resources (one per line: Title | URL)</label>
+            <textarea>${escapeHtml(resourcesText)}</textarea>
+        </div>
+        <div class="roadmap-admin-actions">
+            <button type="submit" class="roadmap-admin-btn">Save Node</button>
+            <button type="button" class="roadmap-admin-btn" data-action="cancel-node-edit">Cancel</button>
+        </div>
+    `;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const inputs = form.querySelectorAll('input, textarea');
+    const title = inputs[0].value.trim();
+    const description = inputs[1].value.trim();
+    const required_tags = parseRequiredTags(inputs[2].value);
+    const resources = parseResourcesText(inputs[3].value);
+
+    const { error } = await supabaseClient
+      .from('roadmap_nodes')
+      .update({ title, description, required_tags, resources })
+      .eq('id', node.id);
+
+    if (error) {
+      alert("Update failed: " + error.message);
+    } else {
+      loadNodes(card, roadmap);
+    }
+  });
+
+  form.querySelector('[data-action="cancel-node-edit"]').addEventListener('click', () => form.remove());
+
+  row.appendChild(form);
 }

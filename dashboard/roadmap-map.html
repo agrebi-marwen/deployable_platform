@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Challenge Archive</title>
+  <title>Roadmap — The Time Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/learn.css">
+  <link rel="stylesheet" href="../assets/css/roadmaps.css">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.98.0/dist/umd/supabase.js" integrity="sha384-NRo2jhGGHu91p1IOcVC3UWI5Vnd+xGXfD/8N7Hr9+aGTK0d/Pl0i+kUZsB/zIlrK" crossorigin="anonymous" defer></script>
   <script src="../assets/js/config.js" defer></script>
@@ -17,11 +19,10 @@
   <script src="../assets/js/galaxy-bg.js" defer></script>
   <script src="../assets/js/cursor-lighting.js" defer></script>
   <script src="../assets/js/creative.js" defer></script>
-  <script src="../assets/js/pages/challenges.js" defer></script>
+  <script src="../assets/js/pages/roadmap-map.js" defer></script>
   <link rel="stylesheet" href="../assets/css/global.css">
   <script src="../assets/js/theme.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2383b5d1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10' stroke-dasharray='4 2'/><circle cx='12' cy='12' r='6' stroke='%23ffffff' stroke-width='1' opacity='0.5'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff'/><circle cx='12' cy='12' r='1.5' fill='%23eec643'/></svg>">
-
 </head>
 <body>
 
@@ -40,9 +41,9 @@
       <nav class="nav-group">
         <span class="nav-group-label">Menu</span>
         <a href="dashboard.html" class="nav-link"><span class="nav-icon">▶</span> Overview</a>
-        <a href="challenges.html" class="nav-link active"><span class="nav-icon">◆</span> Challenges</a>
+        <a href="challenges.html" class="nav-link"><span class="nav-icon">◆</span> Challenges</a>
         <a href="submissions.html" class="nav-link"><span class="nav-icon">◆</span> Submissions</a>
-        <a href="roadmaps.html" class="nav-link"><span class="nav-icon">◆</span> Roadmaps</a>
+        <a href="roadmaps.html" class="nav-link active"><span class="nav-icon">◆</span> Roadmaps</a>
         <a href="learn.html" class="nav-link"><span class="nav-icon">◆</span> Learn</a>
         <a href="workshops.html" class="nav-link"><span class="nav-icon">◆</span> Workshops</a>
       </nav>
@@ -63,7 +64,7 @@
     <div class="main">
 
       <header class="topbar">
-        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Challenge Archive</span></span>
+        <span class="crumb">Home <span class="crumb-sep">/</span> <span class="crumb-cur">Roadmap</span></span>
         <button class="theme-toggle" type="button" aria-label="Toggle theme"></button>
         <div class="user-chip">
           <span class="user-avatar" id="user-avatar">◈</span>
@@ -73,18 +74,21 @@
 
       <main class="content">
 
-        <section class="challenges-page-header">
-          <span class="section-badge">Challenge Archive</span>
-          <h2 class="section-title">All Challenges</h2>
-          <p class="section-subtitle">All challenges grouped by category and difficulty. A new one is published every month.</p>
+        <section class="roadmap-map-header" id="roadmap-header" style="--epoch-hue: 25;">
+          <span class="path-badge" id="roadmap-difficulty">Field</span>
+          <h1 class="roadmap-title" id="roadmap-title">Loading Roadmap...</h1>
+          <p class="roadmap-subtitle" id="roadmap-description">Loading roadmap details...</p>
+          <a href="roadmaps.html" class="roadmap-back">← All Roadmaps</a>
         </section>
 
-        <div class="category-tabs" id="category-tabs">
-          <button type="button" class="category-tab active" data-category="all">All</button>
+        <div class="roadmap-overview" id="roadmap-overview" style="--epoch-hue: 25;">
+          <span class="roadmap-overview-label">Field Progress</span>
+          <div class="learn-progress-bar" id="roadmap-progress-bar"></div>
+          <div class="roadmap-overview-caption" id="roadmap-progress-caption">Node 0/0 unlocked</div>
         </div>
 
-        <div id="challenges-archive">
-          <div class="loading-state">Loading challenges...</div>
+        <div id="roadmap-nodes" class="roadmap-map-steps">
+          <div class="loading-state">Loading nodes...</div>
         </div>
 
       </main>
@@ -106,11 +110,10 @@
         <ul class="footer-links">
           <li><a href="/index.html">Home</a></li>
           <li><a href="/dashboard/dashboard.html">Dashboard</a></li>
-          <li><a href="/dashboard/challenges.html">Challenges</a></li>
+          <li><a href="/dashboard/roadmaps.html">Roadmaps</a></li>
         </ul>
       </div>
 
-      
       <div class="footer-links-group">
         <h4>Connect</h4>
         <ul class="footer-links">
