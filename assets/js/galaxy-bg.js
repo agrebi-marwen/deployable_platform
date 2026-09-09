@@ -4,6 +4,11 @@
  * OPTIMIZED: disabled on mobile devices (screens < 600px) for performance.
  */
 (function () {
+  // Skip entirely when Performance Mode is enabled (set by perf-mode.js)
+  if (window.__PERF_MODE) {
+    return;
+  }
+
   // Skip entirely on mobile — galaxy background is too heavy for phones
   if (window.innerWidth <= 600 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) {
     return;

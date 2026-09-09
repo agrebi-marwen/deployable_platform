@@ -4,6 +4,11 @@
 
 (function () {
   function initCursorLighting() {
+    // Skip entirely when Performance Mode is enabled (set by perf-mode.js)
+    if (window.__PERF_MODE) {
+      return;
+    }
+
     const RING_SIZE = 32; // must match CSS width/height
     const HALF = RING_SIZE / 2;
 
