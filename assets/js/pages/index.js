@@ -61,7 +61,7 @@ async function fetchLastThreeChallenges() {
   try {
     const { data: challenges, error } = await supabaseClient
       .from('challenges')
-      .select('id, title, instructions, points_worth, month_year, is_active')
+      .select('id, title, instructions, points_worth, month_year, is_active, tags')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(3);
@@ -87,6 +87,7 @@ async function fetchLastThreeChallenges() {
                     <p class="challenge-card-homepage-desc">
                         ${ch.instructions ? escapeHtml(ch.instructions.substring(0, 100) + (ch.instructions.length > 100 ? '...' : '')) : ''}
                     </p>
+                    ${ch.tags ? `<div class="card-tags">${ch.tags.split(/\s+/).filter(t => t).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
                 </div>
                 <div class="challenge-card-homepage-meta">
                     <span class="challenge-card-homepage-points">

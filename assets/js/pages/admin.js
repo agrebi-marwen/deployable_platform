@@ -136,6 +136,7 @@ challengeForm.addEventListener('submit', async (e) => {
   const instructions = document.getElementById('instructions').value.trim();
   const is_active = document.getElementById('is_active').checked;
   const category_id = document.getElementById('challenge-category').value;
+  const tags = document.getElementById('challenge-tags').value.trim();
 
   const currentDate = new Date();
   const month_year = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' }).toUpperCase();
@@ -143,6 +144,9 @@ challengeForm.addEventListener('submit', async (e) => {
   const payload = { title, instructions, month_year, points_worth, is_active };
   if (category_id) {
     payload.category_id = category_id;
+  }
+  if (tags) {
+    payload.tags = tags;
   }
 
   const { error } = await supabaseClient

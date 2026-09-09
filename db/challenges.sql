@@ -62,6 +62,12 @@ create policy "challenge_categories_admin_delete"
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
 
+-- ----------------------------------------------------------------------------
+-- 4. CHALLENGES - optional tags column (space-separated, e.g. "#CP #MLOps")
+-- ----------------------------------------------------------------------------
+alter table public.challenges
+  add column if not exists tags text;
+
 -- ============================================================================
--- Done. Challenge categories are managed from the Admin Panel.
+-- Done. Challenge categories and tags are managed from the Admin Panel.
 -- ============================================================================

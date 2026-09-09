@@ -668,9 +668,7 @@ a { text-decoration: none; color: inherit; }
 .challenge-card-homepage-meta {
   text-align: right;
   min-width: 100px;
-}
-
-.challenge-card-homepage-points {
+}.challenge-card-homepage-points {
   display: block;
   font-family: var(--font-meta);
   font-size: 20px;
@@ -692,6 +690,29 @@ a { text-decoration: none; color: inherit; }
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 .challenge-card-homepage-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--line); filter: brightness(1.08); }
+
+/* ---------------------------------------------------------------------------
+   CHALLENGE TAGS — pill styling shared across homepage + archive cards
+   --------------------------------------------------------------------------- */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-tag {
+  font-family: var(--font-meta);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  padding: 2px 8px;
+}
+
+[data-theme="light"] .card-tag { color: hsl(var(--epoch-hue, 25) 70% 32%); }
 
 /* =============================================================================
    FOOTER — DESIGN.md §5.8

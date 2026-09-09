@@ -409,6 +409,24 @@
   flex: 1;
 }
 
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-tag {
+  font-family: var(--font-meta);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: hsl(var(--epoch-hue, 25) 85% 62%);
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  border-color: hsl(var(--epoch-hue, 25) 55% 50% / 0.35);
+  padding: 2px 8px;
+}
+
 .enter-link {
   font-family: var(--font-meta);
   font-size: 17px;
@@ -948,6 +966,7 @@
 
 [data-theme="light"] .challenge-card .card-points { color: hsl(var(--epoch-hue, 25) 75% 35%); }
 [data-theme="light"] .challenge-card:hover .enter-link { color: hsl(var(--epoch-hue, 25) 75% 38%); }
+[data-theme="light"] .card-tag { color: hsl(var(--epoch-hue, 25) 70% 32%); }
 [data-theme="light"] .mission-row:hover .mission-link { color: hsl(var(--epoch-hue, 25) 75% 38%); }
 
 [data-theme="light"] .epoch-stat-bar .seg.on {

@@ -19,6 +19,7 @@ CREATE TABLE public.challenges (
   points_worth integer NOT NULL DEFAULT 100,
   is_active boolean NOT NULL DEFAULT false,
   category_id uuid,
+  tags text,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   CONSTRAINT challenges_pkey PRIMARY KEY (id)
 );

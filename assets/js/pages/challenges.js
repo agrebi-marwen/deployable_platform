@@ -40,7 +40,7 @@ async function fetchAllChallenges() {
   } else {
     const result = await supabaseClient
       .from('challenges')
-      .select(`id, title, instructions, month_year, points_worth, is_active, category_id, challenge_categories (id, slug, name)`)
+      .select(`id, title, instructions, month_year, points_worth, is_active, category_id, tags, challenge_categories (id, slug, name)`)
       .order('created_at', { ascending: false });
     challenges = result.data;
     error = result.error;
@@ -164,6 +164,7 @@ function renderArchive() {
                 </div>
                 <h3>${escapeHtml(challenge.title)}</h3>
                 <p class="challenge-desc">${escapeHtml((challenge.instructions || '').replace(/\s+/g, ' ').trim().slice(0, 140))}</p>
+                ${challenge.tags ? `<div class="card-tags">${challenge.tags.split(/\s+/).filter(t => t).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
                 <span class="enter-link">${archived ? 'Archived Month' : 'Submit Solution →'}</span>
             `;
       grid.appendChild(card);
