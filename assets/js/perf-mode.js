@@ -29,7 +29,7 @@
     btn.title = window.__PERF_MODE
       ? 'Performance mode ON - click to disable'
       : 'Performance mode OFF - click to enable';
-    btn.textContent = window.__PERF_MODE ? '⚡ Perf ON' : '⚡ Perf OFF';
+    btn.textContent = window.__PERF_MODE ? 'PERFORMANCE MODE: ON' : 'PERFORMANCE MODE: OFF';
   }
 
   function toggle() {
@@ -67,19 +67,22 @@
     btn.setAttribute('data-perf-toggle', '');
     var css = {
       position: 'fixed',
-      bottom: '18px',
-      left: '18px',
+      bottom: '24px',
+      right: '24px',
       zIndex: '9970',
       fontFamily: 'var(--font-meta, monospace)',
-      fontSize: '12px',
-      letterSpacing: '0.05em',
+      fontSize: '15px',
+      fontWeight: 'bold',
+      letterSpacing: '0.06em',
       textTransform: 'uppercase',
-      color: 'var(--text-strong, inherit)',
-      background: 'var(--bg-panel, #111)',
-      border: '1px solid var(--line, #333)',
-      padding: '6px 10px',
+      color: 'var(--text-strong, #fff)',
+      background: 'var(--bg-panel, #1a1a22)',
+      border: '2px solid var(--line, #555)',
+      borderRadius: '6px',
+      boxShadow: '4px 4px 0 var(--line, #333)',
+      padding: '12px 20px',
       cursor: 'pointer',
-      opacity: '0.55',
+      opacity: '1',
       willChange: 'auto'
     };
     Object.keys(css).forEach(function (k) { btn.style[k] = css[k]; });
