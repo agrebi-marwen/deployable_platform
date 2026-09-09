@@ -1,40 +1,67 @@
 /* perf-mode.js - Performance mode: disables the heavy galaxy background,
    cursor spotlight/ring, card lighting, and resource-intensive animations.
    Loaded (non-defer) in <head> so the mode applies before first paint.
-   Other effects scripts (galaxy-bg.js, cursor-lighting.js) check
-   window.__PERF_MODE and bail early when it is enabled. */
+   Other effect scripts (galaxy-bg.js, cursor-lighting.js) subscribe via
+   window.perfMode.on(...) so they can fully START/STOP their loops when the
+   mode is toggled at runtime. */
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'timeportal_perf';
-  window.__PERF_MODE = false;
-
   var root = document.documentElement;
+  var listeners = [];
+  var enabled = false;
 
-  function applyMode(on) {
-    window.__PERF_MODE = !!on;
-    root.classList.toggle('perf-mode', !!on);
-    var btn = document.querySelector('[data-perf-toggle]');
-    if (btn) {
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      btn.title = on ? 'Performance mode ON - click to disable' : 'Performance mode OFF - click to enable';
-      btn.textContent = on ? '⚡ Perf ON' : '⚡ Perf OFF';
+  // Restore persisted preference
+  try { enabled = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+  window.__PERF_MODE = enabled;
+  if (enabled) root.classList.add('perf-mode');
+
+  function notify() {
+    for (var i = 0; i < listeners.length; i++) {
+      try { listeners[i](window.__PERF_MODE); } catch (e) {}
     }
   }
 
-  var stored = null;
-  try { stored = localStorage.getItem(STORAGE_KEY); } catch (e) {}
-  var enabled = stored === '1';
-  applyMode(enabled);
+  function renderToggle(btn) {
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', window.__PERF_MODE ? 'true' : 'false');
+    btn.title = window.__PERF_MODE
+      ? 'Performance mode ON - click to disable'
+      : 'Performance mode OFF - click to enable';
+    btn.textContent = window.__PERF_MODE ? '⚡ Perf ON' : '⚡ Perf OFF';
+  }
 
-  // Floating toggle button (non-intrusive, injected here so we don't have to
-  // edit every page's sidebar).
+  function toggle() {
+    window.__PERF_MODE = !window.__PERF_MODE;
+    root.classList.toggle('perf-mode', window.__PERF_MODE);
+    try { localStorage.setItem(STORAGE_KEY, window.__PERF_MODE ? '1' : '0'); } catch (e) {}
+    var btn = document.querySelector('[data-perf-toggle]');
+    renderToggle(btn);
+    notify();
+  }
+
+  // Public API: subscribe to changes; receive latest state on subscribe.
+  window.perfMode = {
+    enabled: function () { return window.__PERF_MODE; },
+    set: function (on) {
+      if (!!on === window.__PERF_MODE) return;
+      window.__PERF_MODE = !!on;
+      root.classList.toggle('perf-mode', window.__PERF_MODE);
+      try { localStorage.setItem(STORAGE_KEY, on ? '1' : '0'); } catch (e) {}
+      renderToggle(document.querySelector('[data-perf-toggle]'));
+      notify();
+    },
+    on: function (cb) {
+      listeners.push(cb);
+      cb(window.__PERF_MODE);
+      return function () { listeners = listeners.filter(function (l) { return l !== cb; }); };
+    }
+  };
+
   function ensureToggle() {
     var existing = document.querySelector('[data-perf-toggle]');
-    if (existing) {
-      applyMode(window.__PERF_MODE);
-      return existing;
-    }
+    if (existing) { renderToggle(existing); return existing; }
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.setAttribute('data-perf-toggle', '');
@@ -53,18 +80,13 @@
       padding: '6px 10px',
       cursor: 'pointer',
       opacity: '0.55',
-      transition: 'opacity 0.15s ease'
+      willChange: 'auto'
     };
     Object.keys(css).forEach(function (k) { btn.style[k] = css[k]; });
-    btn.addEventListener('mouseenter', function () { btn.style.opacity = '1'; });
-    btn.addEventListener('mouseleave', function () { btn.style.opacity = '0.55'; });
-    btn.addEventListener('click', function () {
-      var next = !window.__PERF_MODE;
-      applyMode(next);
-      try { localStorage.setItem(STORAGE_KEY, next ? '1' : '0'); } catch (e) {}
-    });
+    // No CSS transitions on the toggle itself (perf mode is about removing cost).
+    btn.addEventListener('click', toggle);
     document.body.appendChild(btn);
-    applyMode(window.__PERF_MODE);
+    renderToggle(btn);
     return btn;
   }
 

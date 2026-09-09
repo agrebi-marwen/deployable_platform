@@ -1,14 +1,10 @@
 /**
  * Interactive Cursor Spotlight & Dynamic Lighting Effect
+ * Fully starts/stops based on performance mode (perf-mode.js).
  */
 
 (function () {
   function initCursorLighting() {
-    // Skip entirely when Performance Mode is enabled (set by perf-mode.js)
-    if (window.__PERF_MODE) {
-      return;
-    }
-
     const RING_SIZE = 32; // must match CSS width/height
     const HALF = RING_SIZE / 2;
 
@@ -33,19 +29,20 @@
     let isVisible = false;
     let targetX = -200, targetY = -200;
     let currentX = -200, currentY = -200;
-    let rafId;
+    let rafId = null;
 
     // Smooth follow loop
     function tick() {
+      if (window.__PERF_MODE) { rafId = null; return; }
       rafId = requestAnimationFrame(tick);
       // Lerp ring toward cursor
       currentX += (targetX - currentX) * 0.18;
       currentY += (targetY - currentY) * 0.18;
       cursorRing.style.transform = `translate3d(${currentX - HALF}px, ${currentY - HALF}px, 0)`;
     }
-    rafId = requestAnimationFrame(tick);
 
     function onMouseMove(e) {
+      if (window.__PERF_MODE) return;
       targetX = e.clientX;
       targetY = e.clientY;
 
@@ -66,16 +63,37 @@
       isVisible = false;
     }
 
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    document.addEventListener('mouseleave', onMouseLeave);
+    function start() {
+      if (window.__PERF_MODE) return;
+      if (rafId == null) rafId = requestAnimationFrame(tick);
+
+      window.addEventListener('mousemove', onMouseMove, { passive: true });
+      document.addEventListener('mouseleave', onMouseLeave);
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    function stop() {
+      if (rafId != null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      window.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      observer.disconnect();
+      spotlight.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+      isVisible = false;
+    }
 
     // Card hover lighting
     function attachCardEvents() {
+      if (window.__PERF_MODE) return;
       const cards = document.querySelectorAll('.card, .stat-card, .panel-card, .signup-form, .challenge-card, .leaderboard-card, .modal-content, .submission-card, .challenge-details-card, .login-card');
       cards.forEach(card => {
         if (!card.dataset.lightingAttached) {
           card.dataset.lightingAttached = 'true';
           card.addEventListener('mousemove', (e) => {
+            if (window.__PERF_MODE) return;
             const rect = card.getBoundingClientRect();
             card.style.setProperty('--card-mouse-x', `${e.clientX - rect.left}px`);
             card.style.setProperty('--card-mouse-y', `${e.clientY - rect.top}px`);
@@ -84,9 +102,19 @@
       });
     }
 
-    attachCardEvents();
     const observer = new MutationObserver(attachCardEvents);
-    observer.observe(document.body, { childList: true, subtree: true });
+    attachCardEvents();
+
+    // Drive start/stop from performance mode (initial state applied too).
+    if (window.perfMode && window.perfMode.on) {
+      window.perfMode.on(function (perfOn) {
+        if (perfOn) { stop(); } else { start(); }
+      });
+    } else if (window.__PERF_MODE) {
+      stop();
+    } else {
+      start();
+    }
   }
 
   if (document.readyState === 'loading') {

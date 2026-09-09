@@ -4,11 +4,6 @@
  * OPTIMIZED: disabled on mobile devices (screens < 600px) for performance.
  */
 (function () {
-  // Skip entirely when Performance Mode is enabled (set by perf-mode.js)
-  if (window.__PERF_MODE) {
-    return;
-  }
-
   // Skip entirely on mobile — galaxy background is too heavy for phones
   if (window.innerWidth <= 600 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) {
     return;
@@ -197,8 +192,12 @@
       document.body.appendChild(canvas);
     }
 
-    const gl = canvas.getContext('webgl', { alpha: true });
-    if (!gl) return;
+    // When perf mode is active from the start, don't even spin up WebGL.
+    const gl = window.__PERF_MODE ? null : canvas.getContext('webgl', { alpha: true });
+    if (!gl) {
+      canvas.style.display = 'none';
+      return;
+    }
 
     gl.clearColor(0, 0, 0, 0);
 
@@ -294,7 +293,8 @@
       gl.uniform3f(uLocations.uResolution, canvas.width, canvas.height, canvas.width / canvas.height);
     }
 
-    window.addEventListener('resize', resize);
+    function resizeHandler() { if (window.__PERF_MODE) return; resize(); }
+    window.addEventListener('resize', resizeHandler);
     resize();
 
     // Set static uniforms
@@ -319,6 +319,7 @@
     let smoothMouseActive = 0.0;
 
     window.addEventListener('mousemove', (e) => {
+      if (window.__PERF_MODE) return;
       targetMousePos.x = e.clientX / window.innerWidth;
       targetMousePos.y = 1.0 - (e.clientY / window.innerHeight);
       targetMouseActive = 1.0;
@@ -328,7 +329,9 @@
       targetMouseActive = 0.0;
     });
 
-    let animationId;
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let animationId = null;
     function render(t) {
       const timeSec = t * 0.001;
 
@@ -348,17 +351,34 @@
     }
 
     function frame(t) {
+      if (window.__PERF_MODE) { animationId = null; return; }
       render(t);
       animationId = requestAnimationFrame(frame);
     }
 
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      // Reduced motion: render a single static frame, no animation loop
-      render(0);
-      return;
+    function start() {
+      canvas.style.display = '';
+      if (prefersReduced) {
+        render(0); // single static frame
+        return;
+      }
+      if (animationId == null) {
+        animationId = requestAnimationFrame(frame);
+      }
     }
 
-    animationId = requestAnimationFrame(frame);
+    function stop() {
+      if (animationId != null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      canvas.style.display = 'none';
+    }
+
+    // Drive start/stop from performance mode (initial state applied too).
+    const off = window.perfMode && window.perfMode.on ? window.perfMode.on(function (perfOn) {
+      if (perfOn) { stop(); } else { start(); }
+    }) : (window.__PERF_MODE ? stop() : start());
   }
 
   if (document.readyState === 'loading') {

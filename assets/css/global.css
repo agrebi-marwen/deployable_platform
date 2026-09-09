@@ -255,14 +255,6 @@ a { text-decoration: none; color: inherit; }
   display: none !important;
 }
 
-.perf-mode *,
-.perf-mode *::before,
-.perf-mode *::after {
-  animation-duration: 0.001s !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001s !important;
-}
-
 /* =============================================================================
    NAVBAR — DESIGN.md §5.1
    ============================================================================= */
