@@ -240,18 +240,18 @@ async function handleCpSubmit() {
     if (data.verdict === 'AC') {
       cpVerdictEl.innerHTML = `
         <span class="cp-verdict-badge verdict-ac">AC</span>
-        <span class="cp-verdict-detail">All ${data.total} test cases passed.</span>`;
+        <span class="cp-verdict-detail">All sub-tests passed (${data.executionTimeMs || 0} ms).</span>`;
       submissionMessage.textContent = "Accepted! Submission queued for approval.";
       submissionMessage.style.color = "#83b5d1";
     } else {
       const detailText = data.verdict === 'WA'
-        ? `Wrong answer on test ${data.failedTest} of ${data.total}.`
+        ? `Wrong answer — output does not match the expected output.`
         : data.verdict === 'TLE'
         ? `Time limit exceeded.`
         : data.verdict === 'CE'
         ? `Compilation error.`
         : data.verdict === 'RE'
-        ? `Runtime error on test ${data.failedTest || ''}.`
+        ? `Runtime error during execution.`
         : `Verdict: ${data.verdict}`;
       cpVerdictEl.innerHTML = `
         <span class="cp-verdict-badge verdict-${data.verdict.toLowerCase()}">${data.verdict}</span>

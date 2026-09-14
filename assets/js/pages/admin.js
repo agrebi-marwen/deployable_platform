@@ -184,7 +184,7 @@ challengeForm.addEventListener('submit', async (e) => {
       timeLimitMs,
       memoryLimitMb,
       languages,
-      testCaseCount: validation.count
+      testCount: validation.testCount
     };
   }
 
@@ -230,7 +230,7 @@ challengeForm.addEventListener('submit', async (e) => {
       }
 
       creationMessage.style.color = "#83b5d1";
-      creationMessage.textContent = `Success! CP challenge published with ${cpConfig.testCaseCount} test cases.`;
+      creationMessage.textContent = `Success! CP challenge published (${cpConfig.testCount} sub-tests, single-input judge).`;
     } catch (cpErr) {
       creationMessage.style.color = "#fe4e00";
       creationMessage.textContent = cpErr.message;
@@ -265,6 +265,10 @@ function readJsonFile(file) {
 }
 
 // Validate + normalize the uploaded test JSON.
+// Codeforces style: a single { input, expected } pair where the input text
+// STARTS with the number of sub-tests "t" followed by all t data sets, and
+// expected holds the concatenated output for all of them (the judge runs the
+// user's code exactly once against the whole input).
 function validateTestCases(rawText) {
   let parsed;
   try {
@@ -273,20 +277,23 @@ function validateTestCases(rawText) {
     return { ok: false, error: "Invalid JSON (" + err.message + ")" };
   }
 
-  const list = Array.isArray(parsed)
-    ? parsed
-    : (parsed && Array.isArray(parsed.test_cases) ? parsed.test_cases : null);
-
-  if (!list || list.length === 0) return { ok: false, error: "must be an array of { input, expected } objects" };
-  if (list.length > 50) return { ok: false, error: "cannot exceed 50 test cases" };
-
-  for (let i = 0; i < list.length; i++) {
-    const tc = list[i];
-    if (!tc || typeof tc.input !== 'string' || typeof tc.expected !== 'string') {
-      return { ok: false, error: "test case #" + (i + 1) + " needs string fields 'input' and 'expected'" };
-    }
+  let pair = parsed;
+  if (Array.isArray(parsed)) {
+    if (parsed.length === 1) pair = parsed[0];
+    else return { ok: false, error: "must be a single { input, expected } object (Codeforces style)" };
   }
-  return { ok: true, count: list.length };
+
+  if (!pair || typeof pair !== 'object') return { ok: false, error: "must be an object with string fields 'input' and 'expected'" };
+  if (typeof pair.input !== 'string' || typeof pair.expected !== 'string') {
+    return { ok: false, error: "must have string fields 'input' and 'expected'" };
+  }
+
+  const firstLine = pair.input.trim().split(/\r?\n/, 1)[0].trim();
+  if (!/^\d+$/.test(firstLine)) {
+    return { ok: false, error: "input must begin with the number of tests t (Codeforces style)" };
+  }
+
+  return { ok: true, testCount: parseInt(firstLine, 10) };
 }
 
 // Gzip a Blob using the browser's CompressionStream.

@@ -1,7 +1,11 @@
 // api/cpSubmit.js - Serverless CP judge.
 // Authenticates the caller, loads the admin-provided test file from Supabase
-// Storage, runs the submitted code against every test case on Piston, compares
-// outputs with a Piston-hosted C++ comparator, then persists the verdict.
+// Storage, runs the submitted code ONCE on Piston against the whole
+// Codeforces-style input (which starts with "t" = number of test cases, t lines
+// of data follow), compares the full stdout against the full expected output
+// with a Piston-hosted C++ comparator, then persists the verdict.
+//
+//   one submission  ->  one Piston execute call  ->  one comparator run
 //
 // Request  : POST /api/cpSubmit
 //            Authorization: Bearer <session token>
@@ -19,7 +23,7 @@ import { executePiston, compareOutputs, LANG_CONFIG } from './_lib/piston.js';
 import { gunzipSync } from 'zlib';
 
 const MAX_CODE_LENGTH = 256 * 1024;      // 256 KB of source
-const MAX_TEST_CASES = 50;
+const MAX_TEST_FILE_BYTES = 4 * 1024 * 1024; // 4 MB gz cap
 
 async function rest(path, { method = 'GET', body, token } = {}) {
   const headers = {
@@ -38,7 +42,10 @@ async function rest(path, { method = 'GET', body, token } = {}) {
 }
 
 // Download + decompress the gzip test archive from the cp-tests bucket.
-async function loadTestCases(testFilePath) {
+// Returns a single Codeforces-style pair: { input, expected } where
+// input begins with "t" (number of sub-tests) followed by the t data sets,
+// and expected is the concatenated expected output for all t sub-tests.
+async function loadTestFile(testFilePath) {
   const encodedPath = String(testFilePath).split('/').map(encodeURIComponent).join('/');
   const url = `${supabaseUrl()}/storage/v1/object/cp-tests/${encodedPath}`;
   const key = supabaseKey();
@@ -47,6 +54,7 @@ async function loadTestCases(testFilePath) {
   });
   if (!res.ok) throw new Error(`Failed to fetch test file (storage ${res.status})`);
   const buf = Buffer.from(await res.arrayBuffer());
+  if (buf.length > MAX_TEST_FILE_BYTES) throw new Error('Test archive exceeds the 4 MB cap');
 
   let parsed;
   try {
@@ -55,18 +63,22 @@ async function loadTestCases(testFilePath) {
     throw new Error('Test file is not a valid gzip JSON archive: ' + err.message);
   }
 
-  const list = Array.isArray(parsed)
-    ? parsed
-    : (parsed && Array.isArray(parsed.test_cases) ? parsed.test_cases : null);
+  // Accept { input, expected } or a 1-element array of it.
+  let pair = parsed;
+  if (Array.isArray(parsed)) {
+    if (parsed.length === 1) pair = parsed[0];
+    else throw new Error('Test file must be a single { input, expected } object (Codeforces style)');
+  }
+  if (!pair || typeof pair !== 'object' ||
+      typeof pair.input !== 'string' || typeof pair.expected !== 'string') {
+    throw new Error('Test file must be { "input": "...", "expected": "..." }');
+  }
 
-  if (!list || list.length === 0) throw new Error('Problem has no test cases');
-  if (list.length > MAX_TEST_CASES) throw new Error(`Too many test cases (max ${MAX_TEST_CASES})`);
-
-  return list.map((tc, i) => ({
-    index: i + 1,
-    input: String(tc.input ?? ''),
-    expected: String(tc.expected ?? '')
-  }));
+  const firstLine = String(pair.input).split(/\r?\n/, 1)[0].trim();
+  if (!/^\d+$/.test(firstLine)) {
+    throw new Error('input must begin with the number of tests t (Codeforces style)');
+  }
+  return { input: pair.input, expected: pair.expected };
 }
 
 // Classify a single Piston execute response into a judge verdict.
@@ -154,8 +166,8 @@ export default async function handler(req, res) {
     }
 
     const timeLimitMs = cp.time_limit_ms || 1000;
-    const memoryLimitMb = cp.memory_limit_mb || 256;
-    const testCases = await loadTestCases(cp.test_file_path);
+    const memoryLimitMb = cp.memory_limit_mb || 10;
+    const testFile = await loadTestFile(cp.test_file_path);
 
     // --- Persist the submission (status flips after judging) -----------------
     const now = new Date().toISOString();
@@ -193,97 +205,81 @@ export default async function handler(req, res) {
     }
     const detailId = detailResp.data[0].id;
 
-    // --- Judge: run the code on every test case -------------------------------
-    const pairs = [];          // [actual, expected] passed to the comparator
-    const perTest = [];        // test_results jsonb
-    let outcome = null;        // first fatal verdict (CE / RE / TLE)
-    let maxWall = 0;
-    let maxMem = 0;
-    let compileOutput = '';
-    let runOutputBest = '';
-    let completedOk = 0;
-
-    for (const tc of testCases) {
-      let data;
-      try {
-        data = await executePiston({
-          language,
-          code,
-          stdin: tc.input,
-          runTimeoutMs: timeLimitMs,
-          memoryLimitMb
-        });
-      } catch (err) {
-        if (!outcome) outcome = { kind: 'RE', message: err.message };
-        break;
-      }
-
-      const run = data.run || {};
-      maxWall = Math.max(maxWall, run.wall_time || 0);
-      maxMem = Math.max(maxMem, run.memory || 0);
-
-      const resT = classifyRun(data);
-      if (resT.kind === 'CE') {
-        if (!outcome) {
-          outcome = { kind: 'CE', compileOutput: resT.compileOutput };
-          compileOutput = resT.compileOutput;
-        }
-        break;
-      }
-      if (resT.kind === 'TLE') {
-        if (!outcome) outcome = { kind: 'TLE' };
-        break;
-      }
-      if (resT.kind === 'RE') {
-        if (!outcome) outcome = { kind: 'RE', message: resT.message, runOutput: resT.runOutput };
-        if (resT.runOutput) runOutputBest = resT.runOutput;
-        break;
-      }
-
-      pairs.push([resT.output, tc.expected]);
-      completedOk++;
-      perTest.push({
-        index: tc.index,
-        result: 'OK',
-        time_ms: run.wall_time || null,
-        memory_kb: run.memory ? Math.round(run.memory / 1024) : null
+    // --- Judge: one execution against the whole Codeforces-style input --------
+    let data;
+    try {
+      data = await executePiston({
+        language,
+        code,
+        stdin: testFile.input,
+        runTimeoutMs: timeLimitMs,
+        memoryLimitMb
       });
+    } catch (err) {
+      const runError = err.message;
+      await rest(`/rest/v1/cp_submission_details?id=eq.${encodeURIComponent(detailId)}`, {
+        method: 'PATCH',
+        body: { verdict: 'RE', run_output: runError, test_results: [] }
+      });
+      await rest(`/rest/v1/submissions?id=eq.${encodeURIComponent(submission.id)}`, {
+        method: 'PATCH',
+        body: { status: 'REJECTED' }
+      });
+      res.status(200).json({
+        verdict: 'RE',
+        passed: 0,
+        total: 1,
+        failedTest: 1,
+        executionTimeMs: null,
+        memoryKb: null,
+        compileOutput: null,
+        runOutput: runError
+      });
+      return;
     }
 
-    // --- Compare all outputs with the C++ comparator on Piston -----------------
-    let verdict = 'AC';
-    let failedTest = null;
+    const run = data.run || {};
+    const executionTimeMs = run.wall_time || null;
+    const memoryKb = run.memory ? Math.round(run.memory / 1024) : null;
 
-    if (outcome) {
-      verdict = outcome.kind;
-      failedTest = perTest.length + 1;
-      if (outcome.runOutput) runOutputBest = outcome.runOutput;
-    } else if (pairs.length) {
-      const cmp = await compareOutputs(pairs);
-      if (!cmp.accepted) {
-        verdict = 'WA';
-        failedTest = cmp.index;
-      }
-    } else {
+    const resT = classifyRun(data);
+    let verdict;
+    let compileOutput = null;
+    let runOutput = null;
+    let testResults = [];
+
+    if (resT.kind === 'CE') {
+      verdict = 'CE';
+      compileOutput = resT.compileOutput;
+    } else if (resT.kind === 'TLE') {
+      verdict = 'TLE';
+      runOutput = `Time limit exceeded (${timeLimitMs} ms)`;
+    } else if (resT.kind === 'RE') {
       verdict = 'RE';
-      failedTest = 1;
+      runOutput = resT.runOutput || resT.message || 'Runtime error';
+    } else {
+      // Output produced — compare the FULL stdout vs the FULL expected output.
+      const cmp = await compareOutputs([[resT.output, testFile.expected]]);
+      verdict = cmp.accepted ? 'AC' : 'WA';
+      runOutput = verdict === 'WA' ? resT.output : null;
+      testResults = [{
+        index: 1,
+        result: verdict === 'AC' ? 'OK' : 'WA',
+        time_ms: executionTimeMs,
+        memory_kb: memoryKb
+      }];
     }
 
-    const passed = verdict === 'AC' ? pairs.length : 0;
-    const runOutput = verdict === 'TLE'
-      ? `Time limit exceeded (${timeLimitMs} ms)`
-      : (runOutputBest || null);
-
-    // --- Persist verdicts -------------------------------------------------------
+    // --- Persist verdicts -----------------------------------------------------
     await rest(`/rest/v1/cp_submission_details?id=eq.${encodeURIComponent(detailId)}`, {
       method: 'PATCH',
       body: {
         verdict,
-        compile_output: compileOutput || null,
+        compile_output: compileOutput,
         run_output: runOutput,
-        execution_time_ms: maxWall || null,
-        memory_kb: maxMem ? Math.round(maxMem / 1024) : null,
-        test_results: perTest
+        execution_time_ms: executionTimeMs,
+        memory_kb: memoryKb,
+        test_results: testResults
       }
     });
 
@@ -294,13 +290,13 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       verdict,
-      passed,
-      total: testCases.length,
-      failedTest,
-      executionTimeMs: maxWall || null,
-      memoryKb: maxMem ? Math.round(maxMem / 1024) : null,
-      compileOutput: compileOutput || null,
-      runOutput: runOutput
+      passed: verdict === 'AC' ? 1 : 0,
+      total: 1,
+      failedTest: verdict === 'AC' ? null : 1,
+      executionTimeMs,
+      memoryKb,
+      compileOutput,
+      runOutput
     });
   } catch (err) {
     console.error('cpSubmit error:', err.message);

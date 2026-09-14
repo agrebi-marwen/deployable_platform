@@ -106,13 +106,16 @@
               <label for="cp-test-file">Test Cases File (JSON)</label>
               <input type="file" id="cp-test-file" accept=".json,application/json">
               <p class="hint">
-                Attach <code>test_cases.json</code> containing an array of objects, each with an
-                <code>input</code> and <code>expected</code> string, e.g.
+                Attach <code>test_cases.json</code> containing ONE object with an <code>input</code>
+                and an <code>expected</code> string, <strong>Codeforces style</strong>: the input text
+                starts with <code>t</code> (the number of sub-tests) followed by all <code>t</code>
+                data sets; <code>expected</code> holds the concatenated output. Your judge runs the
+                user's code <strong>once</strong> against the whole input. Example:
               </p>
-              <pre class="cp-test-example">[
-  { "input": "5\n1 2 3 4 5\n", "expected": "15\n" },
-  { "input": "3\n10 20 30\n",   "expected": "60\n" }
-]</pre>
+              <pre class="cp-test-example">{
+  "input": "2\n1 2 3 4 5\n10 20 30\n",
+  "expected": "15\n60\n"
+}</pre>
             </div>
           </div>
 

@@ -22,7 +22,11 @@ alter table public.submissions
 --    time_limit_ms  <= 1000 (1 second cap)
 --    memory_limit_mb <= 10 (MB)  -- small problems; Piston containers are lean
 --    test_file_path = storage path inside the "cp-tests" bucket, e.g.
---                     "<challenge_id>/tests.json.gz" (gzip-compressed JSON)
+--                     "<challenge_id>/tests.json.gz" — a gzip JSON archive with a
+--                     SINGLE Codeforces-style pair { "input", "expected" }:
+--                     input starts with "t" (number of sub-tests) followed by all
+--                     t data sets; expected is the concatenated output for all of
+--                     them. The user's code is run ONCE against the whole input.
 --    languages      = allowed submit languages (config keys in api/_lib/piston.js)
 -- ----------------------------------------------------------------------------
 create table if not exists public.cp_problems (
