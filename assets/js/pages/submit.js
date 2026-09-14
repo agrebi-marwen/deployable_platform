@@ -13,8 +13,24 @@ const submissionUrl = document.getElementById('submission-url');
 const submissionMessage = document.getElementById('submission-message');
 const submitBtn = document.getElementById('submit-btn');
 
+const repoBlock = document.getElementById('repo-submit-block');
+const cpBlock   = document.getElementById('cp-submit-block');
+const cpLangSlct = document.getElementById('cp-language');
+const cpLimitsEl = document.getElementById('cp-limits');
+const cpSubmitBtn = document.getElementById('cp-submit-btn');
+const cpVerdictEl = document.getElementById('cp-verdict');
+
 let currentUserId = null;
 let challengeId = null;
+let isCpChallenge = false;
+let cpEditorView = null;
+
+const LANG_TEMPLATES = {
+  c: `#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n`,
+  'c++': `#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n`,
+  python: `def main():\n    pass\n\nif __name__ == "__main__":\n    main()\n`,
+  java: `public class Main {\n    public static void main(String[] args) {\n    }\n}\n`
+};
 
 async function initSubmitPage() {
   const session = await requireSession();
@@ -22,17 +38,17 @@ async function initSubmitPage() {
 
   currentUserId = session.user.id;
 
-  // Grab the challenge ID from URL query parameters (e.g. submit.html?id=uuid)
   challengeId = new URLSearchParams(window.location.search).get('id');
-
   if (!challengeId) {
     challengeTitle.textContent = "Challenge Not Found";
     challengeInstructions.textContent = "Please return to the dashboard and select a challenge.";
     submitBtn.disabled = true;
+    cpSubmitBtn && (cpSubmitBtn.disabled = true);
     return;
   }
 
   await loadChallengeDetails();
+  await loadCpConfig();
 }
 
 async function loadChallengeDetails() {
@@ -46,23 +62,86 @@ async function loadChallengeDetails() {
     challengeTitle.textContent = "Loading Failed";
     challengeInstructions.textContent = "Could not load this challenge. It may have been removed.";
     console.error("Fetch challenge error:", error);
+    submitBtn.disabled = true;
+    cpSubmitBtn && (cpSubmitBtn.disabled = true);
     return;
   }
 
-  // Populate the HTML
   challengeTitle.textContent = challenge.title;
   challengeMonth.textContent = challenge.month_year || "Active Challenge";
   challengePoints.textContent = `Reward: ${challenge.points_worth} pts`;
   challengeInstructions.textContent = challenge.instructions;
 
-  // Tint the challenge header with this month's epoch hue
   const detailsCard = document.querySelector('.challenge-details-card');
   if (detailsCard && window.applyEpochColor && window.epochHue) {
     window.applyEpochColor(detailsCard, window.epochHue(challenge.month_year));
   }
 }
 
-// Handle Form Submission
+// Fetch CP judge config. If present → show CP block; else stay on repo block.
+async function loadCpConfig() {
+  const { data, error } = await supabaseClient
+    .from('cp_problems')
+    .select('languages, time_limit_ms, memory_limit_mb')
+    .eq('challenge_id', challengeId)
+    .maybeSingle();
+
+  if (error || !data) return; // Not a CP challenge — use repo form.
+
+  isCpChallenge = true;
+  repoBlock.style.display = 'none';
+  cpBlock.style.display = 'block';
+  submissionForm.style.display = 'none';
+
+  const allowed = Array.isArray(data.languages) && data.languages.length
+    ? data.languages
+    : ['c++', 'c', 'python', 'java'];
+
+  cpLangSlct.innerHTML = '';
+  allowed.forEach(lang => {
+    const opt = document.createElement('option');
+    opt.value = lang;
+    opt.textContent = lang === 'c++' ? 'C++' : lang === 'c' ? 'C' : lang === 'python' ? 'Python 3' : 'Java';
+    cpLangSlct.appendChild(opt);
+  });
+
+  const tl = data.time_limit_ms || 1000;
+  const ml = data.memory_limit_mb || 256;
+  cpLimitsEl.textContent = `Time: ${tl} ms  ·  Memory: ${ml} MB  ·  ${allowed.length} language${allowed.length > 1 ? 's' : ''}`;
+
+  waitForEditor('cp-editor', LANG_TEMPLATES[cpLangSlct.value] || LANG_TEMPLATES['c++'], cpLangSlct.value);
+
+  cpLangSlct.addEventListener('change', () => {
+    if (!cpEditorView) return;
+    window.cmSetCode(cpEditorView, LANG_TEMPLATES[cpLangSlct.value] || '');
+    window.cmSetLanguage(cpEditorView, cpLangSlct.value);
+  });
+
+  cpSubmitBtn.addEventListener('click', handleCpSubmit);
+}
+
+// Poll until the module loader exposes window.makeCodeEditor.
+function waitForEditor(containerId, source, lang) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  let tries = 0;
+  const maxTries = 100;
+  const timer = setInterval(() => {
+    tries++;
+    if (typeof window.makeCodeEditor === 'function') {
+      clearInterval(timer);
+      cpEditorView = window.makeCodeEditor(el);
+      if (source) window.cmSetCode(cpEditorView, source);
+      if (lang)  window.cmSetLanguage(cpEditorView, lang);
+    } else if (tries >= maxTries) {
+      clearInterval(timer);
+      el.innerHTML = '<p style="color:#fe4e00;">Code editor failed to load. Please refresh the page.</p>';
+    }
+  }, 100);
+}
+
+// Handle Form Submission (repo)
 submissionForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   submitBtn.disabled = true;
@@ -70,8 +149,6 @@ submissionForm.addEventListener('submit', async (e) => {
   submissionMessage.style.color = "var(--text-strong)";
 
   const url = submissionUrl.value.trim();
-
-  // Regex validation for GitHub/GitLab repository links
   const gitUrlRegex = /^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
   if (!gitUrlRegex.test(url)) {
@@ -83,18 +160,15 @@ submissionForm.addEventListener('submit', async (e) => {
 
   const { error } = await supabaseClient
     .from('submissions')
-    .insert([
-      {
-        user_id: currentUserId,
-        challenge_id: challengeId,
-        submission_url: url,
-        status: 'PENDING',
-        submitted_at: new Date().toISOString()
-      }
-    ]);
+    .insert([{
+      user_id: currentUserId,
+      challenge_id: challengeId,
+      submission_url: url,
+      status: 'PENDING',
+      submitted_at: new Date().toISOString()
+    }]);
 
   if (error) {
-    console.error("Supabase insert crash details:", error);
     submissionMessage.textContent = "Failed to submit solution: " + error.message;
     submissionMessage.style.color = "#fe4e00";
     submitBtn.disabled = false;
@@ -104,7 +178,6 @@ submissionForm.addEventListener('submit', async (e) => {
     submissionUrl.value = "";
     submitBtn.textContent = "Solution Submitted";
 
-    // Sparkle burst from the submit button
     if (window.burstParticles) {
       const rect = submitBtn.getBoundingClientRect();
       const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
@@ -117,3 +190,86 @@ submissionForm.addEventListener('submit', async (e) => {
     }, 3000);
   }
 });
+
+// Handle CP submission (code editor → judge endpoint)
+async function handleCpSubmit() {
+  if (!cpEditorView || !currentUserId || !challengeId) return;
+
+  cpSubmitBtn.disabled = true;
+  cpSubmitBtn.textContent = "Judging...";
+  cpVerdictEl.style.display = 'none';
+  submissionMessage.textContent = "Running your code against test cases...";
+  submissionMessage.style.color = "var(--text-strong)";
+
+  const code = window.cmGetCode(cpEditorView);
+  const language = cpLangSlct.value;
+
+  if (!code.trim()) {
+    submissionMessage.textContent = "Your solution is empty. Write some code first.";
+    submissionMessage.style.color = "#fe4e00";
+    cpSubmitBtn.disabled = false;
+    cpSubmitBtn.textContent = "Run & Submit";
+    return;
+  }
+
+  const session = await supabaseClient.auth.getSession();
+  const token = session && session.data && session.data.session && session.data.session.access_token;
+
+  try {
+    const res = await fetch('../api/cpSubmit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (token || '')
+      },
+      body: JSON.stringify({ challengeId, code, language })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      submissionMessage.textContent = data.error || "Judge request failed.";
+      submissionMessage.style.color = "#fe4e00";
+      cpSubmitBtn.disabled = false;
+      cpSubmitBtn.textContent = "Run & Submit";
+      return;
+    }
+
+    cpVerdictEl.style.display = 'block';
+
+    if (data.verdict === 'AC') {
+      cpVerdictEl.innerHTML = `
+        <span class="cp-verdict-badge verdict-ac">AC</span>
+        <span class="cp-verdict-detail">All ${data.total} test cases passed.</span>`;
+      submissionMessage.textContent = "Accepted! Submission queued for approval.";
+      submissionMessage.style.color = "#83b5d1";
+    } else {
+      const detailText = data.verdict === 'WA'
+        ? `Wrong answer on test ${data.failedTest} of ${data.total}.`
+        : data.verdict === 'TLE'
+        ? `Time limit exceeded.`
+        : data.verdict === 'CE'
+        ? `Compilation error.`
+        : data.verdict === 'RE'
+        ? `Runtime error on test ${data.failedTest || ''}.`
+        : `Verdict: ${data.verdict}`;
+      cpVerdictEl.innerHTML = `
+        <span class="cp-verdict-badge verdict-${data.verdict.toLowerCase()}">${data.verdict}</span>
+        <span class="cp-verdict-detail">${escapeHtml(detailText)}</span>`;
+      submissionMessage.textContent = "Not accepted. Try again!";
+      submissionMessage.style.color = "#fe4e00";
+    }
+
+    if (data.verdict === 'AC' && window.burstParticles) {
+      const rect = cpSubmitBtn.getBoundingClientRect();
+      const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
+      window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
+    }
+  } catch (err) {
+    submissionMessage.textContent = "Judge request failed: " + err.message;
+    submissionMessage.style.color = "#fe4e00";
+  }
+
+  cpSubmitBtn.disabled = false;
+  cpSubmitBtn.textContent = "Run & Submit";
+}

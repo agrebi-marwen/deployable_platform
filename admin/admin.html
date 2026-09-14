@@ -73,6 +73,49 @@
             </select>
           </div>
 
+          <div class="form-group" id="cp-settings" style="display:none;">
+            <div class="cp-settings-title">
+              <h3>Competitive Programming Judge</h3>
+              <p class="hint">These settings appear because the category is CP. Accepted submissions are <strong>graded automatically</strong> by the Piston API.</p>
+            </div>
+
+            <div class="cp-settings-grid">
+              <div class="form-group">
+                <label for="cp-time-limit">Time Limit (ms)</label>
+                <input type="number" id="cp-time-limit" min="100" max="1000" step="50" value="1000" required>
+                <p class="hint">Max 1000 ms (1 second).</p>
+              </div>
+              <div class="form-group">
+                <label for="cp-memory-limit">Memory Limit (MB)</label>
+                <input type="number" id="cp-memory-limit" min="16" max="1024" step="16" value="256" required>
+                <p class="hint">Max 1024 MB.</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Allowed Languages</label>
+              <div class="cp-lang-row">
+                <label class="cp-lang-check"><input type="checkbox" id="cp-lang-cpp" checked> C++</label>
+                <label class="cp-lang-check"><input type="checkbox" id="cp-lang-c" checked> C</label>
+                <label class="cp-lang-check"><input type="checkbox" id="cp-lang-python" checked> Python</label>
+                <label class="cp-lang-check"><input type="checkbox" id="cp-lang-java" checked> Java</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="cp-test-file">Test Cases File (JSON)</label>
+              <input type="file" id="cp-test-file" accept=".json,application/json">
+              <p class="hint">
+                Attach <code>test_cases.json</code> containing an array of objects, each with an
+                <code>input</code> and <code>expected</code> string, e.g.
+              </p>
+              <pre class="cp-test-example">[
+  { "input": "5\n1 2 3 4 5\n", "expected": "15\n" },
+  { "input": "3\n10 20 30\n",   "expected": "60\n" }
+]</pre>
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="challenge-tags">Tags</label>
             <input type="text" id="challenge-tags" placeholder="e.g., #NumberTheory #MLOps1 #BinarySearch" >

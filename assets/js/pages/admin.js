@@ -136,7 +136,10 @@ challengeForm.addEventListener('submit', async (e) => {
   const points_worth = parseInt(document.getElementById('points_worth').value, 10);
   const instructions = document.getElementById('instructions').value.trim();
   const is_active = document.getElementById('is_active').checked;
-  const category_id = document.getElementById('challenge-category').value;
+  const categorySlct = document.getElementById('challenge-category');
+  const category_id = categorySlct.value;
+  const categorySlug = categorySlct.options[categorySlct.selectedIndex]?.dataset?.slug || '';
+  const isCp = categorySlug === 'competitive-programming';
   const tags = document.getElementById('challenge-tags').value.trim();
 
   const currentDate = new Date();
@@ -150,22 +153,166 @@ challengeForm.addEventListener('submit', async (e) => {
     payload.tags = tags;
   }
 
-  const { error } = await supabaseClient
+  // --- CP: gather judge config before creating anything -----------------------
+  let cpConfig = null;
+  if (isCp) {
+    const timeLimitMs = parseInt(document.getElementById('cp-time-limit').value, 10);
+    const memoryLimitMb = parseInt(document.getElementById('cp-memory-limit').value, 10);
+    const languages = [];
+    if (document.getElementById('cp-lang-cpp').checked) languages.push('c++');
+    if (document.getElementById('cp-lang-c').checked) languages.push('c');
+    if (document.getElementById('cp-lang-python').checked) languages.push('python');
+    if (document.getElementById('cp-lang-java').checked) languages.push('java');
+
+    const fileInput = document.getElementById('cp-test-file');
+    if (languages.length === 0) {
+      cpFail("Select at least one allowed language.");
+      return;
+    }
+    if (!fileInput.files || !fileInput.files[0]) {
+      cpFail("Attach a test cases JSON file.");
+      return;
+    }
+
+    const validation = validateTestCases(await readJsonFile(fileInput.files[0]));
+    if (!validation.ok) {
+      cpFail("Test file: " + validation.error);
+      return;
+    }
+
+    cpConfig = {
+      timeLimitMs,
+      memoryLimitMb,
+      languages,
+      testCaseCount: validation.count
+    };
+  }
+
+  const { data: inserted, error } = await supabaseClient
     .from('challenges')
-    .insert([payload]);
+    .insert([payload])
+    .select();
 
   if (error) {
-    creationMessage.style.color = "#fe4e00";
-    creationMessage.textContent = "Failed: " + error.message;
+    cpFail("Failed: " + error.message);
+    return;
+  }
+
+  const challengeId = inserted && inserted[0] && inserted[0].id;
+
+  // --- CP: upload gzipped tests + create the problem row -----------------------
+  if (cpConfig && challengeId) {
+    try {
+      const fileInput = document.getElementById('cp-test-file');
+      const rawText = await readJsonFile(fileInput.files[0]);
+      const { gz, err } = await gzipBytes(new Blob([rawText]))
+        .then(bytes => ({ gz: bytes }))
+        .catch(e => ({ err: e }));
+      if (err) throw new Error("Failed to compress test file: " + err.message);
+
+      const testFilePath = `${challengeId}/tests.json.gz`;
+      const { error: upErr } = await supabaseClient.storage
+        .from('cp-tests')
+        .upload(testFilePath, gz, { contentType: 'application/gzip', upsert: true });
+
+      if (upErr) throw new Error("Failed to upload test file: " + upErr.message);
+
+      const { error: cpErr } = await supabaseClient.from('cp_problems').insert([{
+        challenge_id: challengeId,
+        time_limit_ms: cpConfig.timeLimitMs,
+        memory_limit_mb: cpConfig.memoryLimitMb,
+        languages: cpConfig.languages,
+        test_file_path: testFilePath
+      }]);
+
+      if (cpErr) {
+        throw new Error("Challenge created but judge config failed: " + cpErr.message);
+      }
+
+      creationMessage.style.color = "#83b5d1";
+      creationMessage.textContent = `Success! CP challenge published with ${cpConfig.testCaseCount} test cases.`;
+    } catch (cpErr) {
+      creationMessage.style.color = "#fe4e00";
+      creationMessage.textContent = cpErr.message;
+    }
   } else {
     creationMessage.style.color = "#83b5d1";
     creationMessage.textContent = `Success! Challenge published (${month_year}).`;
-    challengeForm.reset();
-    document.getElementById('is_active').checked = true;
   }
+
   submitBtn.disabled = false;
   submitBtn.textContent = "Create Challenge";
+  challengeForm.reset();
+  document.getElementById('is_active').checked = true;
+  syncCpSettingsVisibility();
 });
+
+function cpFail(message) {
+  creationMessage.style.color = "#fe4e00";
+  creationMessage.textContent = message;
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Create Challenge";
+}
+
+// Read a File as text.
+function readJsonFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('read failed'));
+    reader.readAsText(file);
+  });
+}
+
+// Validate + normalize the uploaded test JSON.
+function validateTestCases(rawText) {
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (err) {
+    return { ok: false, error: "Invalid JSON (" + err.message + ")" };
+  }
+
+  const list = Array.isArray(parsed)
+    ? parsed
+    : (parsed && Array.isArray(parsed.test_cases) ? parsed.test_cases : null);
+
+  if (!list || list.length === 0) return { ok: false, error: "must be an array of { input, expected } objects" };
+  if (list.length > 50) return { ok: false, error: "cannot exceed 50 test cases" };
+
+  for (let i = 0; i < list.length; i++) {
+    const tc = list[i];
+    if (!tc || typeof tc.input !== 'string' || typeof tc.expected !== 'string') {
+      return { ok: false, error: "test case #" + (i + 1) + " needs string fields 'input' and 'expected'" };
+    }
+  }
+  return { ok: true, count: list.length };
+}
+
+// Gzip a Blob using the browser's CompressionStream.
+async function gzipBytes(blob) {
+  const cs = new CompressionStream('gzip');
+  const reader = blob.stream().pipeThrough(cs);
+  const chunks = [];
+  const rdr = reader.getReader();
+  while (true) {
+    const { done, value } = await rdr.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return new Blob(chunks, { type: 'application/gzip' });
+}
+
+// Toggle CP-specific fields based on the selected category.
+const cpSettingsBlock = document.getElementById('cp-settings');
+
+function syncCpSettingsVisibility() {
+  const slct = document.getElementById('challenge-category');
+  const slug = slct.options[slct.selectedIndex]?.dataset?.slug || '';
+  if (cpSettingsBlock) cpSettingsBlock.style.display = slug === 'competitive-programming' ? 'block' : 'none';
+}
+
+document.getElementById('challenge-category').addEventListener('change', syncCpSettingsVisibility);
 
 // PENDING SUBMISSIONS
 async function fetchPendingSubmissions() {
@@ -180,7 +327,8 @@ async function fetchPendingSubmissions() {
             status,
             user_id,
             challenge_id,
-            profiles (username)
+            profiles (username),
+            cp_submission_details (verdict, language)
         `)
     .eq('status', 'PENDING');
 
@@ -212,9 +360,27 @@ function renderSubmissions(submissions, challengeLookup) {
     const challengeTitle = challengeLookup[sub.challenge_id] || "Active Challenge";
     const dateRaw = sub.submitted_at || sub.created_at;
     const date = dateRaw ? new Date(dateRaw).toLocaleString() : "Recently";
+    const cpDetails = sub.cp_submission_details || null;
+    const cpDetail = Array.isArray(cpDetails) ? cpDetails[0] : cpDetails;
 
     const card = document.createElement('div');
     card.className = "sub-card";
+
+    const resourceBlock = cpDetail && cpDetail.verdict !== 'PENDING'
+      ? `<div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
+          <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Language & Verdict:</span>
+          <span style="color: #83b5d1; font-size: 0.9rem; font-family: 'VT323', monospace;">${escapeHtml(cpDetail.language || '').toUpperCase()} — ${escapeHtml(cpDetail.verdict || 'PENDING')}</span>
+        </div>`
+      : (sub.submission_url
+          ? `<div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
+              <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Repository URL:</span>
+              <a href="${escapeHtml(safeUrl(sub.submission_url))}" target="_blank" rel="noopener noreferrer" style="color: #83b5d1; font-size: 0.9rem; word-break: break-all; text-decoration: none;">
+                ${escapeHtml(sub.submission_url)} ↗
+              </a>
+            </div>`
+          : `<div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
+              <span style="color: #6e8296; font-size: 0.8rem; display:block;">Code submission (judging in progress...)</span>
+            </div>`);
 
     card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -224,14 +390,7 @@ function renderSubmissions(submissions, challengeLookup) {
                 </div>
                 <span style="font-size: 0.8rem; color: #eec643; background: rgba(238, 198, 67, 0.1); padding: 3px 8px; border: 2px solid #eec643; font-family: 'VT323', monospace; text-transform: uppercase;">PENDING</span>
             </div>
-            
-            <div style="background: rgba(0,0,0,0.2); padding: 10px; border: 2px solid rgba(131,181,209,0.15);">
-                <span style="color: #6e8296; font-size: 0.8rem; display:block; margin-bottom:2px;">Repository URL:</span>
-                <a href="${escapeHtml(safeUrl(sub.submission_url))}" target="_blank" rel="noopener noreferrer" style="color: #83b5d1; font-size: 0.9rem; word-break: break-all; text-decoration: none;">
-                    ${escapeHtml(sub.submission_url)} ↗
-                </a>
-            </div>
-
+            ${resourceBlock}
             <div style="display: flex; gap: 10px; margin-top: 5px;">
                 <button class="action-btn btn-approve" data-id="${escapeHtml(sub.id)}" data-action="APPROVED">Approve</button>
                 <button class="action-btn btn-reject" data-id="${escapeHtml(sub.id)}" data-action="REJECTED">Reject</button>
@@ -744,9 +903,11 @@ async function loadChallengeCategories() {
   (categories || []).forEach(cat => {
     const opt = document.createElement('option');
     opt.value = cat.id;
+    opt.dataset.slug = cat.slug || '';
     opt.textContent = cat.name;
     challengeCategorySelect.appendChild(opt);
   });
+  syncCpSettingsVisibility();
 
   if (!categories || categories.length === 0) {
     challengeCategoryList.innerHTML = `<p class="empty-state">No categories yet. Add the first one above.</p>`;

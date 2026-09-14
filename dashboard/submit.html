@@ -24,6 +24,7 @@
   <script src="../assets/js/cursor-lighting.js" defer></script>
   <script src="../assets/js/creative.js" defer></script>
   <script src="../assets/js/pages/submit.js" defer></script>
+  <script type="module" src="../assets/js/codemirror-loader.js"></script>
 </head>
 <body>
 
@@ -92,19 +93,40 @@
     
             <div class="submission-card">
               <h3>Submit Your Solution</h3>
-              <p class="sub-text">Paste the link to your repository below.</p>
     
-              <form id="submission-form">
-                <label for="submission-url">Repository URL</label>
-                <input 
-                  type="url" 
-                  id="submission-url" 
-                  placeholder="https://github.com/username/repository" 
-                  pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
-                  title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
-                  required>
-                <button type="submit" id="submit-btn">Submit Solution</button>
-              </form>
+              <!-- Repo submission block (hidden for CP challenges) -->
+              <div id="repo-submit-block">
+                <p class="sub-text">Paste the link to your repository below.</p>
+                <form id="submission-form">
+                  <label for="submission-url">Repository URL</label>
+                  <input 
+                    type="url" 
+                    id="submission-url" 
+                    placeholder="https://github.com/username/repository" 
+                    pattern="^https?:\/\/(www\.)?(github\.com|gitlab\.com)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+.*$" 
+                    title="Please enter a valid GitHub or GitLab repository URL (e.g., https://github.com/username/repository)" 
+                    required>
+                  <button type="submit" id="submit-btn">Submit Solution</button>
+                </form>
+              </div>
+
+              <!-- CP submission block (hidden unless challenge is graded) -->
+              <div id="cp-submit-block" style="display:none;">
+                <p class="sub-text">Write your solution, then hit <strong>Run &amp; Submit</strong>. Code is judged against hidden test cases.</p>
+
+                <label for="cp-language">Language</label>
+                <select id="cp-language"></select>
+
+                <div class="cp-limits" id="cp-limits"></div>
+
+                <div class="cp-editor-shell">
+                  <div id="cp-editor"></div>
+                </div>
+
+                <button type="button" id="cp-submit-btn" class="cp-submit-btn">Run &amp; Submit</button>
+                <div id="cp-verdict" class="cp-verdict" style="display:none;"></div>
+              </div>
+
               <div id="submission-message"></div>
             </div>
 
