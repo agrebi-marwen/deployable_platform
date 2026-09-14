@@ -20,7 +20,7 @@ alter table public.submissions
 -- ----------------------------------------------------------------------------
 -- 1. CP PROBLEMS - one row per CP challenge.
 --    time_limit_ms  <= 1000 (1 second cap)
---    memory_limit_mb <= 1024 (cap on the same order as Codeforces/AtCoder)
+--    memory_limit_mb <= 10 (MB)  -- small problems; Piston containers are lean
 --    test_file_path = storage path inside the "cp-tests" bucket, e.g.
 --                     "<challenge_id>/tests.json.gz" (gzip-compressed JSON)
 --    languages      = allowed submit languages (config keys in api/_lib/piston.js)
@@ -29,7 +29,7 @@ create table if not exists public.cp_problems (
   id uuid primary key default gen_random_uuid(),
   challenge_id uuid not null unique,
   time_limit_ms integer not null default 1000 check (time_limit_ms between 100 and 1000),
-  memory_limit_mb integer not null default 256 check (memory_limit_mb between 16 and 1024),
+  memory_limit_mb integer not null default 10 check (memory_limit_mb between 1 and 10),
   test_file_path text not null,
   languages text[] not null default array['c++','c','python','java'],
   created_at timestamptz not null default now(),

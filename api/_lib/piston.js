@@ -65,7 +65,7 @@ export async function executePiston(opts) {
   if (!cfg) throw new Error(`Unsupported language: ${opts.language}`);
 
   const runTimeoutMs = opts.runTimeoutMs ?? 1000;
-  const memoryLimitMb = opts.memoryLimitMb ?? 256;
+  const memoryLimitMb = opts.memoryLimitMb ?? 10;
   const version = await resolveVersion(cfg.language);
 
   const body = {

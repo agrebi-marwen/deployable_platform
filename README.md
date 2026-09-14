@@ -91,7 +91,7 @@ Database schema lives in `db/*.sql`; apply new migrations in the Supabase SQL Ed
 
 ## 5. Competitive Programming judge (cheat sheet)
 
-- Admin sets time limit (100–1000 ms) and memory limit (16–1024 MB), allowed languages, and uploads a JSON test archive `[{ "input": "...", "expected": "..." }]`; the browser gzips it into the **private** `cp-tests` bucket at `<challenge_id>/tests.json.gz` and writes the `cp_problems` row (only visible when the challenge's category slug is `competitive-programming`).
+- Admin sets time limit (100–1000 ms) and memory limit (1–10 MB), allowed languages, and uploads a JSON test archive `[{ "input": "...", "expected": "..." }]`; the browser gzips it into the **private** `cp-tests` bucket at `<challenge_id>/tests.json.gz` and writes the `cp_problems` row (only visible when the challenge's category slug is `competitive-programming`).
 - `api/cpSubmit.js`: auth via Bearer token → reads config + gunzips tests with the service-role key → runs the user's code per test on Piston (early stop on CE/TLE/RE) → compares all outputs with a single Piston-hosted C++ comparator → persists verdict into `cp_submission_details` (AC/WA/TLE/RE/CE) and mirrors AC→`submissions.status='APPROVED'` (roadmap gating counts APPROVED).
 - Submission page shows the CodeMirror editor only when `cp_problems` has a row for the challenge; otherwise the repo-URL form appears.
 - ALL verdicts are written server-side only; `submissions.submission_url` is now nullable (CP rows have none).
