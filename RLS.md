@@ -204,3 +204,43 @@ workshops_read_authenticated
 SELECT	
 authenticated
 
+---
+## ADDENDUM — Competitive Programming (added with cp_problems.sql)
+
+Run `db/cp_problems.sql` once in the Supabase SQL Editor.
+
+### cp_problems
+
+| Policy name | Command | Applied to | Summary |
+| :--- | :--- | :--- | :--- |
+| cp_problems_read_authenticated | SELECT | authenticated | Any logged-in user can read (needed to show the editor and limits) |
+| cp_problems_read_public | SELECT | anon | Public read (in case the landing page ever needs it) |
+| cp_problems_admin_insert | INSERT | authenticated | Admin-only (`profiles.role = 'admin'`) |
+| cp_problems_admin_update | UPDATE | authenticated | Admin-only |
+| cp_problems_admin_delete | DELETE | authenticated | Admin-only |
+
+### cp_submission_details
+
+| Policy name | Command | Applied to | Summary |
+| :--- | :--- | :--- | :--- |
+| cp_details_select_own | SELECT | authenticated | Users may read their own rows (via `submissions.user_id = auth.uid()`) |
+| cp_details_admin_select | SELECT | authenticated | Admins may read all |
+
+Inserts, updates, and deletes are performed **server-side only** (service-role key), so no client-side write policies are needed.
+
+### storage.objects — cp-tests bucket
+
+The bucket itself is inserted with `public = false`.
+
+| Policy name | Command | Applied to | Summary |
+| :--- | :--- | :--- | :--- |
+| cp_tests_admin_insert | INSERT | authenticated | Admin-only, scoped to bucket `cp-tests` |
+| cp_tests_admin_update | UPDATE | authenticated | Admin-only, same bucket |
+| cp_tests_admin_delete | DELETE | authenticated | Admin-only, same bucket |
+
+No public or authenticated SELECT policy exists — the file is read server-side via the service-role key only, so hidden tests never reach the browser.
+
+### submissions table (migration)
+
+`submission_url` has been altered to **drop NOT NULL** — CP submissions store no repo URL (the code lives in `cp_submission_details`).
+

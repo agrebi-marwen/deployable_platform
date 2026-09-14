@@ -1,6 +1,6 @@
 # PROJECT RESUME — The Time Portal
 
-A gamified monthly coding-challenge platform built and maintained by the **IEEE CS INSAT Student Branch Chapter**. Users solve monthly coding challenges, submit GitHub/GitLab repository links, earn Energy Points (EP), and climb a 7-tier rank ladder — all inside a cohesive 16-bit / 8-bit "temporal" design system.
+A gamified monthly coding-challenge platform built and maintained by the **IEEE CS INSAT Student Branch Chapter**. Users solve monthly coding challenges — submitting GitHub/GitLab repository links, or writing code in a built-in editor for auto-graded Competitive Programming challenges — earn Energy Points (EP), and climb a 7-tier rank ladder — all inside a cohesive 16-bit / 8-bit "temporal" design system.
 
 ---
 
@@ -9,8 +9,10 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | Layer | Technology |
 | :--- | :--- |
 | Frontend | Vanilla HTML5, CSS3, JavaScript (no framework) |
+| Code Editor (CP) | CodeMirror 6 (loaded as ESM via `cdn.jsdelivr.net`, CSP-safe module loader) |
 | Backend / Database | Supabase (PostgreSQL + Auth + Row Level Security) |
-| Serverless Functions | Vercel (Node.js) — `api/config`, `api/rateLimit` |
+| CP Judge | Piston API (public, `emkc.org/api/v2/piston/execute`) with a C++ output comparator running on Piston itself |
+| Serverless Functions | Vercel (Node.js ESM) — `api/config`, `api/rateLimit`, `api/authLogin`, `api/authSignup`, `api/adminCheck`, `api/cpSubmit` |
 | Runtime Dependencies | Supabase JS SDK (`supabase-js`), Google Fonts (Press Start 2P, VT323, Space Grotesk) |
 | Deployment | Vercel (`vercel.json`), or local via `python -m http.server` |
 
@@ -50,17 +52,17 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 
 ### 2.5 Submission Flow (`dashboard/submit.html`)
 - Displays full challenge details (title, month epoch, EP reward, instructions) tinted with the epoch color.
-- Accepts a **GitHub or GitLab repository URL**, validated by regex on both client (HTML pattern) and JS.
-- Inserts a submission with `status = PENDING`.
+- **Repo submission (default)**: accepts a GitHub or GitLab repository URL, validated by regex on both client (HTML pattern) and JS; inserts a submission with `status = PENDING`.
+- **Competitive Programming mode**: when the challenge's category slug is `competitive-programming`, the repo form is replaced with an in-browser **CodeMirror 6 editor**, a language selector (populated from the admin's allowed-languages list), a limits bar (time + memory), and a **Run & Submit** button. Code is POSTed to `../api/cpSubmit`; verdict (AC/WA/TLE/RE/CE) is shown inline as a banner with a particle burst on AC.
 - Success feedback with an animated particle burst.
 
 ### 2.6 Submissions Log (`dashboard/submissions.html`)
-- Table of the user's submission history: timestamp, challenge title (joined from `challenges`), repository URL (safe, opens in new tab), and status badge.
+- Table of the user's submission history: timestamp, challenge title (joined from `challenges`), **Details** column (repo URL for regular challenges; language badge + verdict badge for CP challenges), and status badge.
 
 ### 2.7 Admin Panel (`admin/admin.html`)
 - **Two-step authorization**: (1) Supabase database role check (`role = 'admin'`), (2) admin password loaded from the serverless config endpoint (kept secret from the client).
-- **Deploy new challenge**: title, EP reward, instructions, active toggle — automatically tagged to the current month/year.
-- **Review pending submissions**: approve or reject, with animated card removal and live refresh.
+- **Deploy new challenge**: title, EP reward, instructions, active toggle — automatically tagged to the current month/year. Selecting a `Competitive Programming` category reveals an inline judge-config panel: time limit (100–1000 ms), memory limit (16–1024 MB), allowed languages (C++/C/Python/Java checkboxes), and a JSON test-case file upload (`test_cases.json` → gzipped client-side into the private `cp-tests` storage bucket).
+- **Review pending submissions**: approve or reject, with animated card removal and live refresh; pending CP submissions now show language + verdict alongside the approve/reject buttons.
 - **Roadmap operations**: deploy/edit/delete learning paths (title, slug, description, difficulty) and manage their steps (add, edit, delete, reorder via up/down, resources as `Title | URL` lines).
 
 ### 2.8 Learn — Roadmaps (`dashboard/learn.html`, `dashboard/roadmap.html`)
@@ -76,6 +78,12 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 - **Admin management** (`admin/admin.html`): deploy/edit/delete workshops (title, category, Drive link, duration, description, published date) and manage categories (auto-slugged, edit/delete).
 - **Schema** (`db/workshops.sql`): `workshop_categories` (slug unique) and `workshops` (category FK → CASCADE) with RLS — reads for `authenticated`, writes restricted to admins (`profiles.role = 'admin'`).
 
+### 2.10 Competitive Programming Judge (`api/cpSubmit.js`)
+- **Config**: per-challenge row in `cp_problems` (time limit, memory limit, allowed languages, gzipped test file path in `cp-tests` bucket). Created inline by the admin when the challenge category is `competitive-programming`.
+- **Judge flow** (`api/cpSubmit.js`): authenticates the caller → loads config + gunzips tests server-side (via the private `SUPABASE_SERVICE_ROLE_KEY`) → runs the user's code on Piston per test case (early stop on CE/TLE/RE) → compares all outputs in one pass using a C++ comparator running on Piston → persists verdict (`cp_submission_details.verdict`: AC/WA/TLE/RE/CE) and mirrors AC to `submissions.status = 'APPROVED'` (existing roadmap gating counts APPROVED submissions).
+- **Comparator** (`api/_lib/piston.js`): length-prefixed stdin of `(actual, expected)` byte pairs; normalizes trailing whitespace per line, drops trailing blank lines; returns `AC\n` or `WA\n<index>`.
+- **Schema** (`db/cp_problems.sql`): `cp_problems` (one per challenge, unique FK), `cp_submission_details` (one per submission, unique FK, code + verdict + time/memory stats + per-test jsonb), private `cp-tests` storage bucket (admin-only insert/update/delete), `submissions.submission_url` made nullable.
+
 ---
 
 ## 3. Security Measures
@@ -85,6 +93,8 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 - **Serverless config endpoint** (`api/config`): serves Supabase credentials and admin password from environment variables — never exposed in client source; adds CORS allowlist, `X-Content-Type-Options`, `X-Frame-Options`, HSTS, CSP, and 1-hour caching.
 - **Rate limiting** (`api/rateLimit`): 5 auth attempts per 15 minutes per IP+email hash (SHA-256), returns HTTP 429 with retry-after.
 - **Auth hardening**: password-strength policy, session persistence, route guards (pages redirect unauthenticated users to login).
+- **CP judge (server-side only)**: test files live in a private Supabase Storage bucket (`cp-tests`) readable only with `SUPABASE_SERVICE_ROLE_KEY`; the `api/cpSubmit.js` endpoint reads tests and writes results server-side — no hidden tests or API keys ever reach the browser. `cp_problems` rows are readable by `authenticated` users (to show the editor), but storage objects are not.
+- **Piston API key**: optional `PISTON_API_KEY` is sent as the `Authorization` header when set; the emkc.org public endpoint also works without it.
 
 ---
 
@@ -117,16 +127,23 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | `account/signup.html` / `assets/js/pages/signup.js` | Signup page |
 | `dashboard/dashboard.html` / `assets/js/pages/dashboard.js` | Main user dashboard |
 | `dashboard/challenges.html` / `assets/js/pages/challenges.js` | Challenge archive |
-| `dashboard/submit.html` / `assets/js/pages/submit.js` | Solution submission |
-| `dashboard/submissions.html` / `assets/js/pages/submissions.js` | Submission history |
-| `admin/admin.html` / `assets/js/pages/admin.js` | Admin challenge deployment & review + roadmap/step management |
+| `dashboard/submit.html` / `assets/js/pages/submit.js` | Solution submission (repo URL or CP editor) |
+| `dashboard/submissions.html` / `assets/js/pages/submissions.js` | Submission history (verdicts for CP) |
+| `admin/admin.html` / `assets/js/pages/admin.js` | Admin: deploy challenges + CP config + review subs + roadmap mgmt |
 | `dashboard/learn.html` / `assets/js/pages/learn.js` | Learning path index with progress |
 | `dashboard/roadmap.html` / `assets/js/pages/roadmap.js` | Path detail: steps, resources, per-account completion |
 | `dashboard/workshops.html` / `assets/js/pages/workshops.js` | Workshop video archive with category filters + player modal |
+| `db/cp_problems.sql` | CP judge tables, `cp-tests` storage bucket, RLS policies |
 | `db/roadmaps.sql` | Supabase schema + RLS + seed data for the Learn feature |
 | `db/workshops.sql` | Supabase schema + RLS for the Workshops feature |
 | `api/config.js` | Secure config serverless function |
+| `api/authLogin.js` / `api/authSignup.js` | Server-side auth endpoints (rate-limited) |
+| `api/adminCheck.js` | Admin role + password verification |
+| `api/cpSubmit.js` | CP judge endpoint (Piston + comparator, maxDuration 60 s) |
+| `api/_lib/piston.js` | Piston client, language config, C++ comparator constant |
 | `api/rateLimit.js` | Auth rate-limiting serverless function |
-| `assets/js/` | Shared helpers: config, cache, theme, galaxy, lighting, creative |
-| `assets/css/` | Shared `global.css` + per-page `account.css`, `admin.css`, `dashboard.css`, `learn.css`, `workshops.css` |
+| `assets/js/codemirror-loader.js` | CodeMirror 6 ESM loader (CSP-safe, exposed via `window.cm*` globals) |
+| `assets/js/` | Shared helpers: config, common, security, cache, theme, galaxy, lighting, creative |
+| `assets/css/` | `global.css` + per-context stylesheets including `dashboard.css` (CP editor/verdict CSS) |
 | `DESIGN.md` | Design system specification |
+| `PROJECT_RESUME.md` | This file |
