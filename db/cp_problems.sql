@@ -143,6 +143,21 @@ create policy "cp_details_admin_select"
 --    If your project already has default storage policies, they do not conflict
 --    because everything is scoped to bucket_id = 'cp-tests'. Ensure no public
 --    read policy is added for this bucket or hidden tests would leak.
+--
+--    NOTE: storage.buckets and storage.objects are owned by the
+--    supabase_storage_admin role, not by the role your SQL editor session runs
+--    as, so this script does NOT try to ALTER TABLE ... ENABLE ROW LEVEL
+--    SECURITY or GRANT on those tables (that fails with "must be owner of
+--    table buckets"). Supabase already ships with RLS enabled on both by
+--    default and the necessary grants already in place, so only the policy
+--    statements below are needed - creating/dropping policies is explicitly
+--    delegated to the postgres role even without table ownership.
+--
+--    IMPORTANT: if the admin panel reports
+--      "Failed to upload test file: new row violates row-level security policy"
+--    then this file has NOT been (re)run, or one of these policies is missing.
+--    The statements below are idempotent - run them again in the
+--    Supabase SQL Editor and the error clears.
 -- ----------------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('cp-tests', 'cp-tests', false)

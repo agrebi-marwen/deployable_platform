@@ -211,11 +211,38 @@ challengeForm.addEventListener('submit', async (e) => {
       if (err) throw new Error("Failed to compress test file: " + err.message);
 
       const testFilePath = `${challengeId}/tests.json.gz`;
-      const { error: upErr } = await supabaseClient.storage
-        .from('cp-tests')
-        .upload(testFilePath, gz, { contentType: 'application/gzip', upsert: true });
 
-      if (upErr) throw new Error("Failed to upload test file: " + upErr.message);
+      // Confirm which user is attached to the client performing the upload.
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+      const { data: identity } = await supabaseClient.auth.getUser();
+      console.log("[cp] uploading test file as user:", identity?.user?.id || session?.user?.id);
+      if (sessionError || !session?.access_token) {
+        throw new Error("Session invalid — please log in again.");
+      }
+
+      // Upload server-side with the service role key. Direct client uploads to
+      // the private bucket are rejected by storage.objects RLS (Storage can
+      // evaluate the authenticated request under the anon role), so the gzipped
+      // archive is posted to our API route, which bypasses RLS. See
+      // api/cpTestUpload.js.
+      const gzBase64 = await blobToBase64(gz);
+      const upRes = await fetch('../api/cpTestUpload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ challengeId, gzipBase64: gzBase64 })
+      });
+
+      const upResult = await upRes.json().catch(() => ({}));
+      if (!upRes.ok || !upResult.ok) {
+        let message = upResult.error || `Storage upload failed (${upRes.status})`;
+        if (/row[- ]level security|supabase_storage_admin/i.test(String(message))) {
+          message += " — the upload must use SUPABASE_SERVICE_ROLE_KEY to bypass storage RLS; confirm that env var is set in Vercel.";
+        }
+        throw new Error("Failed to upload test file: " + message);
+      }
 
       const { error: cpErr } = await supabaseClient.from('cp_problems').insert([{
         challenge_id: challengeId,
@@ -261,6 +288,20 @@ function readJsonFile(file) {
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(reader.error || new Error('read failed'));
     reader.readAsText(file);
+  });
+}
+
+// Read a Blob/File as a bare base64 string (strips the data-URL prefix).
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      const comma = result.indexOf(',');
+      resolve(comma === -1 ? result : result.slice(comma + 1));
+    };
+    reader.onerror = () => reject(reader.error || new Error('read failed'));
+    reader.readAsDataURL(blob);
   });
 }
 
