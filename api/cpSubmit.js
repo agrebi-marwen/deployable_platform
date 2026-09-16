@@ -30,6 +30,10 @@ async function rest(path, { method = 'GET', body, token } = {}) {
     apikey: supabaseKey(),
     'Content-Type': 'application/json'
   };
+  // PostgREST returns no body for write requests by default (return=minimal),
+  // but the judge needs the created row back to get its id. Ask for the
+  // representation so a successful POST actually yields the inserted object.
+  if (method === 'POST') headers.Prefer = 'return=representation';
   headers.Authorization = token ? `Bearer ${token}` : `Bearer ${supabaseKey()}`;
   const res = await fetch(`${supabaseUrl()}${path}`, {
     method,
@@ -38,7 +42,7 @@ async function rest(path, { method = 'GET', body, token } = {}) {
   });
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
-  return { ok: res.ok, status: res.status, data };
+  return { ok: res.ok, status: res.status, data, text };
 }
 
 // Download + decompress the gzip test archive from the cp-tests bucket.
@@ -182,7 +186,8 @@ export default async function handler(req, res) {
       }
     });
     if (!subResp.ok || !subResp.data || !subResp.data[0]) {
-      res.status(500).json({ error: 'Failed to record submission' });
+      const reason = subResp.text ? ` (${subResp.status}: ${subResp.text.slice(0, 300)})` : ` (${subResp.status})`;
+      res.status(500).json({ error: 'Failed to record submission' + reason });
       return;
     }
     const submission = subResp.data[0];
@@ -200,7 +205,8 @@ export default async function handler(req, res) {
       }
     });
     if (!detailResp.ok || !detailResp.data || !detailResp.data[0]) {
-      res.status(500).json({ error: 'Failed to record submission details' });
+      const reason = detailResp.text ? ` (${detailResp.status}: ${detailResp.text.slice(0, 300)})` : ` (${detailResp.status})`;
+      res.status(500).json({ error: 'Failed to record submission details' + reason });
       return;
     }
     const detailId = detailResp.data[0].id;
