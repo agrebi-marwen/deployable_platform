@@ -55,6 +55,13 @@ async function initDashboard() {
   await fetchUserProfile();
   await fetchDashboardData();
   await fetchRegistry();
+
+  // Auto-open the leaderboard modal when arriving via dashboard.html#leaderboard.
+  if (window.location.hash === '#leaderboard') {
+    leaderboardModal.classList.add('active');
+    fetchLeaderboard();
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
 async function fetchUserProfile() {
