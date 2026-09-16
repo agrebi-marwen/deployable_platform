@@ -17,32 +17,28 @@ const repoBlock = document.getElementById('repo-submit-block');
 const cpBlock   = document.getElementById('cp-submit-block');
 const cpLangSlct = document.getElementById('cp-language');
 const cpLimitsEl = document.getElementById('cp-limits');
+const cpFileInput = document.getElementById('cp-file');
+const cpFileNameEl = document.getElementById('cp-file-name');
 const cpSubmitBtn = document.getElementById('cp-submit-btn');
 const cpVerdictEl = document.getElementById('cp-verdict');
 
 let currentUserId = null;
 let challengeId = null;
 let isCpChallenge = false;
-let cpEditorView = null;
-let cmLoadAttempt = 0;
 
-// Capture the real reason if the CodeMirror loader fails, so the editor error
-// message includes the underlying network/CSP error instead of hiding it.
-window.__cmLoadError = null;
-window.addEventListener('error', (e) => {
-  if (e.target && e.target.tagName === 'SCRIPT' && String(e.target.src || '').includes('codemirror-loader.js')) {
-    window.__cmLoadError = e.message || String(e.error && e.error.message) || 'module failed to load';
-  }
-});
-window.addEventListener('unhandledrejection', (e) => {
-  if (e.reason && e.reason.message) window.__cmLoadError = e.reason.message;
-});
+const MAX_CODE_LENGTH = 256 * 1024; // 256 KB of source
 
-const LANG_TEMPLATES = {
-  c: `#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n`,
-  'c++': `#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n`,
-  python: `def main():\n    pass\n\nif __name__ == "__main__":\n    main()\n`,
-  java: `public class Main {\n    public static void main(String[] args) {\n    }\n}\n`
+const FILE_LANG = {
+  '.c': 'c',
+  '.cpp': 'c++',
+  '.cc': 'c++',
+  '.cxx': 'c++',
+  '.c++': 'c++',
+  '.h': 'c++',
+  '.hpp': 'c++',
+  '.py': 'python',
+  '.py3': 'python',
+  '.java': 'java'
 };
 
 async function initSubmitPage() {
@@ -122,49 +118,45 @@ async function loadCpConfig() {
   const ml = data.memory_limit_mb || 256;
   cpLimitsEl.textContent = `Time: ${tl} ms  ·  Memory: ${ml} MB  ·  ${allowed.length} language${allowed.length > 1 ? 's' : ''}`;
 
-  waitForEditor('cp-editor', LANG_TEMPLATES[cpLangSlct.value] || LANG_TEMPLATES['c++'], cpLangSlct.value);
-
-  cpLangSlct.addEventListener('change', () => {
-    if (!cpEditorView) return;
-    window.cmSetCode(cpEditorView, LANG_TEMPLATES[cpLangSlct.value] || '');
-    window.cmSetLanguage(cpEditorView, cpLangSlct.value);
-  });
-
+  cpFileInput.addEventListener('change', handleFileSelect);
   cpSubmitBtn.addEventListener('click', handleCpSubmit);
 }
 
-// Ensure the CodeMirror loader is running, then mount the editor.
-// The loader pulls ESM bundles from jsDelivr's "+esm" endpoint, which has had
-// intermittent production outages; if the static module in the page never
-// initialises, retry with a cache-busted import so a stale/corrupt CDN bundle
-// gets bypassed, and report the actual error if it still fails.
-async function waitForEditor(containerId, source, lang) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
+// A source file was picked — validate size and auto-detect the language from
+// its extension so the user only has to attach a file and submit.
+function handleFileSelect() {
+  const file = cpFileInput.files && cpFileInput.files[0];
+  if (!file) return;
 
-  for (;;) {
-    if (typeof window.makeCodeEditor === 'function') {
-      cpEditorView = window.makeCodeEditor(el);
-      if (source) window.cmSetCode(cpEditorView, source);
-      if (lang)  window.cmSetLanguage(cpEditorView, lang);
-      return;
-    }
-
-    if (cmLoadAttempt++ >= 2) {
-      const detail = window.__cmLoadError
-        ? ` (${window.__cmLoadError})`
-        : ' (see the browser console for details)';
-      el.innerHTML = `<p style="color:#fe4e00;">Code editor failed to load${detail}. Please refresh the page.</p>`;
-      return;
-    }
-
-    const bust = cmLoadAttempt === 1 ? '' : `?t=${Date.now()}`;
-    await import(`/assets/js/codemirror-loader.js${bust}`)
-      .catch((e) => {
-        window.__cmLoadError = e && e.message ? e.message : String(e);
-      });
-    await new Promise((resolve) => setTimeout(resolve, 250));
+  if (file.size > MAX_CODE_LENGTH) {
+    cpFileNameEl.textContent = 'File too large (max 256 KB).';
+    cpFileNameEl.style.color = '#fe4e00';
+    return;
   }
+
+  const ext = (file.name.match(/(\.[^.]+)$/) || [])[1] || '';
+  const inferred = FILE_LANG[ext.toLowerCase()];
+  if (inferred) {
+    const allowedVals = Array.from(cpLangSlct.options).map(o => o.value);
+    if (allowedVals.includes(inferred)) cpLangSlct.value = inferred;
+  }
+
+  cpFileNameEl.textContent = `${file.name} (${file.size} bytes)`;
+  cpFileNameEl.style.color = 'var(--text-mid)';
+}
+
+// Read the currently selected file as UTF-8 text (used at submit time).
+function readSelectedFile() {
+  const file = cpFileInput.files && cpFileInput.files[0];
+  if (!file) return Promise.resolve('');
+  if (file.size > MAX_CODE_LENGTH) return Promise.resolve('');
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => resolve('');
+    reader.readAsText(file);
+  });
 }
 
 // Handle Form Submission (repo)
@@ -217,9 +209,9 @@ submissionForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Handle CP submission (code editor → judge endpoint)
+// Handle CP submission (attached source file → judge endpoint)
 async function handleCpSubmit() {
-  if (!cpEditorView || !currentUserId || !challengeId) return;
+  if (!currentUserId || !challengeId) return;
 
   cpSubmitBtn.disabled = true;
   cpSubmitBtn.textContent = "Judging...";
@@ -227,11 +219,11 @@ async function handleCpSubmit() {
   submissionMessage.textContent = "Running your code against test cases...";
   submissionMessage.style.color = "var(--text-strong)";
 
-  const code = window.cmGetCode(cpEditorView);
+  const code = await readSelectedFile();
   const language = cpLangSlct.value;
 
   if (!code.trim()) {
-    submissionMessage.textContent = "Your solution is empty. Write some code first.";
+    submissionMessage.textContent = "Attach a source file with your solution first.";
     submissionMessage.style.color = "#fe4e00";
     cpSubmitBtn.disabled = false;
     cpSubmitBtn.textContent = "Run & Submit";

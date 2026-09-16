@@ -1596,16 +1596,26 @@
    COMPETITIVE PROGRAMMING — editor, verdicts, admin CP settings
    ========================================================================== */
 
-/* Editor shell */
-.cp-editor-shell {
-  border: 2px solid rgba(131,181,209,0.15);
-  background: #0a0a0a;
-  border-radius: 4px;
-  height: 420px;
-  overflow: hidden;
-  margin: 10px 0 14px;
+/* File attach */
+#cp-file {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  background: var(--bg-abyss);
+  border: var(--border-thin);
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  border-radius: 0;
+  cursor: pointer;
 }
-.cp-editor-shell .cm-editor { height: 100%; }
+#cp-file:focus { border-color: var(--neon-cyan); }
+.cp-file-name {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  margin-bottom: 12px;
+  font-family: var(--font-mono);
+  min-height: 1.2em;
+}
 
 /* Limits pill */
 .cp-limits {

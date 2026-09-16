@@ -1,6 +1,6 @@
 # PROJECT RESUME — The Time Portal
 
-A gamified monthly coding-challenge platform built and maintained by the **IEEE CS INSAT Student Branch Chapter**. Users solve monthly coding challenges — submitting GitHub/GitLab repository links, or writing code in a built-in editor for auto-graded Competitive Programming challenges — earn Energy Points (EP), and climb a 7-tier rank ladder — all inside a cohesive 16-bit / 8-bit "temporal" design system.
+A gamified monthly coding-challenge platform built and maintained by the **IEEE CS INSAT Student Branch Chapter**. Users solve monthly coding challenges — submitting GitHub/GitLab repository links, or attaching a source file for auto-graded Competitive Programming challenges — earn Energy Points (EP), and climb a 7-tier rank ladder — all inside a cohesive 16-bit / 8-bit "temporal" design system.
 
 ---
 
@@ -9,7 +9,7 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | Layer | Technology |
 | :--- | :--- |
 | Frontend | Vanilla HTML5, CSS3, JavaScript (no framework) |
-| Code Editor (CP) | CodeMirror 6 (loaded as ESM via `cdn.jsdelivr.net`, CSP-safe module loader) |
+| CP Submission | Attach a source file (`.c`, `.cpp`, `.cc`, `.cxx`, `.py`, `.java`); language auto-detected from the extension, sent to the judge |
 | Backend / Database | Supabase (PostgreSQL + Auth + Row Level Security) |
 | CP Judge | Piston API (public, `emkc.org/api/v2/piston/execute`) with a C++ output comparator running on Piston itself |
 | Serverless Functions | Vercel (Node.js ESM) — `api/config`, `api/rateLimit`, `api/authLogin`, `api/authSignup`, `api/adminCheck`, `api/cpSubmit` |
@@ -53,7 +53,7 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 ### 2.5 Submission Flow (`dashboard/submit.html`)
 - Displays full challenge details (title, month epoch, EP reward, instructions) tinted with the epoch color.
 - **Repo submission (default)**: accepts a GitHub or GitLab repository URL, validated by regex on both client (HTML pattern) and JS; inserts a submission with `status = PENDING`.
-- **Competitive Programming mode**: when the challenge's category slug is `competitive-programming`, the repo form is replaced with an in-browser **CodeMirror 6 editor**, a language selector (populated from the admin's allowed-languages list), a limits bar (time + memory), and a **Run & Submit** button. Code is POSTed to `../api/cpSubmit`; verdict (AC/WA/TLE/RE/CE) is shown inline as a banner with a particle burst on AC.
+- **Competitive Programming mode**: when the challenge's category slug is `competitive-programming`, the repo form is replaced with a **file-attach** area (with a language selector auto-populated from the admin's allowed-languages list and pre-filled from the file extension), a limits bar (time + memory), and a **Run & Submit** button. The attached source file is read client-side and POSTed to `../api/cpSubmit`; verdict (AC/WA/TLE/RE/CE) is shown inline as a banner with a particle burst on AC.
 - Success feedback with an animated particle burst.
 
 ### 2.6 Submissions Log (`dashboard/submissions.html`)
@@ -127,7 +127,7 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | `account/signup.html` / `assets/js/pages/signup.js` | Signup page |
 | `dashboard/dashboard.html` / `assets/js/pages/dashboard.js` | Main user dashboard |
 | `dashboard/challenges.html` / `assets/js/pages/challenges.js` | Challenge archive |
-| `dashboard/submit.html` / `assets/js/pages/submit.js` | Solution submission (repo URL or CP editor) |
+| `dashboard/submit.html` / `assets/js/pages/submit.js` | Solution submission (repo URL or CP file attach) |
 | `dashboard/submissions.html` / `assets/js/pages/submissions.js` | Submission history (verdicts for CP) |
 | `admin/admin.html` / `assets/js/pages/admin.js` | Admin: deploy challenges + CP config + review subs + roadmap mgmt |
 | `dashboard/learn.html` / `assets/js/pages/learn.js` | Learning path index with progress |
@@ -142,8 +142,7 @@ A gamified monthly coding-challenge platform built and maintained by the **IEEE 
 | `api/cpSubmit.js` | CP judge endpoint (Piston + comparator, maxDuration 60 s) |
 | `api/_lib/piston.js` | Piston client, language config, C++ comparator constant |
 | `api/rateLimit.js` | Auth rate-limiting serverless function |
-| `assets/js/codemirror-loader.js` | CodeMirror 6 ESM loader (CSP-safe, exposed via `window.cm*` globals) |
 | `assets/js/` | Shared helpers: config, common, security, cache, theme, galaxy, lighting, creative |
-| `assets/css/` | `global.css` + per-context stylesheets including `dashboard.css` (CP editor/verdict CSS) |
+| `assets/css/` | `global.css` + per-context stylesheets including `dashboard.css` (CP file-attach/verdict CSS) |
 | `DESIGN.md` | Design system specification |
 | `PROJECT_RESUME.md` | This file |

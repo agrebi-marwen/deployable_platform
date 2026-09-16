@@ -25,7 +25,6 @@
   <script src="../assets/js/cursor-lighting.js" defer></script>
   <script src="../assets/js/creative.js" defer></script>
   <script src="../assets/js/pages/submit.js" defer></script>
-  <script type="module" src="../assets/js/codemirror-loader.js"></script>
 </head>
 <body>
 
@@ -114,16 +113,16 @@
 
               <!-- CP submission block (hidden unless challenge is graded) -->
               <div id="cp-submit-block" style="display:none;">
-                <p class="sub-text">Write your solution, then hit <strong>Run &amp; Submit</strong>. Code is judged against hidden test cases.</p>
+                <p class="sub-text">Attach your source file below. Code is judged against hidden test cases; the language is detected from the file extension.</p>
 
                 <label for="cp-language">Language</label>
                 <select id="cp-language"></select>
 
                 <div class="cp-limits" id="cp-limits"></div>
 
-                <div class="cp-editor-shell">
-                  <div id="cp-editor"></div>
-                </div>
+                <label for="cp-file">Source File</label>
+                <input type="file" id="cp-file" accept=".c,.cpp,.cc,.cxx,.py,.java">
+                <div class="cp-file-name" id="cp-file-name"></div>
 
                 <button type="button" id="cp-submit-btn" class="cp-submit-btn">Run &amp; Submit</button>
                 <div id="cp-verdict" class="cp-verdict" style="display:none;"></div>

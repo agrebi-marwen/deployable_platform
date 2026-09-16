@@ -1,7 +1,7 @@
 # THE TIME PORTAL — deployable_platform
 
 A gamified monthly coding-challenge platform built and maintained by the **IEEE CS INSAT Student Branch Chapter**.
-Users solve monthly coding challenges (submit GitHub/GitLab repos or write code in a built-in editor for Competitive Programming challenges), earn Energy Points (EP), climb a 7-tier rank ladder, follow learning roadmaps, and watch workshop videos — all inside a 16-bit / 8-bit "temporal" design system (see `DESIGN.md`).
+Users solve monthly coding challenges (submit GitHub/GitLab repos or attach a source file for Competitive Programming challenges), earn Energy Points (EP), climb a 7-tier rank ladder, follow learning roadmaps, and watch workshop videos — all inside a 16-bit / 8-bit "temporal" design system (see `DESIGN.md`).
 
 ---
 
@@ -10,7 +10,7 @@ Users solve monthly coding challenges (submit GitHub/GitLab repos or write code 
 | Layer | Technology |
 | :--- | :--- |
 | Frontend | Vanilla HTML5 + CSS3 + ES6 JS, no framework, no build step |
-| Editor (CP only) | CodeMirror 6, loaded as ESM from `cdn.jsdelivr.net` (`assets/js/codemirror-loader.js`) |
+| CP submission | Users attach a source file (`.c/.cpp/.py/.java`); language detected from the extension |
 | Backend / Database | Supabase (PostgreSQL + Auth + Row Level Security), queried in-browser via `supabase-js` UMD |
 | Judge | Piston API (`https://emkc.org/api/v2/piston/execute` + `/runtimes`), public + optional `PISTON_API_KEY` |
 | Serverless | Vercel Node.js functions in `api/` (ESM) |
@@ -38,7 +38,6 @@ Users solve monthly coding challenges (submit GitHub/GitLab repos or write code 
 │   ├── js/                  shared: config, common, security, theme, galaxy-bg,
 │   │                        cursor-lighting, creative, perf-mode, api-cache
 │   ├── js/pages/            one file per page (admin, submit, dashboard, ...)
-│   ├── js/codemirror-loader.js   CP editor ESM loader (CSP-safe)
 │   └── css/                 global.css + per-context css
 ├── db/                      *.sql schema + RLS, run in Supabase SQL Editor
 │   ├── tables.sql / challenges.sql / roadmaps.sql / roadmap_nodes.sql
@@ -81,7 +80,7 @@ Database schema lives in `db/*.sql`; apply new migrations in the Supabase SQL Ed
 
 - **No build step.** Pages are plain HTML that load `theme.js` early, then `config.js` → `common.js` → `security.js`/`api-cache.js`/effect scripts → `pages/<page>.js` (all `defer`). Page scripts bootstrap with `initApp(initPageFn)`; every page calls `requireSession()` to enforce the auth wall.
 - **API functions are ESM.** `api/**` uses `import`/`export default`. `node --check` on a `.js` file needs an ESM parse — copy it to `.mjs` in temp first, e.g. `Copy-Item x.js $env:TEMP\opencode\x.mjs` then `node --check`. Files in `api/_lib/` are never deployed as routes (Vercel ignores `_` dirs).
-- **Content Security Policy (`vercel.json`) limits:** `script-src 'self' https://cdn.jsdelivr.net` — **no inline scripts**; any new JS dependency must be an ESM URL on `cdn.jsdelivr.net` (this is why CodeMirror is loaded by `codemirror-loader.js` as a module with `window.cm*` globals). `connect-src 'self' https://*.supabase.co` — browser code may only reach Supabase, so the judge must run on the server (`api/`) to touch Piston.
+- **Content Security Policy (`vercel.json`) limits:** `script-src 'self' https://cdn.jsdelivr.net` — **no inline scripts**; any new JS dependency must be an ESM URL on `cdn.jsdelivr.net`. `connect-src 'self' https://*.supabase.co` — browser code may only reach Supabase, so the judge must run on the server (`api/`) to touch Piston.
 - **Paths from `dashboard/*.html` to API:** `../api/<fn>`. Signals: `pages/admin.js`, `pages/login.js` use `fetch('../api/...')`.
 - **XSS:** always `escapeHtml()` dynamic strings; untrusted URLs go through `safeUrl()`.
 - **New DB feature = new `db/<name>.sql`** with `IF NOT EXISTS`-safe statements + RLS policies, matching `cp_problems.sql` / `workshops.sql` style. Re-run is safe.
@@ -93,5 +92,5 @@ Database schema lives in `db/*.sql`; apply new migrations in the Supabase SQL Ed
 
 - Admin sets time limit (100–1000 ms) and memory limit (1–10 MB), allowed languages, and uploads a **single Codeforces-style test archive** `{ "input": "...", "expected": "..." }` — the input text starts with `t` (number of sub-tests) followed by all `t` data sets, and `expected` is the concatenated output. The browser gzips it and POSTs it to `api/cpTestUpload.js`, which re-verifies the admin session server-side and writes it with the service-role key (bypassing `storage.objects` RLS) to the **private** `cp-tests` bucket at `<challenge_id>/tests.json.gz`; the `cp_problems` row is then written (only visible when the challenge's category slug is `competitive-programming`).
 - `api/cpSubmit.js`: auth via Bearer token → reads config + gunzips tests with the service-role key → runs the user's code **once** on Piston with the whole input as stdin → compares the full stdout vs the full expected output in one C++ comparator pass → persists verdict into `cp_submission_details` (AC/WA/TLE/RE/CE) and mirrors AC → `submissions.status='APPROVED'` (roadmap gating counts APPROVED).
-- Submission page shows the CodeMirror editor only when `cp_problems` has a row for the challenge; otherwise the repo-URL form appears.
+- Submission page shows the CP file-attach block only when `cp_problems` has a row for the challenge; otherwise the repo-URL form appears.
 - ALL verdicts are written server-side only; `submissions.submission_url` is now nullable (CP rows have none).
