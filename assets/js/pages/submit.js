@@ -159,7 +159,7 @@ async function waitForEditor(containerId, source, lang) {
     }
 
     const bust = cmLoadAttempt === 1 ? '' : `?t=${Date.now()}`;
-    await import(`../assets/js/codemirror-loader.js${bust}`)
+    await import(`/assets/js/codemirror-loader.js${bust}`)
       .catch((e) => {
         window.__cmLoadError = e && e.message ? e.message : String(e);
       });
