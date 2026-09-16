@@ -44,6 +44,20 @@ create table if not exists public.cp_problems (
 create index if not exists cp_problems_challenge_id_idx on public.cp_problems (challenge_id);
 
 -- ----------------------------------------------------------------------------
+-- 1b. CONSTRAINT SYNC - "create table if not exists" skips existing tables, so
+--    a constraint changed in a later migration never reaches a DB where the
+--    table already existed (e.g. memory_limit_mb used to be 16..1024). Re-run
+--    this file to drop the old check and apply the current one.
+-- ----------------------------------------------------------------------------
+alter table public.cp_problems drop constraint if exists cp_problems_memory_limit_mb_check;
+alter table public.cp_problems add constraint cp_problems_memory_limit_mb_check
+  check (memory_limit_mb between 1 and 10);
+
+alter table public.cp_problems drop constraint if exists cp_problems_time_limit_ms_check;
+alter table public.cp_problems add constraint cp_problems_time_limit_ms_check
+  check (time_limit_ms between 100 and 1000);
+
+-- ----------------------------------------------------------------------------
 -- 2. CP SUBMISSION DETAILS - source code + judge verdict per submission.
 --    verdict: PENDING (judging) | AC | WA | TLE | RE | CE
 -- ----------------------------------------------------------------------------

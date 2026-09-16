@@ -24,6 +24,19 @@ let currentUserId = null;
 let challengeId = null;
 let isCpChallenge = false;
 let cpEditorView = null;
+let cmLoadAttempt = 0;
+
+// Capture the real reason if the CodeMirror loader fails, so the editor error
+// message includes the underlying network/CSP error instead of hiding it.
+window.__cmLoadError = null;
+window.addEventListener('error', (e) => {
+  if (e.target && e.target.tagName === 'SCRIPT' && String(e.target.src || '').includes('codemirror-loader.js')) {
+    window.__cmLoadError = e.message || String(e.error && e.error.message) || 'module failed to load';
+  }
+});
+window.addEventListener('unhandledrejection', (e) => {
+  if (e.reason && e.reason.message) window.__cmLoadError = e.reason.message;
+});
 
 const LANG_TEMPLATES = {
   c: `#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n`,
@@ -120,25 +133,38 @@ async function loadCpConfig() {
   cpSubmitBtn.addEventListener('click', handleCpSubmit);
 }
 
-// Poll until the module loader exposes window.makeCodeEditor.
-function waitForEditor(containerId, source, lang) {
+// Ensure the CodeMirror loader is running, then mount the editor.
+// The loader pulls ESM bundles from jsDelivr's "+esm" endpoint, which has had
+// intermittent production outages; if the static module in the page never
+// initialises, retry with a cache-busted import so a stale/corrupt CDN bundle
+// gets bypassed, and report the actual error if it still fails.
+async function waitForEditor(containerId, source, lang) {
   const el = document.getElementById(containerId);
   if (!el) return;
 
-  let tries = 0;
-  const maxTries = 100;
-  const timer = setInterval(() => {
-    tries++;
+  for (;;) {
     if (typeof window.makeCodeEditor === 'function') {
-      clearInterval(timer);
       cpEditorView = window.makeCodeEditor(el);
       if (source) window.cmSetCode(cpEditorView, source);
       if (lang)  window.cmSetLanguage(cpEditorView, lang);
-    } else if (tries >= maxTries) {
-      clearInterval(timer);
-      el.innerHTML = '<p style="color:#fe4e00;">Code editor failed to load. Please refresh the page.</p>';
+      return;
     }
-  }, 100);
+
+    if (cmLoadAttempt++ >= 2) {
+      const detail = window.__cmLoadError
+        ? ` (${window.__cmLoadError})`
+        : ' (see the browser console for details)';
+      el.innerHTML = `<p style="color:#fe4e00;">Code editor failed to load${detail}. Please refresh the page.</p>`;
+      return;
+    }
+
+    const bust = cmLoadAttempt === 1 ? '' : `?t=${Date.now()}`;
+    await import(`../assets/js/codemirror-loader.js${bust}`)
+      .catch((e) => {
+        window.__cmLoadError = e && e.message ? e.message : String(e);
+      });
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
 }
 
 // Handle Form Submission (repo)
