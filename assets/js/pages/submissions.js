@@ -21,6 +21,7 @@ async function fetchUserSubmissions(userId) {
             id,
             submitted_at,
             submission_url,
+            notes,
             status,
             challenges (
                 title
@@ -76,6 +77,8 @@ async function fetchUserSubmissions(userId) {
       detailHtml = `
         <span class="cp-detail-lang">${escapeHtml(langLabel)}</span>
         <span class="cp-detail-verdict ${escapeHtml(vClass)}">${escapeHtml(verdictCode)}</span>`;
+    } else if (sub.notes) {
+      detailHtml = `<span class="cp-detail-pending">${escapeHtml(sub.notes)}</span>`;
     } else if (sub.submission_url) {
       detailHtml = `<a href="${escapeHtml(sub.submission_url)}" target="_blank" rel="noopener noreferrer" class="table-link">${escapeHtml(sub.submission_url)}</a>`;
     } else {

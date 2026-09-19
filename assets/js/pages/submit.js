@@ -22,9 +22,15 @@ const cpFileNameEl = document.getElementById('cp-file-name');
 const cpSubmitBtn = document.getElementById('cp-submit-btn');
 const cpVerdictEl = document.getElementById('cp-verdict');
 
+const freebieBlock = document.getElementById('freebie-submit-block');
+const freebieForm = document.getElementById('freebie-form');
+const freebieAnswer = document.getElementById('freebie-answer');
+const freebieSubmitBtn = document.getElementById('freebie-submit-btn');
+
 let currentUserId = null;
 let challengeId = null;
 let isCpChallenge = false;
+let isFreebieChallenge = false;
 
 const MAX_CODE_LENGTH = 256 * 1024; // 256 KB of source
 
@@ -53,17 +59,20 @@ async function initSubmitPage() {
     challengeInstructions.textContent = "Please return to the dashboard and select a challenge.";
     submitBtn.disabled = true;
     cpSubmitBtn && (cpSubmitBtn.disabled = true);
+    freebieSubmitBtn && (freebieSubmitBtn.disabled = true);
     return;
   }
 
   await loadChallengeDetails();
   await loadCpConfig();
+  showSubmitBlock();
+  await applySubmissionAvailability();
 }
 
 async function loadChallengeDetails() {
   const { data: challenge, error } = await supabaseClient
     .from('challenges')
-    .select('*')
+    .select('*, challenge_categories(id, slug, name)')
     .eq('id', challengeId)
     .single();
 
@@ -73,8 +82,12 @@ async function loadChallengeDetails() {
     console.error("Fetch challenge error:", error);
     submitBtn.disabled = true;
     cpSubmitBtn && (cpSubmitBtn.disabled = true);
+    freebieSubmitBtn && (freebieSubmitBtn.disabled = true);
     return;
   }
+
+  const cat = challenge.challenge_categories;
+  isFreebieChallenge = !!(cat && (cat.slug === 'freebie' || String(cat.name || '').toLowerCase() === 'freebie'));
 
   challengeTitle.textContent = challenge.title;
   challengeMonth.textContent = challenge.month_year || "Active Challenge";
@@ -122,6 +135,16 @@ async function loadCpConfig() {
   cpSubmitBtn.addEventListener('click', handleCpSubmit);
 }
 
+// Pick which submission UI is shown: freebie > CP > repo.
+function showSubmitBlock() {
+  if (isFreebieChallenge) {
+    repoBlock.style.display = 'none';
+    submissionForm.style.display = 'none';
+    cpBlock.style.display = 'none';
+    freebieBlock.style.display = 'block';
+  }
+}
+
 // A source file was picked — validate size and auto-detect the language from
 // its extension so the user only has to attach a file and submit.
 function handleFileSelect() {
@@ -143,6 +166,55 @@ function handleFileSelect() {
 
   cpFileNameEl.textContent = `${file.name} (${file.size} bytes)`;
   cpFileNameEl.style.color = 'var(--text-mid)';
+}
+
+// Submission eligibility is enforced by the site (the DB no longer enforces a
+// single submission per user + challenge). Policy:
+//   - succeeded before (any APPROVED)                        -> blocked
+//   - a CP judge is currently running (PENDING, no repo URL) -> blocked
+//   - failed (REJECTED) or awaiting confirmation (PENDING)   -> allowed
+async function getSubmissionPolicy() {
+  const { data, error } = await supabaseClient
+    .from('submissions')
+    .select('status, submission_url')
+    .eq('user_id', currentUserId)
+    .eq('challenge_id', challengeId);
+
+  if (error) {
+    console.error("Submission policy check failed:", error);
+    return { allowed: true };
+  }
+
+  const subs = Array.isArray(data) ? data : [];
+  if (subs.some(s => s.status === 'APPROVED')) {
+    return {
+      allowed: false,
+      reason: "You've already succeeded on this challenge, so you can't submit again."
+    };
+  }
+  if (subs.some(s => s.status === 'PENDING' && !s.submission_url)) {
+    return {
+      allowed: false,
+      reason: "A submission is currently being judged. Wait for the verdict before submitting again."
+    };
+  }
+  return { allowed: true, reason: null };
+}
+
+function showSubmissionMessage(text, color) {
+  submissionMessage.textContent = text;
+  submissionMessage.style.color = color;
+}
+
+// On load, lock the forms if the user is not eligible to submit right now.
+async function applySubmissionAvailability() {
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    submitBtn.disabled = true;
+    cpSubmitBtn.disabled = true;
+    freebieSubmitBtn.disabled = true;
+    showSubmissionMessage(policy.reason, "#fe4e00");
+  }
 }
 
 // Read the currently selected file as UTF-8 text (used at submit time).
@@ -172,6 +244,13 @@ submissionForm.addEventListener('submit', async (e) => {
   if (!gitUrlRegex.test(url)) {
     submissionMessage.textContent = "Invalid URL. Please provide a valid GitHub or GitLab repository link.";
     submissionMessage.style.color = "#fe4e00";
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    showSubmissionMessage(policy.reason, "#fe4e00");
     submitBtn.disabled = false;
     return;
   }
@@ -209,9 +288,71 @@ submissionForm.addEventListener('submit', async (e) => {
   }
 });
 
+// Freebie challenge — a short-text answer that is always accepted. The user
+// must not learn that it always succeeds, so the flow mirrors a normal repo
+// submission (submit -> "waiting for admin approval") even though approval is
+// instant. The usual policy still applies: one successful submission per user.
+freebieForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const text = freebieAnswer.value.trim();
+  if (!text) {
+    showSubmissionMessage("Enter your answer first.", "#fe4e00");
+    return;
+  }
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    showSubmissionMessage(policy.reason, "#fe4e00");
+    return;
+  }
+
+  freebieSubmitBtn.disabled = true;
+  showSubmissionMessage("Submitting solution...", "var(--text-strong)");
+
+  const { error } = await supabaseClient
+    .from('submissions')
+    .insert([{
+      user_id: currentUserId,
+      challenge_id: challengeId,
+      submission_url: null,
+      notes: text,
+      status: 'APPROVED',
+      submitted_at: new Date().toISOString()
+    }]);
+
+  if (error) {
+    showSubmissionMessage("Failed to submit solution: " + error.message, "#fe4e00");
+    freebieSubmitBtn.disabled = false;
+    return;
+  }
+
+  freebieAnswer.value = "";
+  showSubmissionMessage("Solution submitted! Waiting for admin approval.", "#83b5d1");
+  freebieSubmitBtn.textContent = "Solution Submitted";
+
+  if (window.burstParticles) {
+    const rect = freebieSubmitBtn.getBoundingClientRect();
+    const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
+    window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
+  }
+
+  setTimeout(() => {
+    freebieSubmitBtn.disabled = false;
+    freebieSubmitBtn.textContent = "Submit Solution";
+  }, 3000);
+});
+
 // Handle CP submission (attached source file → judge endpoint)
 async function handleCpSubmit() {
   if (!currentUserId || !challengeId) return;
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    cpVerdictEl.style.display = 'none';
+    showSubmissionMessage(policy.reason, "#fe4e00");
+    return;
+  }
 
   cpSubmitBtn.disabled = true;
   cpSubmitBtn.textContent = "Judging...";
