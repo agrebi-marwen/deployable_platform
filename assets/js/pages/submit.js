@@ -22,9 +22,15 @@ const cpFileNameEl = document.getElementById('cp-file-name');
 const cpSubmitBtn = document.getElementById('cp-submit-btn');
 const cpVerdictEl = document.getElementById('cp-verdict');
 
+const freebieBlock = document.getElementById('freebie-submit-block');
+const freebieForm = document.getElementById('freebie-form');
+const freebieAnswer = document.getElementById('freebie-answer');
+const freebieSubmitBtn = document.getElementById('freebie-submit-btn');
+
 let currentUserId = null;
 let challengeId = null;
 let isCpChallenge = false;
+let isFreebieChallenge = false;
 
 const MAX_CODE_LENGTH = 256 * 1024; // 256 KB of source
 
@@ -53,18 +59,20 @@ async function initSubmitPage() {
     challengeInstructions.textContent = "Please return to the dashboard and select a challenge.";
     submitBtn.disabled = true;
     cpSubmitBtn && (cpSubmitBtn.disabled = true);
+    freebieSubmitBtn && (freebieSubmitBtn.disabled = true);
     return;
   }
 
   await loadChallengeDetails();
   await loadCpConfig();
+  showSubmitBlock();
   await applySubmissionAvailability();
 }
 
 async function loadChallengeDetails() {
   const { data: challenge, error } = await supabaseClient
     .from('challenges')
-    .select('*')
+    .select('*, challenge_categories(id, slug, name)')
     .eq('id', challengeId)
     .single();
 
@@ -74,8 +82,12 @@ async function loadChallengeDetails() {
     console.error("Fetch challenge error:", error);
     submitBtn.disabled = true;
     cpSubmitBtn && (cpSubmitBtn.disabled = true);
+    freebieSubmitBtn && (freebieSubmitBtn.disabled = true);
     return;
   }
+
+  const cat = challenge.challenge_categories;
+  isFreebieChallenge = !!(cat && (cat.slug === 'freebie' || String(cat.name || '').toLowerCase() === 'freebie'));
 
   challengeTitle.textContent = challenge.title;
   challengeMonth.textContent = challenge.month_year || "Active Challenge";
@@ -121,6 +133,16 @@ async function loadCpConfig() {
 
   cpFileInput.addEventListener('change', handleFileSelect);
   cpSubmitBtn.addEventListener('click', handleCpSubmit);
+}
+
+// Pick which submission UI is shown: freebie > CP > repo.
+function showSubmitBlock() {
+  if (isFreebieChallenge) {
+    repoBlock.style.display = 'none';
+    submissionForm.style.display = 'none';
+    cpBlock.style.display = 'none';
+    freebieBlock.style.display = 'block';
+  }
 }
 
 // A source file was picked — validate size and auto-detect the language from
@@ -190,6 +212,7 @@ async function applySubmissionAvailability() {
   if (!policy.allowed) {
     submitBtn.disabled = true;
     cpSubmitBtn.disabled = true;
+    freebieSubmitBtn.disabled = true;
     showSubmissionMessage(policy.reason, "#fe4e00");
   }
 }
@@ -263,6 +286,61 @@ submissionForm.addEventListener('submit', async (e) => {
       submitBtn.textContent = "Submit Solution";
     }, 3000);
   }
+});
+
+// Freebie challenge — a short-text answer that is always accepted. The user
+// must not learn that it always succeeds, so the flow mirrors a normal repo
+// submission (submit -> "waiting for admin approval") even though approval is
+// instant. The usual policy still applies: one successful submission per user.
+freebieForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const text = freebieAnswer.value.trim();
+  if (!text) {
+    showSubmissionMessage("Enter your answer first.", "#fe4e00");
+    return;
+  }
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    showSubmissionMessage(policy.reason, "#fe4e00");
+    return;
+  }
+
+  freebieSubmitBtn.disabled = true;
+  showSubmissionMessage("Submitting solution...", "var(--text-strong)");
+
+  const { error } = await supabaseClient
+    .from('submissions')
+    .insert([{
+      user_id: currentUserId,
+      challenge_id: challengeId,
+      submission_url: null,
+      notes: text,
+      status: 'APPROVED',
+      submitted_at: new Date().toISOString()
+    }]);
+
+  if (error) {
+    showSubmissionMessage("Failed to submit solution: " + error.message, "#fe4e00");
+    freebieSubmitBtn.disabled = false;
+    return;
+  }
+
+  freebieAnswer.value = "";
+  showSubmissionMessage("Solution submitted! Waiting for admin approval.", "#83b5d1");
+  freebieSubmitBtn.textContent = "Solution Submitted";
+
+  if (window.burstParticles) {
+    const rect = freebieSubmitBtn.getBoundingClientRect();
+    const hue = window.epochHue ? window.epochHue(challengeMonth.textContent) : undefined;
+    window.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, hue);
+  }
+
+  setTimeout(() => {
+    freebieSubmitBtn.disabled = false;
+    freebieSubmitBtn.textContent = "Submit Solution";
+  }, 3000);
 });
 
 // Handle CP submission (attached source file → judge endpoint)
