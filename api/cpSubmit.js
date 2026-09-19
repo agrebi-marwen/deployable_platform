@@ -153,6 +153,25 @@ export default async function handler(req, res) {
   }
 
   try {
+    // --- Enforce the site-side submission policy -----------------------------
+    // The DB no longer enforces a single submission per (user, challenge), so
+    // this check is authoritative:
+    //   - already succeeded (APPROVED)                        -> 409
+    //   - a judge is currently running (PENDING, no repo URL) -> 409
+    //   - failed (REJECTED) or awaiting confirmation (PENDING)-> allowed
+    const gateResp = await rest(
+      `/rest/v1/submissions?user_id=eq.${encodeURIComponent(user.id)}&challenge_id=eq.${encodeURIComponent(challengeId)}&select=status,submission_url`
+    );
+    const existing = Array.isArray(gateResp.data) ? gateResp.data : [];
+    if (existing.some(s => s.status === 'APPROVED')) {
+      res.status(409).json({ error: 'You have already succeeded on this challenge.' });
+      return;
+    }
+    if (existing.some(s => s.status === 'PENDING' && !s.submission_url)) {
+      res.status(409).json({ error: 'A submission is already being judged. Wait for the verdict before submitting again.' });
+      return;
+    }
+
     // --- Challenge + judge config -------------------------------------------
     const cpResp = await rest(`/rest/v1/cp_problems?challenge_id=eq.${encodeURIComponent(challengeId)}&select=*`);
     const cp = Array.isArray(cpResp.data) ? cpResp.data[0] : null;

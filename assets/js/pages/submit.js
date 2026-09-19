@@ -58,6 +58,7 @@ async function initSubmitPage() {
 
   await loadChallengeDetails();
   await loadCpConfig();
+  await applySubmissionAvailability();
 }
 
 async function loadChallengeDetails() {
@@ -145,6 +146,54 @@ function handleFileSelect() {
   cpFileNameEl.style.color = 'var(--text-mid)';
 }
 
+// Submission eligibility is enforced by the site (the DB no longer enforces a
+// single submission per user + challenge). Policy:
+//   - succeeded before (any APPROVED)                        -> blocked
+//   - a CP judge is currently running (PENDING, no repo URL) -> blocked
+//   - failed (REJECTED) or awaiting confirmation (PENDING)   -> allowed
+async function getSubmissionPolicy() {
+  const { data, error } = await supabaseClient
+    .from('submissions')
+    .select('status, submission_url')
+    .eq('user_id', currentUserId)
+    .eq('challenge_id', challengeId);
+
+  if (error) {
+    console.error("Submission policy check failed:", error);
+    return { allowed: true };
+  }
+
+  const subs = Array.isArray(data) ? data : [];
+  if (subs.some(s => s.status === 'APPROVED')) {
+    return {
+      allowed: false,
+      reason: "You've already succeeded on this challenge, so you can't submit again."
+    };
+  }
+  if (subs.some(s => s.status === 'PENDING' && !s.submission_url)) {
+    return {
+      allowed: false,
+      reason: "A submission is currently being judged. Wait for the verdict before submitting again."
+    };
+  }
+  return { allowed: true, reason: null };
+}
+
+function showSubmissionMessage(text, color) {
+  submissionMessage.textContent = text;
+  submissionMessage.style.color = color;
+}
+
+// On load, lock the forms if the user is not eligible to submit right now.
+async function applySubmissionAvailability() {
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    submitBtn.disabled = true;
+    cpSubmitBtn.disabled = true;
+    showSubmissionMessage(policy.reason, "#fe4e00");
+  }
+}
+
 // Read the currently selected file as UTF-8 text (used at submit time).
 function readSelectedFile() {
   const file = cpFileInput.files && cpFileInput.files[0];
@@ -172,6 +221,13 @@ submissionForm.addEventListener('submit', async (e) => {
   if (!gitUrlRegex.test(url)) {
     submissionMessage.textContent = "Invalid URL. Please provide a valid GitHub or GitLab repository link.";
     submissionMessage.style.color = "#fe4e00";
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    showSubmissionMessage(policy.reason, "#fe4e00");
     submitBtn.disabled = false;
     return;
   }
@@ -212,6 +268,13 @@ submissionForm.addEventListener('submit', async (e) => {
 // Handle CP submission (attached source file → judge endpoint)
 async function handleCpSubmit() {
   if (!currentUserId || !challengeId) return;
+
+  const policy = await getSubmissionPolicy();
+  if (!policy.allowed) {
+    cpVerdictEl.style.display = 'none';
+    showSubmissionMessage(policy.reason, "#fe4e00");
+    return;
+  }
 
   cpSubmitBtn.disabled = true;
   cpSubmitBtn.textContent = "Judging...";
