@@ -682,7 +682,8 @@
 }
 
 .form-group input,
-.submission-card input {
+.submission-card input,
+.submission-card textarea {
   background: var(--bg-abyss);
   border: var(--border-thin);
   box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
@@ -695,7 +696,8 @@
   transition: border-color 0.15s ease;
 }
 .form-group input:focus,
-.submission-card input:focus { border-color: var(--neon-cyan); }
+.submission-card input:focus,
+.submission-card textarea:focus { border-color: var(--neon-cyan); }
 
 .btn-save-settings {
   font-family: var(--font-meta);
@@ -813,7 +815,8 @@
   margin-bottom: 8px;
 }
 
-.submission-card input { width: 100%; margin-bottom: 16px; }
+.submission-card input,
+.submission-card textarea { width: 100%; margin-bottom: 16px; resize: vertical; min-height: 120px; }
 
 .submission-card button {
   width: 100%;

@@ -3,9 +3,6 @@
 
 initApp(
   () => {
-    fetchLastThreeChallenges();
-    loadPublicLeaderboard();
-
     // Fallback: drop team images that fail to load (keeps the CSP free of
     // inline handlers while preserving the previous onerror="this.remove()").
     document.querySelectorAll('.team-avatar img').forEach(img => {
@@ -52,98 +49,6 @@ initApp(
   },
   { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 );
-
-// Fetch last three active challenges from database
-async function fetchLastThreeChallenges() {
-  const container = document.getElementById('latest-challenges-container');
-  if (!container) return;
-
-  try {
-    const { data: challenges, error } = await supabaseClient
-      .from('challenges')
-      .select('id, title, instructions, points_worth, month_year, is_active, tags')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    if (error) throw error;
-
-    if (!challenges || challenges.length === 0) {
-      container.innerHTML = `<p class="empty-state">No active challenges right now. Check back soon!</p>`;
-      return;
-    }
-
-    container.innerHTML = challenges.map(ch => {
-      const hue = window.epochHue ? window.epochHue(ch.month_year) : 25;
-      return `
-            <div class="challenge-card-homepage" style="--epoch-hue: ${hue};">
-                <div>
-                    <span class="challenge-card-homepage-epoch">
-                        ${escapeHtml(ch.month_year || "Active Month")}
-                    </span>
-                    <h3 class="challenge-card-homepage-title">
-                        ${escapeHtml(ch.title)}
-                    </h3>
-                    <p class="challenge-card-homepage-desc">
-                        ${ch.instructions ? escapeHtml(ch.instructions.substring(0, 100) + (ch.instructions.length > 100 ? '...' : '')) : ''}
-                    </p>
-                    ${ch.tags ? `<div class="card-tags">${ch.tags.split(/\s+/).filter(t => t).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-                </div>
-                <div class="challenge-card-homepage-meta">
-                    <span class="challenge-card-homepage-points">
-                        +${escapeHtml(ch.points_worth)} pts
-                    </span>
-                    <a href="dashboard/challenges.html?target=${escapeHtml(encodeURIComponent(ch.id))}" class="challenge-card-homepage-btn">
-                        View Challenge
-                    </a>
-                </div>
-            </div>
-        `;
-    }).join('');
-  } catch (err) {
-    console.error("❌ Challenges Error:", err);
-    container.innerHTML = `<p style="color: #fe4e00; font-size: 0.9rem;">Error loading challenges: ${escapeHtml(err.message)}</p>`;
-  }
-}
-
-// Load public leaderboard (top 3 travelers)
-async function loadPublicLeaderboard() {
-  const tbody = document.getElementById('public-leaderboard-tbody');
-  if (!tbody) return;
-
-  try {
-    const { data: rankings, error } = await supabaseClient
-      .from('profiles')
-      .select('username, total_points')
-      .order('total_points', { ascending: false })
-      .limit(3);
-
-    if (error) throw error;
-
-    if (!rankings || rankings.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" class="table-loading">No members ranked yet.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = rankings.map((profile, index) => {
-      let rankBadge = `#${index + 1}`;
-      if (index === 0) rankBadge = "🥇";
-      else if (index === 1) rankBadge = "🥈";
-      else if (index === 2) rankBadge = "🥉";
-
-      return `
-                <tr>
-                    <td class="col-rank"><strong>${rankBadge}</strong></td>
-                    <td class="col-name">${escapeHtml(profile.username || "Anonymous Member")}</td>
-                    <td class="col-points">${escapeHtml(profile.total_points ?? 0)} pts</td>
-                </tr>
-            `;
-    }).join('');
-  } catch (err) {
-    console.error("❌ Leaderboard Error:", err);
-    tbody.innerHTML = `<tr><td colspan="3" class="table-loading" style="color: #fe4e00;">Link offline.</td></tr>`;
-  }
-}
 
 // Login state change
 async function handleLogout() {
